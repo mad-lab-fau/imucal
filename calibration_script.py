@@ -4,7 +4,7 @@ import pandas as pd
 #import datareader.datareader as dr
 import calibration as cal
 import pre_calibrate as pc
-import SensorDataImport.session as sensor
+from NilsPodLib import session as sensor
 
 
 
@@ -31,7 +31,7 @@ plt.close('all')
 #filename = 'right.csv'   # ToDo S05, left
 save = True
 
-path = "/Users/nils/Documents/InSole/PythonGit/Calibration/Ferraris/Calibration_Sessions/"
+path = "./Calibration_Sessions/"
 
 sensorType = "NilsPod"
 file_name = str(options.filename);
@@ -40,7 +40,7 @@ samplingRate_Hz = float(options.samplingrate);
 
 
 if(sensorType is "NilsPod"):
-    dataset = sensor.dataset(path + file_name,1,1);
+    dataset = sensor.dataset(path + file_name);
     imu_data = pd.DataFrame(np.concatenate((dataset.acc.data, dataset.gyro.data), axis=-1), columns = ["accX", "accY", "accZ", "gyroX", "gyroY", "gyroZ"])
 
 if(sensorType is "miPodV3"):
