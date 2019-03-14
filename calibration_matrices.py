@@ -1,10 +1,11 @@
 import h5py
 import numpy as np
 
+
 class calibration_matrices(object):
 
     def __init__(self, K_a, R_a, b_a, K_g, R_g, K_ga, b_g):
-        '''
+        """
         Contructor for calibration matrices class
         :param K_a: Scaling matrix acceleration (numpy array)
         :param R_a: Rotation matrix acceleration (numpy array)
@@ -13,7 +14,7 @@ class calibration_matrices(object):
         :param R_g: Rotation matrix gyroscope (numpy array)
         :param K_ga: Effect matrix of acceleration on gyroscope (numpy array)
         :param b_g: Bias vector gyroscope (numpy array)
-        '''
+        """
 
         self.K_a = K_a
         self.R_a = R_a
@@ -47,10 +48,10 @@ class calibration_matrices(object):
         print('')
 
     def save_to_hdf5(self, filename):
-        '''
+        """
         Saves calibration matrices to hdf5 fileformat
         :param filename: filename (including h5 at end)
-        '''
+        """
 
         with h5py.File(filename, 'w') as hdf:
             hdf.create_dataset('K_a', data=self.K_a)
@@ -63,11 +64,11 @@ class calibration_matrices(object):
 
 
 def read_from_hdf5(filename):
-    '''
+    """
     Reads calibration data stored in hdf5 fileformat (created by calibration_matrices save_to_hdf5)
     :param filename: filename
     :return: calibration_matrices object
-    '''
+    """
 
     with h5py.File(filename, 'r') as hdf:
         K_a = np.array(hdf.get('K_a'))

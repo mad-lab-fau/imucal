@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+
 def get_prepro_data(imu_data, debug_plot=False):
-    '''
+    """
     Prepares the calibration data for the later calculation of calibration matrices.
 
     Operations manual:
@@ -16,7 +17,7 @@ def get_prepro_data(imu_data, debug_plot=False):
 
     :param imu_data: pandas data frame with accX/Y/Z, gyroX/Y/Z
     :param debug_plot: set true to see, whether data cutting was successful
-    '''
+    """
 
     acc = imu_data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
     gyro = imu_data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
@@ -25,13 +26,13 @@ def get_prepro_data(imu_data, debug_plot=False):
     allData = np.concatenate((np.array(acc), np.array(gyro)), axis=1)
 
     # plot the data
-    fig = plt.figure(figsize=(20,10))
+    fig = plt.figure(figsize=(20, 10))
     ax1 = plt.subplot(211)
     plt.plot(acc)
     plt.grid(True)
     plt.title("Set a label at start/end of accelerometer placements (12 in total)")
-    ticks = np.arange(0, allData.shape[0] , 2000)
-    plt.xticks(ticks,ticks//200)
+    ticks = np.arange(0, allData.shape[0], 2000)
+    plt.xticks(ticks, ticks // 200)
     plt.xlabel("time [s]")
     plt.ylabel("acceleration [m/s^2]")
     ax2 = plt.subplot(212, sharex=ax1)
@@ -44,7 +45,7 @@ def get_prepro_data(imu_data, debug_plot=False):
     acc_list_markers = []
     gyro_list_markers = []
     list_labels = []
-    test=0
+    test = 0
 
     def onclick(event):
         # switch to the move cursor
@@ -69,7 +70,7 @@ def get_prepro_data(imu_data, debug_plot=False):
             g = gyro_list_markers.pop()
             # remove the last marker
             a.remove(), g.remove()
-            del a,g
+            del a, g
             list_labels.remove(x)
             plt.show()
 
@@ -78,8 +79,6 @@ def get_prepro_data(imu_data, debug_plot=False):
 
     # sort the labels in ascending order
     list_labels.sort()
-    
-   
 
     # use the labels to cut out the unnecessary data and add a column with the part
     X_p = allData[list_labels[0]:list_labels[1], :]
@@ -105,8 +104,6 @@ def get_prepro_data(imu_data, debug_plot=False):
     list_parts = [X_p, X_a, Y_p, Y_a, Z_p, Z_a, Rot_X, Rot_Y, Rot_Z]
     pre_pro_data = np.concatenate(list_parts, axis=0)
     pre_pro_data = pd.DataFrame(pre_pro_data, columns=['accX', 'accY', 'accZ', 'gyroX', 'gyroY', 'gyroZ', 'part'])
-
-
 
     if debug_plot:
         # plot the resulting data
