@@ -6,7 +6,7 @@ import numpy as np
 
 _calibration_info = namedtuple('CalibrationInfo', ['K_a', 'R_a', 'b_a', 'K_g', 'R_g', 'K_ga', 'b_g'])
 
-
+# TODO: Is this best practice? :D
 class CalibrationInfo(_calibration_info):
     __slots__ = ()
 
@@ -16,6 +16,21 @@ class CalibrationInfo(_calibration_info):
             out += '\n' + val + ' =\n' + getattr(self, val).__repr__() + ',\n'
         out += '\n)'
         return out
+
+    def __eq__(self, other):
+        # Check type:
+        if not isinstance(other, self.__class__):
+            raise ValueError('Comparison is only defined between two CalibrationInfo object!')
+
+        # Test keys equal:
+        if not self._fields == other._fields:
+            return False
+
+        # Test Calibration values
+        for v1, v2 in zip(self._asdict().values(), other._asdict().values()):
+            if not np.array_equal(v1, v2):
+                return False
+        return True
 
     def _to_list_dict(self):
         return {key: getattr(self, key).tolist() for key in self._fields}
@@ -67,3 +82,7 @@ class CalibrationInfo(_calibration_info):
     def from_json_file(cls, path):
         raw_json = json.load(open(path, 'r'))
         return cls._from_list_dict(raw_json)
+
+    # def calibrate(self, acc, gyro):
+
+
