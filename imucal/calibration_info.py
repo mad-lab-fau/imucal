@@ -24,28 +24,11 @@ class calibration_matrices(object):
         self.K_ga = K_ga
         self.b_g = b_g
 
-    def print(self):
-        print('K_a:')
-        print(self.K_a)
-        print('')
-        print('R_a:')
-        print(self.R_a)
-        print('')
-        print('b_a:')
-        print(self.b_a)
-        print('')
-        print('K_g:')
-        print(self.K_g)
-        print('')
-        print('R_g:')
-        print(self.R_g)
-        print('')
-        print('k_g:')
-        print(self.K_ga)
-        print('')
-        print('b_g:')
-        print(self.b_g)
-        print('')
+    def __repr__(self):
+        out = ''
+        for val in ['K_a', 'R_a', 'b_a', 'K_g', 'R_g', 'K_ga', 'b_g']:
+            out += '\n\n' + val + ':\n' + str(getattr(self, val))
+        return out
 
     def save_to_hdf5(self, filename):
         """
