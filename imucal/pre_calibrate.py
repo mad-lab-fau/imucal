@@ -18,9 +18,9 @@ def get_prepro_data(imu_data, debug_plot=False):
     :param imu_data: pandas data frame with accX/Y/Z, gyroX/Y/Z
     :param debug_plot: set true to see, whether data cutting was successful
     """
-
-    acc = imu_data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
-    gyro = imu_data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
+    # TODO: Make more generic by passing acc and gyro as 2 Dataframes
+    acc = imu_data.loc[:, ['acc_x', 'acc_y', 'acc_z']].values
+    gyro = imu_data.loc[:, ['gyr_x', 'gyr_y', 'gyr_z']].values
 
     # remove the unnecessary data
     allData = np.concatenate((np.array(acc), np.array(gyro)), axis=1)
@@ -60,7 +60,6 @@ def get_prepro_data(imu_data, debug_plot=False):
             marker_gyro = ax2.axvline(x)
             acc_list_markers.append(marker_acc)
             gyro_list_markers.append(marker_gyro)
-            plt.show()
 
         # with button 3 (double right click) you will remove a marker
         elif event.button == 3 and event.dblclick:
@@ -72,10 +71,11 @@ def get_prepro_data(imu_data, debug_plot=False):
             a.remove(), g.remove()
             del a, g
             list_labels.remove(x)
-            plt.show()
+        fig.canvas.draw()
+        fig.canvas.flush_events()
 
     fig.canvas.mpl_connect('button_press_event', onclick)
-    plt.show()
+    plt.show(block=True)
 
     # sort the labels in ascending order
     list_labels.sort()
