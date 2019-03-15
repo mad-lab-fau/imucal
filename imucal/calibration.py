@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from numpy.linalg import inv
-import calibration_matrices as cm
+from imucal import calibration_matrices as cm
 
 
-def calibrateArray(data, calib_mat):
-    """
-    Calibration of input data arrays acc, gyro
+def calibrate_array(data, calib_mat):
+    """Calibration of input data arrays acc, gyro
+
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
     :param calib_mat: calibration matrices
     :return: calibrated acceleration, calibrated gyroscope (numpy ndarray)
@@ -31,9 +31,9 @@ def calibrateArray(data, calib_mat):
         acc_calib[i, :] = np.transpose(np.matmul(accel_mat, (np.transpose([acc[i, :]]) - calib_mat.b_a)))
         gyro_calib[i, :] = np.transpose(np.matmul(gyro_mat, (np.transpose([gyro[i, :]]) - np.matmul(calib_mat.K_ga,
                                                                                                     np.transpose([
-                                                                                                                     acc_calib[
-                                                                                                                     i,
-                                                                                                                     :]])) - calib_mat.b_g)))
+                                                                                                        acc_calib[
+                                                                                                        i,
+                                                                                                        :]])) - calib_mat.b_g)))
 
     data_calib.loc[:, ['accX', 'accY', 'accZ']] = acc_calib
     data_calib.loc[:, ['gyroX', 'gyroY', 'gyroZ']] = gyro_calib
@@ -41,7 +41,7 @@ def calibrateArray(data, calib_mat):
     return data_calib
 
 
-def calibrateSample(data, calib_mat):
+def calibrate_sample(data, calib_mat):
     """
     Calibration of single  acc, gyro
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
@@ -60,7 +60,7 @@ def calibrateSample(data, calib_mat):
     # Calibration step
     acc_calib = np.transpose(np.matmul(accel_mat, (np.transpose([acc]) - calib_mat.b_a)))
     gyro_calib = np.transpose(np.matmul(gyro_mat, (
-                np.transpose([gyro]) - np.matmul(calib_mat.K_ga, np.transpose([acc_calib])) - calib_mat.b_g)))
+            np.transpose([gyro]) - np.matmul(calib_mat.K_ga, np.transpose([acc_calib])) - calib_mat.b_g)))
 
     data_calib.loc[:, ['accX', 'accY', 'accZ']] = acc_calib
     data_calib.loc[:, ['gyroX', 'gyroY', 'gyroZ']] = gyro_calib
@@ -69,7 +69,7 @@ def calibrateSample(data, calib_mat):
 
 
 # Compute calibration matrix
-def computeCalibrationMatrix(X_p, X_a, Y_p, Y_a, Z_p, Z_a, Rot_X, Rot_Y, Rot_Z, fs):
+def compute_calibration_matrix(X_p, X_a, Y_p, Y_a, Z_p, Z_a, Rot_X, Rot_Y, Rot_Z, fs):
     # The calibration consists of mainly two parts
     # 1. Stationary phase: Turn sensor on each side and measure 1g
     # 2. Rotation phase: Rotate sensor around each axis (counterclockwise, positive axis pointing upwards)
@@ -232,7 +232,7 @@ def plotCalibration(data, calib_mat, fs):
     :param fs: samplingrate for integration
     """
 
-    data_calibrated = calibrateArray(data, calib_mat)
+    data_calibrated = calibrate_array(data, calib_mat)
 
     acc = data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
     gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
@@ -311,7 +311,7 @@ def checkCalibration(data, calib_mat, points, fs):
     acc = data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
     gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
 
-    acc_calibrated, gyro_calibrated = calibrateArray(acc, gyro, calib_mat)
+    acc_calibrated, gyro_calibrated = calibrate_array(acc, gyro, calib_mat)
 
     # Compute angle measures
     angles_original = np.zeros(gyro_calibrated.shape)
@@ -384,7 +384,7 @@ def save_calibration_data(filename, acc, gyro, calib_mat):
     :param calib_mat: object with calibration matrices (calibration_matrices.py)
     """
 
-    acc_calib, gyro_calib = calibrateArray(acc, gyro, calib_mat)
+    acc_calib, gyro_calib = calibrate_array(acc, gyro, calib_mat)
 
     test = np.concatenate((acc_calib, gyro_calib), axis=1)
     test2 = pd.DataFrame(data=test, columns=['accX', 'accY', 'accZ', 'gyroX', 'gyroY', 'gyroZ'])

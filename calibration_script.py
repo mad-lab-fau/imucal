@@ -2,8 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 # import datareader.datareader as dr
-import calibration as cal
-import pre_calibrate as pc
+from imucal import calibration as cal, pre_calibrate as pc
 from NilsPodLib import session as sensor
 
 import optparse
@@ -63,7 +62,7 @@ Rot_Y = np.array(allData[allData['part'] == 8])[:, :6]
 Rot_Z = np.array(allData[allData['part'] == 9])[:, :6]
 
 # Compute calibration matrices
-calib_mat = cal.computeCalibrationMatrix(X_p, X_a, Y_p, Y_a, Z_p, Z_a, Rot_X, Rot_Y, Rot_Z, fs=samplingRate_Hz)
+calib_mat = cal.compute_calibration_matrix(X_p, X_a, Y_p, Y_a, Z_p, Z_a, Rot_X, Rot_Y, Rot_Z, fs=samplingRate_Hz)
 
 # save calibration matrices
 # cal.save_calibration_data(path + 'data', acc, gyro, calib_mat)
