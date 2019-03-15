@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from numpy.linalg import inv
-from imucal import calibration_matrices as cm
+from imucal import calibration_info as cm
 
 
 def calibrate_array(data, calib_mat):
@@ -218,7 +218,7 @@ def compute_calibration_matrix(X_p, X_a, Y_p, Y_a, Z_p, Z_a, Rot_X, Rot_Y, Rot_Z
     # -> rotation matrix
     R_g = np.matmul(inv(K_g), multiplied)
 
-    calib_mat = cm.calibration_matrices(K_a, R_a, b_a, K_g, R_g, K_ga, b_g)
+    calib_mat = cm.CalibrationInfo(K_a, R_a, b_a, K_g, R_g, K_ga, b_g)
 
     return calib_mat
 
@@ -303,7 +303,7 @@ def checkCalibration(data, calib_mat, points, fs):
     """
     Prints calibration relevant paramers (function may be deleted)
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
-    :param calib_mat: object with calibration matrices (class calibration_matrices)
+    :param calib_mat: object with calibration matrices (class CalibrationInfo)
     :param points: pandas array with start and end of all fields in calibration data
     :param fs: sampling rate
     """
@@ -381,8 +381,7 @@ def save_calibration_data(filename, acc, gyro, calib_mat):
     :param filename to save, calibrated and uncalibrated will be added
     :param acc: Acceleration x,y,z (numpy ndarray, first dimension samples, second dimension different x,y,z)
     :param gyro: Gyroscope x,y,z (numpy ndarray, first dimension samples, second dimension different x,y,z)
-    :param calib_mat: object with calibration matrices (calibration_matrices.py)
-    """
+    :param calib_mat: object with calibration matrices (CalibrationInfo    """
 
     acc_calib, gyro_calib = calibrate_array(acc, gyro, calib_mat)
 

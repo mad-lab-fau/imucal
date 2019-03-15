@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 
 
-class calibration_matrices(object):
+class CalibrationInfo:
 
     def __init__(self, K_a, R_a, b_a, K_g, R_g, K_ga, b_g):
         """
@@ -48,9 +48,9 @@ class calibration_matrices(object):
 
 def read_from_hdf5(filename):
     """
-    Reads calibration data stored in hdf5 fileformat (created by calibration_matrices save_to_hdf5)
+    Reads calibration data stored in hdf5 fileformat (created by CalibrationInfo save_to_hdf5)
     :param filename: filename
-    :return: calibration_matrices object
+    :return: CalibrationInfo object
     """
 
     with h5py.File(filename, 'r') as hdf:
@@ -62,6 +62,6 @@ def read_from_hdf5(filename):
         K_ga = np.array(hdf.get('K_ga'))
         b_g = np.array(hdf.get('b_g'))
 
-        calib_mat = calibration_matrices(K_a, R_a, b_a, K_g, R_g, K_ga, b_g)
+        calib_mat = CalibrationInfo(K_a, R_a, b_a, K_g, R_g, K_ga, b_g)
 
         return calib_mat
