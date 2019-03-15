@@ -42,8 +42,8 @@ class CalibrationInfo(_calibration_info):
         """
 
         with h5py.File(filename, 'w') as hdf:
-            for k, v in self._asdict().iteritems():
-                hdf.create_dataset(k, v)
+            for k, v in self._asdict().items():
+                hdf.create_dataset(k, data=v)
 
     def to_json(self):
         data_dict = self._to_list_dict()
