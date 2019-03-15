@@ -1,4 +1,5 @@
 import tempfile
+from copy import deepcopy
 
 import numpy as np
 import pytest
@@ -7,7 +8,7 @@ from imucal.calibration_info import CalibrationInfo
 
 
 @pytest.fixture()
-def sample_cal():
+def sample_cal_dict():
     sample_data = {'K_a': np.array([[208.54567264, 0., 0.],
                                     [0., 208.00113412, 0.],
                                     [0., 0., 214.78455365]]),
@@ -29,7 +30,27 @@ def sample_cal():
                    'b_g': np.array([[1.9693536],
                                     [-4.46624421],
                                     [-3.65097072]])}
-    return CalibrationInfo(**sample_data)
+    return sample_data
+
+
+@pytest.fixture()
+def sample_cal(sample_cal_dict):
+    return CalibrationInfo(**sample_cal_dict)
+
+
+def test_equal(sample_cal):
+    assert sample_cal == deepcopy(sample_cal)
+
+
+def test_equal_wrong_type(sample_cal):
+    with pytest.raises(ValueError):
+        assert sample_cal == 3
+
+
+def test_equal_data(sample_cal, sample_cal_dict):
+    not_equal = sample_cal_dict
+    not_equal['K_a'] = not_equal['K_a'] - 1
+    assert not (sample_cal == CalibrationInfo(**not_equal))
 
 
 def test_json_roundtrip(sample_cal):
