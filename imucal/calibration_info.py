@@ -1,14 +1,23 @@
 import json
-from collections import namedtuple
 
 import h5py
 import numpy as np
 
-_calibration_info = namedtuple('CalibrationInfo', ['K_a', 'R_a', 'b_a', 'K_g', 'R_g', 'K_ga', 'b_g'])
 
-# TODO: Is this best practice? :D
-class CalibrationInfo(_calibration_info):
-    __slots__ = ()
+class CalibrationInfo:
+    K_a: np.ndarray
+    R_a: np.ndarray
+    b_a: np.ndarray
+    K_g: np.ndarray
+    R_g: np.ndarray
+    K_ga: np.ndarray
+    b_g: np.ndarray
+
+    _fields = ('K_a', 'R_a', 'b_a', 'K_g', 'R_g', 'K_ga', 'b_g')
+
+    def __init__(self, **kwargs):
+        for field in self._fields:
+            setattr(self, field, kwargs.get(field, None))
 
     def __repr__(self):
         out = 'CalibrationInfo('
@@ -27,7 +36,7 @@ class CalibrationInfo(_calibration_info):
             return False
 
         # Test Calibration values
-        for v1, v2 in zip(self._asdict().values(), other._asdict().values()):
+        for v1, v2 in zip(self.__dict__.values(), other.__dict__.values()):
             if not np.array_equal(v1, v2):
                 return False
         return True
@@ -42,7 +51,7 @@ class CalibrationInfo(_calibration_info):
         """
 
         with h5py.File(filename, 'w') as hdf:
-            for k, v in self._asdict().items():
+            for k, v in self.__dict__.items():
                 hdf.create_dataset(k, data=v)
 
     def to_json(self):
