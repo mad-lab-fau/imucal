@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Optional, Iterable
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 from numpy.linalg import inv
 from imucal import calibration_info as cm
 from imucal.calibration_info import CalibrationInfo
@@ -38,7 +39,7 @@ class Calibration:
 
     EXPECTED_ANGLE: float = 360.
 
-    def __init__(self, sampling_rate: Optional[float] = None, grav: Optional[float] = 9.81, **kwargs) -> None:
+    def __init__(self, sampling_rate: float, grav: Optional[float] = 9.81, **kwargs) -> None:
         for field in self._fields:
             setattr(self, field, kwargs.get(field, None))
 
@@ -46,7 +47,26 @@ class Calibration:
         self.grav = grav
         super().__init__()
 
-    def compute_calibration_matrix(self):
+    @classmethod
+    def from_df(cls,
+                df: pd.DataFrame,
+                sampling_rate: float,
+                grav: Optional[float] = 9.81,
+                acc_cols: Optional[Iterable[str]] = ('acc_x', 'acc_y', 'acc_z'),
+                gyro_cols: Optional[Iterable[str]] = ('acc_x', 'acc_y', 'acc_z')
+                ):
+        # TODO: need proper documentation
+
+        acc_df = df[list(acc_cols)]
+        gyro_df = df[list(gyro_cols)]
+        acc_dict = acc_df.groupby(level=0).apply(lambda x: x.values).to_dict()
+        gyro_dict = gyro_df.groupby(level=0).apply(lambda x: x.values).to_dict()
+        acc_dict = {'acc_' + k: v for k, v in acc_dict.items()}
+        gyro_dict = {'gyr_' + k: v for k, v in gyro_dict.items()}
+
+        return cls(sampling_rate, grav, **acc_dict, **gyro_dict)
+
+    def compute_calibration_matrix(self) -> CalibrationInfo:
         cal_mat = CalibrationInfo()
 
         # Note this implementation uses median instead of mean in an attempt to be robust against outlier values during
@@ -56,6 +76,7 @@ class Calibration:
         # Compute Acceleration Matrix
 
         # Calculate means from all static phases and stack them into 3x3 matrices
+        # TODO: Check transpose
         U_a_p = np.vstack((
             np.median(self.acc_x_p, axis=0),
             np.median(self.acc_y_p, axis=0),
@@ -101,7 +122,7 @@ class Calibration:
         # One static phase would be sufficient, but why not use all of them if you have them.
         # Note that this calibration ignores any influences due to the earth rotation.
 
-        b_g = np.median(np.hstack((
+        b_g = np.median(np.vstack((
             self.gyr_x_p,
             self.gyr_x_a,
             self.gyr_y_p,
