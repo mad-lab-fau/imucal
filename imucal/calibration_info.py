@@ -83,13 +83,23 @@ class CalibrationInfo(_calibration_info):
         raw_json = json.load(open(path, 'r'))
         return cls._from_list_dict(raw_json)
 
-    def calibrate(self, acc, gyro):
+    def calibrate_acc(self, acc):
         # Combine Scaling and rotation matrix to one matrix
         acc_mat = np.matmul(np.linalg.inv(self.R_a), np.linalg.inv(self.K_a))
+        acc_out = acc_mat @ (acc.T - self.b_a)
+
+        return acc_out.T
+
+    def calibrate_gyro(self, gyro, calibrated_acc):
+        # Combine Scaling and rotation matrix to one matrix
         gyro_mat = np.matmul(np.linalg.inv(self.R_g), np.linalg.inv(self.K_g))
 
-        acc_out = acc_mat @ (acc.T - self.b_a)
-        d_ga = self.K_ga @ acc_out
+        d_ga = self.K_ga @ calibrated_acc
         gyro_out = gyro_mat @ (gyro.T - d_ga - self.b_g)
+        return gyro_out.T
 
-        return acc_out.T, gyro_out.T
+    def calibrate(self, acc, gyro):
+        acc_out = self.calibrate_acc(acc)
+        gyro_out = self.calibrate_gyro(gyro, acc_out.T)
+
+        return acc_out, gyro_out
