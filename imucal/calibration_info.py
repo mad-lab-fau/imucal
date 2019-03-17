@@ -93,6 +93,13 @@ class CalibrationInfo:
         return cls._from_list_dict(raw_json)
 
     def calibrate_acc(self, acc):
+        # Check if all required paras are initialized to throw appropriate error messages:
+        PARAS = ('K_a', 'R_a', 'b_a')
+        for v in PARAS:
+            if getattr(self, v, None) is None:
+                raise ValueError(
+                    '{} need to initialised before an acc calibration can be performed. {} is missing'.format(PARAS, v))
+
         # Combine Scaling and rotation matrix to one matrix
         acc_mat = np.matmul(np.linalg.inv(self.R_a), np.linalg.inv(self.K_a))
         acc_out = acc_mat @ (acc.T - self.b_a)
