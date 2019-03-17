@@ -5,69 +5,6 @@ from numpy.linalg import inv
 from imucal import calibration_info as cm
 
 
-def calibrate_array(data, calib_mat):
-    """Calibration of input data arrays acc, gyro
-
-    :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
-    :param calib_mat: calibration matrices
-    :return: calibrated acceleration, calibrated gyroscope (numpy ndarray)
-    """
-
-    data_calib = data.copy()
-
-    acc = data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
-    gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
-
-    # Combine Scaling and rotation matrix to one matrix
-    accel_mat = np.matmul(inv(calib_mat.R_a), inv(calib_mat.K_a))
-    gyro_mat = np.matmul(inv(calib_mat.R_g), inv(calib_mat.K_g))
-
-    # Initialize Calibrated arrays
-    acc_calib = np.zeros(acc.shape)
-    gyro_calib = np.zeros(gyro.shape)
-
-    # Do calibration!
-    for i in np.arange(0, acc.shape[0]):
-        acc_calib[i, :] = np.transpose(np.matmul(accel_mat, (np.transpose([acc[i, :]]) - calib_mat.b_a)))
-        gyro_calib[i, :] = np.transpose(np.matmul(gyro_mat, (np.transpose([gyro[i, :]]) - np.matmul(calib_mat.K_ga,
-                                                                                                    np.transpose([
-                                                                                                        acc_calib[
-                                                                                                        i,
-                                                                                                        :]])) - calib_mat.b_g)))
-
-    data_calib.loc[:, ['accX', 'accY', 'accZ']] = acc_calib
-    data_calib.loc[:, ['gyroX', 'gyroY', 'gyroZ']] = gyro_calib
-
-    return data_calib
-
-
-def calibrate_sample(data, calib_mat):
-    """
-    Calibration of single  acc, gyro
-    :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
-    :param calib_mat: object with calibration matrices
-    :return: calibrated acceleration, calibrated gyroscope (numpy ndarray)
-    """
-
-    data_calib = data.copy()
-
-    acc = data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
-    gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
-
-    # Combine Scaling and Rotation matrix
-    accel_mat = np.matmul(inv(calib_mat.K_a), inv(calib_mat.R_a))
-    gyro_mat = np.matmul(inv(calib_mat.K_g), inv(calib_mat.R_g))
-    # Calibration step
-    acc_calib = np.transpose(np.matmul(accel_mat, (np.transpose([acc]) - calib_mat.b_a)))
-    gyro_calib = np.transpose(np.matmul(gyro_mat, (
-            np.transpose([gyro]) - np.matmul(calib_mat.K_ga, np.transpose([acc_calib])) - calib_mat.b_g)))
-
-    data_calib.loc[:, ['accX', 'accY', 'accZ']] = acc_calib
-    data_calib.loc[:, ['gyroX', 'gyroY', 'gyroZ']] = gyro_calib
-
-    return data_calib
-
-
 # Compute calibration matrix
 def compute_calibration_matrix(X_p, X_a, Y_p, Y_a, Z_p, Z_a, Rot_X, Rot_Y, Rot_Z, fs):
     # The calibration consists of mainly two parts
