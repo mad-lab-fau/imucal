@@ -6,27 +6,29 @@ from pathlib import Path
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 
+from imucal import FerrarisCalibrationInfo
 from imucal.ferraris_calibration import FerrarisCalibration
+
+import pandas as pd
 
 
 @pytest.fixture()
 def example_calibration_data():
-    tmp = pickle.load(open(Path(__file__).parent / '_test_data/example_cal.pk', 'rb'))
-    data = tmp['data']
-    sampling_rate = tmp['sampling_rate']
-    calib = tmp['calib']
+    calib = FerrarisCalibrationInfo.from_json_file(Path(__file__).parent / '_test_data/example_cal.json')
+    data = pd.read_csv(Path(__file__).parent / '_test_data/example_data.csv', index_col=[0,1])
+    sampling_rate = 204.8
     return data, sampling_rate, calib
 
 
 def test_example_calibration(example_calibration_data):
     data, sampling_rate, calib = example_calibration_data
 
-    cal = FerrarisCalibration.from_df(data, sampling_rate, acc_cols=('accX', 'accY', 'accZ'), gyro_cols=('gyroX', 'gyroY', 'gyroZ'))
+    cal = FerrarisCalibration.from_df(data, sampling_rate, acc_cols=('accX', 'accY', 'accZ'),
+                                      gyro_cols=('gyroX', 'gyroY', 'gyroZ'))
     cal_mat = cal.compute_calibration_matrix()
 
-    ## Uncomment if you want to save the new cal matrix to update the regression test
-    # tmp = dict(data=data, sampling_rate=sampling_rate, calib=cal_mat)
-    # pickle.dump(tmp, open(Path(__file__).parent / '_test_data/example_cal.pk', 'wb'))
+    # Uncomment if you want to save the new cal matrix to update the regression test
+    # cal_mat.to_json_file(Path(__file__).parent / '_test_data/example_data.csv')
 
     for val in cal_mat._fields:
         assert_array_almost_equal(getattr(cal_mat, val), getattr(calib, val), 5, err_msg=val)
@@ -155,6 +157,7 @@ def scaling_data(default_data, default_expected):
     default_expected['K_g'] = np.diag(gyro_scaling)
 
     return default_data, default_expected
+
 
 # TODO: Test for rotation is missing
 
