@@ -142,17 +142,16 @@ class Calibration:
         # Acceleration sensitivity
 
         # Note: Each measurement should be a column? or should it
-        # TODO: Important I think this is wrong and needs to be transposed
         U_g_p = np.vstack((
             np.mean(self.gyr_x_p, axis=0),
             np.mean(self.gyr_y_p, axis=0),
             np.mean(self.gyr_z_p, axis=0),
-        ))
+        )).T
         U_g_a = np.vstack((
             np.mean(self.gyr_x_a, axis=0),
             np.mean(self.gyr_y_a, axis=0),
             np.mean(self.gyr_z_a, axis=0),
-        ))
+        )).T
 
         # Eq. 9
         K_ga = (U_g_p - U_g_a) / (2 * self.grav)
