@@ -259,7 +259,7 @@ class _PlottingHelper:
     gyro_list_markers = None
 
     def __init__(self, acc, gyro, master=None):
-        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
         import tkinter as tk
 
         if not master:
@@ -277,6 +277,10 @@ class _PlottingHelper:
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         self.canvas.mpl_connect('button_press_event', self._onclick)
+
+        toolbar = NavigationToolbar2Tk(self.canvas, master)
+        toolbar.update()
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         master.mainloop()
 
