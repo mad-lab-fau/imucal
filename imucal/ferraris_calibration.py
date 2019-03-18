@@ -240,58 +240,10 @@ def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
     from matplotlib import pyplot as plt
 
     # remove the unnecessary data
-    allData = np.concatenate((np.array(acc), np.array(gyro)), axis=1)
 
-    # plot the data
-    fig = plt.figure(figsize=(20, 10))
-    ax1 = plt.subplot(211)
-    plt.plot(acc)
-    plt.grid(True)
-    plt.title("Set a label at start/end of accelerometer placements (12 in total)")
-    ticks = np.arange(0, allData.shape[0], 2000)
-    plt.xticks(ticks, ticks // 200)
-    plt.xlabel("time [s]")
-    plt.ylabel("acceleration [m/s^2]")
-    ax2 = plt.subplot(212, sharex=ax1)
-    plt.plot(gyro)
-    plt.grid(True)
-    plt.title("Set a label at start/end of gyroscope rotation (6 in total)")
-    plt.xlabel("time[s]")
-    plt.ylabel("rotation [°/s]")
+    plot = _PlottingHelper(acc, gyro)
 
-    acc_list_markers = []
-    gyro_list_markers = []
-    section_list = []
-
-    def onclick(event):
-        # switch to the move cursor
-        # set a marker with doubleclick left
-        # remove the last marker with doubleclick right
-
-        # with button 1 (double left click) you will set a marker
-        if event.button == 1 and event.dblclick:
-            x = int(event.xdata)
-            section_list.append(x)
-            marker_acc = ax1.axvline(x)
-            marker_gyro = ax2.axvline(x)
-            acc_list_markers.append(marker_acc)
-            gyro_list_markers.append(marker_gyro)
-
-        # with button 3 (double right click) you will remove the last marker
-        elif event.button == 3 and event.dblclick:
-            # position of the last marker
-            x = section_list[-1]
-            a = acc_list_markers.pop()
-            g = gyro_list_markers.pop()
-            # remove the last marker
-            a.remove(), g.remove()
-            del a, g
-            section_list.remove(x)
-        fig.canvas.draw()
-        fig.canvas.flush_events()
-
-    fig.canvas.mpl_connect('button_press_event', onclick)
-    plt.show(block=True)
+    section_list = plot.section_list
 
     # sort the labels in ascending order
     section_list.sort()
@@ -301,10 +253,80 @@ def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
     return section_list
 
 
+class _PlottingHelper:
+    section_list = None
+    acc_list_markers = None
+    gyro_list_markers = None
+
+    def __init__(self, acc, gyro, master=None):
+        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+        import tkinter as tk
+
+        if not master:
+            master = tk.Tk()
+
+        # reset variables
+        self.section_list = []
+        self.acc_list_markers = []
+        self.gyro_list_markers = []
+
+        # Create a container
+        self.fig, self.axs = self._create_figure(acc, gyro)
+
+        self.canvas = FigureCanvasTkAgg(self.fig, master=master)
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+        self.canvas.mpl_connect('button_press_event', self._onclick)
+
+        master.mainloop()
+
+    def _create_figure(self, acc, gyro):
+        from matplotlib.figure import Figure
+
+        fig = Figure(figsize=(20, 10))
+        ax1 = fig.add_subplot(211)
+        ax1.plot(acc)
+        ax1.grid(True)
+        ax1.set_title("Set a label at start/end of accelerometer placements (12 in total)")
+        ax1.set_xlabel("time [s]")
+        ax1.set_ylabel("acceleration [m/s^2]")
+        ax2 = fig.add_subplot(212, sharex=ax1)
+        ax2.plot(gyro)
+        ax2.grid(True)
+        ax2.set_title("Set a label at start/end of gyroscope rotation (6 in total)")
+        ax2.set_xlabel("time[s]")
+        ax2.set_ylabel("rotation [°/s]")
+        return fig, (ax1, ax2)
+
+    def _onclick(self, event):
+        # switch to the move cursor
+        # set a marker with doubleclick left
+        # remove the last marker with doubleclick right
+
+        # with button 1 (double left click) you will set a marker
+        if event.button == 1 and event.dblclick:
+            x = int(event.xdata)
+            self.section_list.append(x)
+            marker_acc = self.axs[0].axvline(x)
+            marker_gyro = self.axs[1].axvline(x)
+            self.acc_list_markers.append(marker_acc)
+            self.gyro_list_markers.append(marker_gyro)
+
+        # with button 3 (double right click) you will remove the last marker
+        elif event.button == 3 and event.dblclick:
+            # position of the last marker
+            x = self.section_list[-1]
+            self.acc_list_markers.pop().remove()
+            self.gyro_list_markers.pop().remove()
+            self.section_list.remove(x)
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+
+
 def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame):
     out = dict()
 
     for label, row in section_list.iterrows():
-        out[label] = data.loc[row.start, row.end]
+        out[label] = data.iloc[row.start:row.end]
 
     return pd.concat(out)
