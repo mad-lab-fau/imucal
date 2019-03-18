@@ -24,6 +24,10 @@ def test_example_calibration(example_calibration_data):
     cal = Calibration.from_df(data, sampling_rate, acc_cols=('accX', 'accY', 'accZ'), gyro_cols=('gyroX', 'gyroY', 'gyroZ'))
     cal_mat = cal.compute_calibration_matrix()
 
+    ## Uncomment if you want to save the new cal matrix to update the regression test
+    # tmp = dict(data=data, sampling_rate=sampling_rate, calib=cal_mat)
+    # pickle.dump(tmp, open(Path(__file__).parent / '_test_data/example_cal.pk', 'wb'))
+
     for val in cal_mat._fields:
         assert_array_almost_equal(getattr(cal_mat, val), getattr(calib, val), 5, err_msg=val)
 
