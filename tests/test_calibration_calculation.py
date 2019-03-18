@@ -25,12 +25,28 @@ def test_example_calibration(example_calibration_data):
     cal_mat = cal.compute_calibration_matrix()
 
     for val in cal_mat._fields:
-        assert_array_almost_equal(getattr(cal_mat, val), getattr(calib, val), 5), val
+        assert_array_almost_equal(getattr(cal_mat, val), getattr(calib, val), 5, err_msg=val)
 
 
 @pytest.fixture()
-def k_ga_data():
+def default_expected():
+    expected = dict()
+    expected['K_a'] = np.identity(3)
+    expected['R_a'] = np.identity(3)
+    expected['b_a'] = np.zeros((3, 1))
+    expected['K_g'] = np.identity(3)
+    expected['R_g'] = np.identity(3)
+    expected['b_g'] = np.zeros((3, 1))
+    expected['K_ga'] = np.zeros((3, 3))
+
+    return expected
+
+@pytest.fixture()
+def default_data():
     data = dict()
+
+    data['sampling_rate'] = 100
+
     data['acc_x_p'] = np.repeat(np.array([[9.81, 0, 0]]), 100, axis=0)
     data['acc_x_a'] = -data['acc_x_p']
     data['acc_y_p'] = np.repeat(np.array([[0, 9.81, 0]]), 100, axis=0)
@@ -38,44 +54,54 @@ def k_ga_data():
     data['acc_z_p'] = np.repeat(np.array([[0, 0, 9.81]]), 100, axis=0)
     data['acc_z_a'] = -data['acc_z_p']
 
-    # "Simulate" a large influence of acc on gyro.
-    # Every gyro axis depends on acc_x to produce predictable off axis elements
-    data['gyr_x_p'] = data['acc_x_p']
-    data['gyr_x_a'] = data['acc_x_a']
-    data['gyr_y_p'] = data['acc_x_p']
-    data['gyr_y_a'] = data['acc_x_a']
-    data['gyr_z_p'] = data['acc_x_p']
-    data['gyr_z_a'] = data['acc_x_a']
+    data['gyr_x_p'] = np.zeros((100, 3))
+    data['gyr_x_a'] = np.zeros((100, 3))
+    data['gyr_y_p'] = np.zeros((100, 3))
+    data['gyr_y_a'] = np.zeros((100, 3))
+    data['gyr_z_p'] = np.zeros((100, 3))
+    data['gyr_z_a'] = np.zeros((100, 3))
 
     data['acc_x_rot'] = np.repeat(np.array([[9.81, 0, 0]]), 100, axis=0)
     data['acc_y_rot'] = np.repeat(np.array([[0, 9.81, 0]]), 100, axis=0)
     data['acc_z_rot'] = np.repeat(np.array([[0, 0, 9.81]]), 100, axis=0)
 
-    # add the influence artifact to the rotation as well
-    data['gyr_x_rot'] = np.repeat(np.array([[360, 0, 0]]), 100, axis=0) + data['acc_x_p']
-    data['gyr_y_rot'] = np.repeat(np.array([[0, 360, 0]]), 100, axis=0) + data['acc_x_p']
-    data['gyr_z_rot'] = np.repeat(np.array([[0, 0, 360]]), 100, axis=0) + data['acc_x_p']
-
-    data['sampling_rate'] = 100
+    data['gyr_x_rot'] = np.repeat(np.array([[360., 0, 0]]), 100, axis=0)
+    data['gyr_y_rot'] = np.repeat(np.array([[0, 360., 0]]), 100, axis=0)
+    data['gyr_z_rot'] = np.repeat(np.array([[0, 0, 360.]]), 100, axis=0)
 
     return data
 
 
-def test_a_g_influence(k_ga_data):
-    cal = Calibration(**k_ga_data)
-    cal_mat = cal.compute_calibration_matrix()
+@pytest.fixture()
+def k_ga_data(default_data, default_expected):
+    # "Simulate" a large influence of acc on gyro.
+    # Every gyro axis depends on acc_x to produce predictable off axis elements
+    default_data['gyr_x_p'] += default_data['acc_x_p']
+    default_data['gyr_x_a'] += default_data['acc_x_a']
+    default_data['gyr_y_p'] += default_data['acc_x_p']
+    default_data['gyr_y_a'] += default_data['acc_x_a']
+    default_data['gyr_z_p'] += default_data['acc_x_p']
+    default_data['gyr_z_a'] += default_data['acc_x_a']
 
-    # No influence on acc expected
-    assert_array_almost_equal(cal_mat.K_a, np.identity(3))
-    assert_array_almost_equal(cal_mat.R_a, np.identity(3))
-    assert_array_almost_equal(cal_mat.b_a, np.zeros((3, 1)))
+    # add the influence artifact to the rotation as well
+    default_data['gyr_x_rot'] += default_data['acc_x_p']
+    default_data['gyr_y_rot'] += default_data['acc_x_p']
+    default_data['gyr_z_rot'] += default_data['acc_x_p']
 
-    # No influence in simple gyro expected
-    assert_array_almost_equal(cal_mat.K_g, np.identity(3))
-    assert_array_almost_equal(cal_mat.R_g, np.identity(3))
-    assert_array_almost_equal(cal_mat.b_g, np.zeros((3, 1)))
     # Only influence in K_ga expected
     # acc_x couples to 100% into all axis -> Therefore first row 1
     expected = np.zeros((3, 3))
     expected[0, :] = 1
-    assert_array_almost_equal(cal_mat.K_ga, expected)
+    default_expected['K_ga'] = expected
+
+    return default_data, default_expected
+
+
+@pytest.mark.parametrize('test_data', ['k_ga_data'])
+def test_simulations(test_data, request):
+    test_data = request.getfixturevalue(test_data)
+    cal = Calibration(**test_data[0])
+    cal_mat = cal.compute_calibration_matrix()
+
+    for para, val in test_data[1].items():
+        assert_array_almost_equal(getattr(cal_mat, para), val, err_msg=para)
