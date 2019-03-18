@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from numpy.linalg import inv
-from imucal import calibration_info as cm
 from imucal.calibration_info import CalibrationInfo
 
 
@@ -180,22 +179,18 @@ class Calibration:
         return cal_mat
 
 
-# Plot the Calibration result uncalibrated vs calibrated
-def plotCalibration(data, calib_mat, fs):
-    """
-    Plots the calibration
+def plotCalibration(data, calib_mat: CalibrationInfo, fs: float):
+    """Plot the Calibration result uncalibrated vs calibrated.
+
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
     :param calib_mat: calibration matrices
     :param fs: samplingrate for integration
     """
 
-    data_calibrated = calibrate_array(data, calib_mat)
+    acc = data.loc[:, ['accX', 'accY', 'accZ']].values
+    gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].values
 
-    acc = data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
-    gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
-
-    acc_calibrated = data_calibrated.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
-    gyro_calibrated = data_calibrated.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
+    acc_calibrated, gyro_calibrated = calib_mat.calibrate(acc, gyro)
 
     # Compute angle measures
     angles_original = np.zeros(gyro_calibrated.shape)
@@ -255,8 +250,7 @@ def plotCalibration(data, calib_mat, fs):
     return
 
 
-# Compute integration results and check if they make sense
-def checkCalibration(data, calib_mat, points, fs):
+def checkCalibration(data, calib_mat: CalibrationInfo, points, fs: float):
     """
     Prints calibration relevant paramers (function may be deleted)
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
@@ -268,7 +262,7 @@ def checkCalibration(data, calib_mat, points, fs):
     acc = data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
     gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
 
-    acc_calibrated, gyro_calibrated = calibrate_array(acc, gyro, calib_mat)
+    acc_calibrated, gyro_calibrated = calib_mat.calibrate(acc, gyro)
 
     # Compute angle measures
     angles_original = np.zeros(gyro_calibrated.shape)
@@ -312,21 +306,23 @@ def reverseCalibration(acc, gyro, calib_mat):
     :param gyro: Gyroscope x,y,z (numpy ndarray, first dimension samples, second dimension different x,y,z)
     :return: calibrated acceleration, calibrated gyroscope (numpy ndarray)
     """
+    # TODO: Reimplement
+    raise NotImplemented('Reverse Calibration is currently not implemented')
 
-    # Precomputation of combined rotation/scaling matrix
-    accel_mat = np.matmul(calib_mat.K_g, calib_mat.R_g)
-    gyro_mat = np.matmul(calib_mat.K_a, calib_mat.R_a)
-
-    # Initialize Calibrated arrays
-    acc_reverse = np.zeros(acc.shape)
-    gyro_reverse = np.zeros(gyro.shape)
-
-    # Do reverse calibration calibration!
-    for i in np.arange(0, acc.shape[0]):
-        acc_reverse[i, :] = np.transpose(np.matmul(accel_mat, np.transpose(acc[i, :]))) + calib_mat.b_a
-        gyro_reverse[i, :] = np.transpose(np.matmul(gyro_mat, np.transpose(gyro[i, :]))) + calib_mat.b_g + np.transpose(
-            np.matmul(calib_mat.K_ga, np.transpose([acc[i, :]])))
-        # acc_calib[i,:]=np.transpose(np.matmul(accel_mat,(np.transpose([acc[i,:]])-b_a)))
-        # gyro_calib[i,:]=np.transpose(np.matmul(gyro_mat,(np.transpose([gyro[i,:]])-np.matmul(K_ga,np.transpose([acc_calib[i,:]]))-b_g)))
-
-    return acc_reverse, gyro_reverse
+    # # Precomputation of combined rotation/scaling matrix
+    # accel_mat = np.matmul(calib_mat.K_g, calib_mat.R_g)
+    # gyro_mat = np.matmul(calib_mat.K_a, calib_mat.R_a)
+    #
+    # # Initialize Calibrated arrays
+    # acc_reverse = np.zeros(acc.shape)
+    # gyro_reverse = np.zeros(gyro.shape)
+    #
+    # # Do reverse calibration calibration!
+    # for i in np.arange(0, acc.shape[0]):
+    #     acc_reverse[i, :] = np.transpose(np.matmul(accel_mat, np.transpose(acc[i, :]))) + calib_mat.b_a
+    #     gyro_reverse[i, :] = np.transpose(np.matmul(gyro_mat, np.transpose(gyro[i, :]))) + calib_mat.b_g + np.transpose(
+    #         np.matmul(calib_mat.K_ga, np.transpose([acc[i, :]])))
+    #     # acc_calib[i,:]=np.transpose(np.matmul(accel_mat,(np.transpose([acc[i,:]])-b_a)))
+    #     # gyro_calib[i,:]=np.transpose(np.matmul(gyro_mat,(np.transpose([gyro[i,:]])-np.matmul(K_ga,np.transpose([acc_calib[i,:]]))-b_g)))
+    #
+    # return acc_reverse, gyro_reverse
