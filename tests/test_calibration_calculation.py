@@ -37,10 +37,10 @@ def default_expected():
     expected = dict()
     expected['K_a'] = np.identity(3)
     expected['R_a'] = np.identity(3)
-    expected['b_a'] = np.zeros((3, 1))
+    expected['b_a'] = np.zeros(3)
     expected['K_g'] = np.identity(3)
     expected['R_g'] = np.identity(3)
-    expected['b_g'] = np.zeros((3, 1))
+    expected['b_g'] = np.zeros(3)
     expected['K_ga'] = np.zeros((3, 3))
 
     return expected
@@ -113,7 +113,7 @@ def bias_data(default_data, default_expected):
     default_data['acc_z_p'] += acc_bias
     default_data['acc_z_a'] += acc_bias
 
-    default_expected['b_a'] = acc_bias[:, None]
+    default_expected['b_a'] = acc_bias
 
     # Add bias to gyro
     gyro_bias = np.array([2, 4, 6])
@@ -128,7 +128,7 @@ def bias_data(default_data, default_expected):
     default_data['gyr_y_rot'] += gyro_bias
     default_data['gyr_z_rot'] += gyro_bias
 
-    default_expected['b_g'] = gyro_bias[:, None]
+    default_expected['b_g'] = gyro_bias
 
     return default_data, default_expected
 
@@ -156,7 +156,8 @@ def scaling_data(default_data, default_expected):
 
     return default_data, default_expected
 
-# TODO: Test for roation is missing
+# TODO: Test for rotation is missing
+
 
 @pytest.mark.parametrize('test_data', ['k_ga_data', 'bias_data', 'scaling_data'])
 def test_simulations(test_data, request):

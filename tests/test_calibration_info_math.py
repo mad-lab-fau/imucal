@@ -8,11 +8,11 @@ from imucal.calibration_info import CalibrationInfo
 def dummy_cal():
     sample_data = {'K_a': np.identity(3),
                    'R_a': np.identity(3),
-                   'b_a': np.zeros(3)[:, None],
+                   'b_a': np.zeros(3),
                    'K_g': np.identity(3),
                    'R_g': np.identity(3),
                    'K_ga': np.identity(3),
-                   'b_g': np.zeros(3)[:, None]}
+                   'b_g': np.zeros(3)}
     return CalibrationInfo(**sample_data)
 
 

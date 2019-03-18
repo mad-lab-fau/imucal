@@ -93,9 +93,9 @@ class CalibrationInfo:
         return cls._from_list_dict(raw_json)
 
     def _calibrate_gyro_offsets(self, gyro, calibrated_acc):
-        d_ga = self.K_ga @ calibrated_acc.T
-        offsets = d_ga + self.b_g
-        return (gyro.T - offsets).T
+        d_ga = (self.K_ga @ calibrated_acc.T)
+        offsets = d_ga.T + self.b_g
+        return gyro - offsets
 
     def calibrate_acc(self, acc):
         # Check if all required paras are initialized to throw appropriate error messages:
@@ -107,12 +107,13 @@ class CalibrationInfo:
 
         # Combine Scaling and rotation matrix to one matrix
         acc_mat = np.linalg.inv(self.R_a) @ np.linalg.inv(self.K_a)
-        acc_out = acc_mat @ (acc.T - self.b_a)
+        acc_out = acc_mat @ (acc - self.b_a).T
 
         return acc_out.T
 
     def calibrate_gyro(self, gyro, calibrated_acc):
         # Combine Scaling and rotation matrix to one matrix
+        # TODO: Error check for initialized paras
         gyro_mat = np.matmul(np.linalg.inv(self.R_g), np.linalg.inv(self.K_g))
         tmp = self._calibrate_gyro_offsets(gyro, calibrated_acc)
 

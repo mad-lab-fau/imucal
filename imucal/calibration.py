@@ -94,7 +94,7 @@ class Calibration:
 
         # Bias Vector
         b_a = np.diag(B_a)
-        cal_mat.b_a = b_a[:, None]
+        cal_mat.b_a = b_a
 
         # Compute Scaling and Rotation
         # No need for bias correction, since it cancels out!
@@ -128,7 +128,7 @@ class Calibration:
             self.gyr_z_a,
         )), axis=0)
 
-        cal_mat.b_g = b_g[:, None]
+        cal_mat.b_g = b_g
 
         # Acceleration sensitivity
 
