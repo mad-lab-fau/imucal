@@ -128,15 +128,6 @@ class Calibration:
             self.gyr_z_a,
         )), axis=0)
 
-# TODO: Remove again after testing
-        gyro_stat = np.concatenate(([np.mean(self.gyr_x_p, axis=0)],
-                                    [np.mean(self.gyr_x_a, axis=0)],
-                                    [np.mean(self.gyr_y_p, axis=0)],
-                                    [np.mean(self.gyr_y_a, axis=0)],
-                                    [np.mean(self.gyr_z_p, axis=0)],
-                                    [np.mean(self.gyr_z_a, axis=0)]), axis=0)
-        b_g = np.mean(gyro_stat, axis=0)
-
         cal_mat.b_g = b_g[:, None]
 
         # Acceleration sensitivity
