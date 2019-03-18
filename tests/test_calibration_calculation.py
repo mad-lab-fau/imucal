@@ -41,6 +41,7 @@ def default_expected():
 
     return expected
 
+
 @pytest.fixture()
 def default_data():
     data = dict()
@@ -97,7 +98,63 @@ def k_ga_data(default_data, default_expected):
     return default_data, default_expected
 
 
-@pytest.mark.parametrize('test_data', ['k_ga_data'])
+@pytest.fixture()
+def bias_data(default_data, default_expected):
+    # Add bias to acc
+    acc_bias = np.array([1, 3, 5])
+    default_data['acc_x_p'] += acc_bias
+    default_data['acc_x_a'] += acc_bias
+    default_data['acc_y_p'] += acc_bias
+    default_data['acc_y_a'] += acc_bias
+    default_data['acc_z_p'] += acc_bias
+    default_data['acc_z_a'] += acc_bias
+
+    default_expected['b_a'] = acc_bias[:, None]
+
+    # Add bias to gyro
+    gyro_bias = np.array([2, 4, 6])
+    default_data['gyr_x_p'] += gyro_bias
+    default_data['gyr_x_a'] += gyro_bias
+    default_data['gyr_y_p'] += gyro_bias
+    default_data['gyr_y_a'] += gyro_bias
+    default_data['gyr_z_p'] += gyro_bias
+    default_data['gyr_z_a'] += gyro_bias
+
+    default_data['gyr_x_rot'] += gyro_bias
+    default_data['gyr_y_rot'] += gyro_bias
+    default_data['gyr_z_rot'] += gyro_bias
+
+    default_expected['b_g'] = gyro_bias[:, None]
+
+    return default_data, default_expected
+
+
+@pytest.fixture()
+def scaling_data(default_data, default_expected):
+    # Add scaling to acc
+    acc_scaling = np.array([1, 3, 5])
+    default_data['acc_x_p'] *= acc_scaling[0]
+    default_data['acc_x_a'] *= acc_scaling[0]
+    default_data['acc_y_p'] *= acc_scaling[1]
+    default_data['acc_y_a'] *= acc_scaling[1]
+    default_data['acc_z_p'] *= acc_scaling[2]
+    default_data['acc_z_a'] *= acc_scaling[2]
+
+    default_expected['K_a'] = np.diag(acc_scaling)
+
+    # Add scaling to gyro
+    gyro_scaling = np.array([2, 4, 6])
+    default_data['gyr_x_rot'] *= gyro_scaling[0]
+    default_data['gyr_y_rot'] *= gyro_scaling[1]
+    default_data['gyr_z_rot'] *= gyro_scaling[2]
+
+    default_expected['K_g'] = np.diag(gyro_scaling)
+
+    return default_data, default_expected
+
+# TODO: Test for roation is missing
+
+@pytest.mark.parametrize('test_data', ['k_ga_data', 'bias_data', 'scaling_data'])
 def test_simulations(test_data, request):
     test_data = request.getfixturevalue(test_data)
     cal = Calibration(**test_data[0])
