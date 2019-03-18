@@ -19,7 +19,7 @@ class FerrarisCalibrationInfo:
             setattr(self, field, kwargs.get(field, None))
 
     def __repr__(self):
-        out = 'FerrarisCalibrationInfo('
+        out = self.__class__.__name__ + '('
         for val in self._fields:
             out += '\n' + val + ' =\n' + getattr(self, val).__repr__() + ',\n'
         out += '\n)'
@@ -28,7 +28,7 @@ class FerrarisCalibrationInfo:
     def __eq__(self, other):
         # Check type:
         if not isinstance(other, self.__class__):
-            raise ValueError('Comparison is only defined between two FerrarisCalibrationInfo object!')
+            raise ValueError('Comparison is only defined between two {} object!'.format(self.__class__.__name__))
 
         # Test keys equal:
         if not self._fields == other._fields:
