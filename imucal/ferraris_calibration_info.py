@@ -34,7 +34,7 @@ class FerrarisCalibrationInfo:
         if not self._fields == other._fields:
             return False
 
-        # Test FerrarisCalibration values
+        # Test Calibration values
         for v1, v2 in zip(self.__dict__.values(), other.__dict__.values()):
             if not np.array_equal(v1, v2):
                 return False

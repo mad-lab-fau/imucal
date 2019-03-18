@@ -1,4 +1,5 @@
-from typing import Optional, Iterable
+from itertools import product
+from typing import Optional, Iterable, TypeVar, Type
 
 import numpy as np
 import pandas as pd
@@ -6,10 +7,12 @@ from numpy.linalg import inv
 
 from imucal.ferraris_calibration_info import FerrarisCalibrationInfo
 
-FERRARIS_SECTIONS = (
-    'acc_x_p', 'acc_x_a', 'acc_y_p', 'acc_y_a', 'acc_z_p', 'acc_z_a', 'gyr_x_p', 'gyr_x_a', 'gyr_y_p', 'gyr_y_a',
-    'gyr_z_p', 'gyr_z_a', 'acc_x_rot', 'acc_y_rot', 'acc_z_rot', 'gyr_x_rot', 'gyr_y_rot', 'gyr_z_rot'
-)
+FERRARIS_SECTIONS = ('x_p', 'x_a', 'y_p', 'y_a', 'z_p', 'z_a','x_rot', 'y_rot', 'z_rot')
+
+ACC_COLS = ('acc_x', 'acc_y', 'acc_z')
+GYRO_COLS = ('gyr_x', 'gyr_y', 'gyr_z')
+
+T = TypeVar('T', bound='FerrarisCalibration')
 
 
 class FerrarisCalibration:
@@ -33,7 +36,7 @@ class FerrarisCalibration:
     gyr_y_rot: np.ndarray
     gyr_z_rot: np.ndarray
 
-    _fields = FERRARIS_SECTIONS
+    _fields = tuple('{}_{}'.format(x, y) for x,y in product(('acc', 'gyr'), FERRARIS_SECTIONS))
 
     sampling_rate: float
     grav: float
@@ -49,13 +52,13 @@ class FerrarisCalibration:
         super().__init__()
 
     @classmethod
-    def from_df(cls,
+    def from_df(cls: Type[T],
                 df: pd.DataFrame,
                 sampling_rate: float,
                 grav: Optional[float] = 9.81,
-                acc_cols: Optional[Iterable[str]] = ('acc_x', 'acc_y', 'acc_z'),
-                gyro_cols: Optional[Iterable[str]] = ('acc_x', 'acc_y', 'acc_z')
-                ):
+                acc_cols: Optional[Iterable[str]] = ACC_COLS,
+                gyro_cols: Optional[Iterable[str]] = GYRO_COLS
+                ) -> T:
         # TODO: need proper documentation
 
         acc_df = df[list(acc_cols)]
@@ -66,6 +69,18 @@ class FerrarisCalibration:
         gyro_dict = {'gyr_' + k: v for k, v in gyro_dict.items()}
 
         return cls(sampling_rate, grav, **acc_dict, **gyro_dict)
+
+    @classmethod
+    def from_interactive_plot(cls: Type[T],
+                              acc: np.ndarray,
+                              gyro: np.ndarray,
+                              sampling_rate: float,
+                              grav: Optional[float] = 9.81,
+                              debug_plot: Optional[bool] = False
+                              ) -> T:
+        # TODO: proper documentation
+        df = _find_calibration_sections_interactive(acc, gyro, debug_plot=debug_plot)
+        return cls.from_df(df, sampling_rate, grav=grav)
 
     def compute_calibration_matrix(self) -> FerrarisCalibrationInfo:
         cal_mat = FerrarisCalibrationInfo()
@@ -181,7 +196,7 @@ class FerrarisCalibration:
         return cal_mat
 
 
-def find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, debug_plot: Optional[bool] = False):
+def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, debug_plot: Optional[bool] = False):
     """
     Prepares the calibration data for the later calculation of calibration matrices.
 
@@ -237,7 +252,7 @@ def find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, deb
             acc_list_markers.append(marker_acc)
             gyro_list_markers.append(marker_gyro)
 
-        # with button 3 (double right click) you will remove a marker
+        # with button 3 (double right click) you will remove the last marker
         elif event.button == 3 and event.dblclick:
             # position of the last marker
             x = list_labels[-1]
@@ -256,6 +271,7 @@ def find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, deb
     # sort the labels in ascending order
     list_labels.sort()
 
+    # TODO: This function could use a refactor
     # use the labels to cut out the unnecessary data and add a column with the part
     X_p = allData[list_labels[0]:list_labels[1], :]
     X_p = np.column_stack((X_p, np.array([1] * X_p.shape[0])))
@@ -279,20 +295,24 @@ def find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, deb
     # put all of it together again
     list_parts = [X_p, X_a, Y_p, Y_a, Z_p, Z_a, Rot_X, Rot_Y, Rot_Z]
     pre_pro_data = np.concatenate(list_parts, axis=0)
-    pre_pro_data = pd.DataFrame(pre_pro_data, columns=['accX', 'accY', 'accZ', 'gyroX', 'gyroY', 'gyroZ', 'part'])
+    pre_pro_data = pd.DataFrame(pre_pro_data, columns=[*ACC_COLS, *GYRO_COLS, 'part'])
+    pre_pro_data.index.name = 'sample'
+    pre_pro_data['part'] = pre_pro_data['part'].apply(lambda x: FERRARIS_SECTIONS[int(x - 1)])
+    pre_pro_data = pre_pro_data.set_index('part', append=True).swaplevel(axis=0).sort_index()
 
     if debug_plot:
+        plot_data = pre_pro_data.copy().reset_index(level=0, drop=True)
         # plot the resulting data
         fig = plt.figure(figsize=(20, 10))
         gs = plt.GridSpec(2, 2)
         ax3 = fig.add_subplot(gs[0, 0])
-        ax3.plot(pre_pro_data.iloc[:, 0:3])
+        ax3.plot(plot_data.iloc[:, 0:3])
         ax3.set_title('Preprocessed Accelerometer Data')
         ax4 = fig.add_subplot(gs[0, 1])
-        ax4.plot(pre_pro_data.iloc[:, 3:6])
+        ax4.plot(plot_data.iloc[:, 3:6])
         ax4.set_title('Preprocessed Gyroscope Data')
         ax5 = fig.add_subplot(gs[1, :])
-        ax5.plot(pre_pro_data.iloc[:, 0:6])
+        ax5.plot(plot_data.iloc[:, 0:6])
         ax5.set_title('Preprocessed Sensor Data')
 
     return pre_pro_data
