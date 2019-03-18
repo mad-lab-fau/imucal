@@ -1,9 +1,9 @@
 import numpy as np
 
-from imucal.calibration_info import CalibrationInfo
+from imucal.ferraris_calibration_info import FerrarisCalibrationInfo
 
 
-def plot_calibration(data, calib_mat: CalibrationInfo, fs: float):
+def plot_calibration(data, calib_mat: FerrarisCalibrationInfo, fs: float):
     """Plot the FerrarisCalibration result uncalibrated vs calibrated.
 
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
@@ -75,11 +75,11 @@ def plot_calibration(data, calib_mat: CalibrationInfo, fs: float):
     return
 
 
-def check_calibration(data, calib_mat: CalibrationInfo, points, fs: float):
+def check_calibration(data, calib_mat: FerrarisCalibrationInfo, points, fs: float):
     """
     Prints calibration relevant paramers (function may be deleted)
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
-    :param calib_mat: object with calibration matrices (class CalibrationInfo)
+    :param calib_mat: object with calibration matrices (class FerrarisCalibrationInfo)
     :param points: pandas array with start and end of all fields in calibration data
     :param fs: sampling rate
     """

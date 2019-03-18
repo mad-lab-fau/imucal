@@ -3,7 +3,7 @@ import json
 import numpy as np
 
 
-class CalibrationInfo:
+class FerrarisCalibrationInfo:
     K_a: np.ndarray
     R_a: np.ndarray
     b_a: np.ndarray
@@ -19,7 +19,7 @@ class CalibrationInfo:
             setattr(self, field, kwargs.get(field, None))
 
     def __repr__(self):
-        out = 'CalibrationInfo('
+        out = 'FerrarisCalibrationInfo('
         for val in self._fields:
             out += '\n' + val + ' =\n' + getattr(self, val).__repr__() + ',\n'
         out += '\n)'
@@ -28,7 +28,7 @@ class CalibrationInfo:
     def __eq__(self, other):
         # Check type:
         if not isinstance(other, self.__class__):
-            raise ValueError('Comparison is only defined between two CalibrationInfo object!')
+            raise ValueError('Comparison is only defined between two FerrarisCalibrationInfo object!')
 
         # Test keys equal:
         if not self._fields == other._fields:
@@ -64,10 +64,10 @@ class CalibrationInfo:
 
     @classmethod
     def from_hdf5(cls, path):
-        """Reads calibration data stored in hdf5 fileformat (created by CalibrationInfo save_to_hdf5).
+        """Reads calibration data stored in hdf5 fileformat (created by FerrarisCalibrationInfo save_to_hdf5).
 
         :param path: filename
-        :return: CalibrationInfo object
+        :return: FerrarisCalibrationInfo object
         """
         import h5py
 

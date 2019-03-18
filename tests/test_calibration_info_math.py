@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from imucal.calibration_info import CalibrationInfo
+from imucal.ferraris_calibration_info import FerrarisCalibrationInfo
 
 
 @pytest.fixture()
@@ -13,7 +13,7 @@ def dummy_cal():
                    'R_g': np.identity(3),
                    'K_ga': np.identity(3),
                    'b_g': np.zeros(3)}
-    return CalibrationInfo(**sample_data)
+    return FerrarisCalibrationInfo(**sample_data)
 
 
 @pytest.fixture()
