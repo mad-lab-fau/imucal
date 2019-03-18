@@ -1,11 +1,15 @@
 from typing import Optional, Iterable
 
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib import pyplot as plt
 from numpy.linalg import inv
 from imucal.calibration_info import CalibrationInfo
 
+FERRARIS_SECTIONS = (
+        'acc_x_p', 'acc_x_a', 'acc_y_p', 'acc_y_a', 'acc_z_p', 'acc_z_a', 'gyr_x_p', 'gyr_x_a', 'gyr_y_p', 'gyr_y_a',
+        'gyr_z_p', 'gyr_z_a', 'acc_x_rot', 'acc_y_rot', 'acc_z_rot', 'gyr_x_rot', 'gyr_y_rot', 'gyr_z_rot'
+    )
 
 class FerrarisCalibration:
     acc_x_p: np.ndarray
@@ -28,10 +32,7 @@ class FerrarisCalibration:
     gyr_y_rot: np.ndarray
     gyr_z_rot: np.ndarray
 
-    _fields = (
-        'acc_x_p', 'acc_x_a', 'acc_y_p', 'acc_y_a', 'acc_z_p', 'acc_z_a', 'gyr_x_p', 'gyr_x_a', 'gyr_y_p', 'gyr_y_a',
-        'gyr_z_p', 'gyr_z_a', 'acc_x_rot', 'acc_y_rot', 'acc_z_rot', 'gyr_x_rot', 'gyr_y_rot', 'gyr_z_rot'
-    )
+    _fields = FERRARIS_SECTIONS
 
     sampling_rate: float
     grav: float
@@ -179,150 +180,116 @@ class FerrarisCalibration:
         return cal_mat
 
 
-def plotCalibration(data, calib_mat: CalibrationInfo, fs: float):
-    """Plot the FerrarisCalibration result uncalibrated vs calibrated.
+def find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, debug_plot: Optional[bool] = False):
+    """
+    Prepares the calibration data for the later calculation of calibration matrices.
 
-    :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
-    :param calib_mat: calibration matrices
-    :param fs: samplingrate for integration
+    Operations manual:
+    Use the move cursor and a double click to place a label at the plot.
+    Accelerometer: Place the labels where the data is steady.
+                   Two labels for each position +x,-x,+y,-y,+z,-z. That makes in total 12 labels.
+    Gyroscope:     Place the labels where the sensor is rotated around a axis.
+                   Two labels for each axis. Makes 6 in total.
+    The space between the labels of a single position is kept, everything else is discarded.
+
+    :param imu_data: pandas data frame with accX/Y/Z, gyroX/Y/Z
+    :param debug_plot: set true to see, whether data cutting was successful
     """
 
-    acc = data.loc[:, ['accX', 'accY', 'accZ']].values
-    gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].values
+    # remove the unnecessary data
+    allData = np.concatenate((np.array(acc), np.array(gyro)), axis=1)
 
-    acc_calibrated, gyro_calibrated = calib_mat.calibrate(acc, gyro)
-
-    # Compute angle measures
-    angles_original = np.zeros(gyro_calibrated.shape)
-    angles_calibrated = np.zeros(gyro_calibrated.shape)
-    for i in np.arange(0, acc_calibrated.shape[0]):
-        if i == 0:
-            angles_original[i, :] = angles_original[i, :] * 1 / fs
-            angles_calibrated[i, :] = angles_calibrated[i, :] * 1 / fs
-        else:
-            angles_original[i, :] = angles_original[i - 1, :] + gyro[i, :] * 1 / fs
-            angles_calibrated[i, :] = angles_calibrated[i - 1, :] + gyro_calibrated[i, :] * 1 / fs
-
-    plt.figure()
+    # plot the data
+    fig = plt.figure(figsize=(20, 10))
     ax1 = plt.subplot(211)
     plt.plot(acc)
     plt.grid(True)
-    plt.title("Accelerometer uncalibrated")
-    plt.xlabel("idx")
+    plt.title("Set a label at start/end of accelerometer placements (12 in total)")
+    ticks = np.arange(0, allData.shape[0], 2000)
+    plt.xticks(ticks, ticks // 200)
+    plt.xlabel("time [s]")
     plt.ylabel("acceleration [m/s^2]")
-    ax2 = plt.subplot(212, sharex=ax1, sharey=ax1)
-    plt.plot(acc_calibrated)
-    plt.grid(True)
-    plt.title("Accelerometer calibrated")
-    plt.xlabel("idx")
-    plt.ylabel("acceleration [m/s^2]")
-
-    plt.figure()
-    ax1 = plt.subplot(211)
+    ax2 = plt.subplot(212, sharex=ax1)
     plt.plot(gyro)
     plt.grid(True)
-    plt.title("Gyroscope uncalibrated")
-    plt.xlabel("idx")
-    plt.ylabel("angular rate [deg/s]")
-    ax2 = plt.subplot(212, sharex=ax1, sharey=ax1)
-    plt.plot(gyro_calibrated)
-    plt.grid(True)
-    plt.title("Gyroscope calibrated")
-    plt.xlabel("idx")
-    plt.ylabel("angular rate [deg/s]")
+    plt.title("Set a label at start/end of gyroscope rotation (6 in total)")
+    plt.xlabel("time[s]")
+    plt.ylabel("rotation [°/s]")
 
-    plt.figure()
-    ax1 = plt.subplot(211)
-    plt.plot(angles_original)
-    plt.grid(True)
-    plt.title("Integrated angles uncalibrated")
-    plt.xlabel("idx")
-    plt.ylabel("angle [deg/s]")
-    ax2 = plt.subplot(212, sharex=ax1, sharey=ax1)
-    plt.plot(angles_calibrated)
-    plt.grid(True)
-    plt.title("Integrated angles calibrated")
-    plt.xlabel("idx")
-    plt.ylabel("angle [deg/s]")
+    acc_list_markers = []
+    gyro_list_markers = []
+    list_labels = []
 
-    # plt.show()
+    def onclick(event):
+        # switch to the move cursor
+        # set a marker with doubleclick left
+        # remove the last marker with doubleclick right
 
-    return
+        # with button 1 (double left click) you will set a marker
+        if event.button == 1 and event.dblclick:
+            x = int(event.xdata)
+            list_labels.append(x)
+            marker_acc = ax1.axvline(x)
+            marker_gyro = ax2.axvline(x)
+            acc_list_markers.append(marker_acc)
+            gyro_list_markers.append(marker_gyro)
 
+        # with button 3 (double right click) you will remove a marker
+        elif event.button == 3 and event.dblclick:
+            # position of the last marker
+            x = list_labels[-1]
+            a = acc_list_markers.pop()
+            g = gyro_list_markers.pop()
+            # remove the last marker
+            a.remove(), g.remove()
+            del a, g
+            list_labels.remove(x)
+        fig.canvas.draw()
+        fig.canvas.flush_events()
 
-def checkCalibration(data, calib_mat: CalibrationInfo, points, fs: float):
-    """
-    Prints calibration relevant paramers (function may be deleted)
-    :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
-    :param calib_mat: object with calibration matrices (class CalibrationInfo)
-    :param points: pandas array with start and end of all fields in calibration data
-    :param fs: sampling rate
-    """
+    fig.canvas.mpl_connect('button_press_event', onclick)
+    plt.show(block=True)
 
-    acc = data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
-    gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
+    # sort the labels in ascending order
+    list_labels.sort()
 
-    acc_calibrated, gyro_calibrated = calib_mat.calibrate(acc, gyro)
+    # use the labels to cut out the unnecessary data and add a column with the part
+    X_p = allData[list_labels[0]:list_labels[1], :]
+    X_p = np.column_stack((X_p, np.array([1] * X_p.shape[0])))
+    X_a = allData[list_labels[2]:list_labels[3], :]
+    X_a = np.column_stack((X_a, np.array([2] * X_a.shape[0])))
+    Y_p = allData[list_labels[4]:list_labels[5], :]
+    Y_p = np.column_stack((Y_p, np.array([3] * Y_p.shape[0])))
+    Y_a = allData[list_labels[6]:list_labels[7], :]
+    Y_a = np.column_stack((Y_a, np.array([4] * Y_a.shape[0])))
+    Z_p = allData[list_labels[8]:list_labels[9], :]
+    Z_p = np.column_stack((Z_p, np.array([5] * Z_p.shape[0])))
+    Z_a = allData[list_labels[10]:list_labels[11], :]
+    Z_a = np.column_stack((Z_a, np.array([6] * Z_a.shape[0])))
+    Rot_X = allData[list_labels[12]:list_labels[13], :]
+    Rot_X = np.column_stack((Rot_X, np.array([7] * Rot_X.shape[0])))
+    Rot_Y = allData[list_labels[14]:list_labels[15], :]
+    Rot_Y = np.column_stack((Rot_Y, np.array([8] * Rot_Y.shape[0])))
+    Rot_Z = allData[list_labels[16]:list_labels[17], :]
+    Rot_Z = np.column_stack((Rot_Z, np.array([9] * Rot_Z.shape[0])))
 
-    # Compute angle measures
-    angles_original = np.zeros(gyro_calibrated.shape)
-    angles_calibrated = np.zeros(gyro_calibrated.shape)
-    for i in np.arange(0, acc_calibrated.shape[0]):
-        if i == 0:
-            angles_original[i, :] = angles_original[i, :] * 1 / fs
-            angles_calibrated[i, :] = angles_calibrated[i, :] * 1 / fs
-        else:
-            angles_original[i, :] = angles_original[i - 1, :] + gyro[i, :] * 1 / fs
-            angles_calibrated[i, :] = angles_calibrated[i - 1, :] + gyro_calibrated[i, :] * 1 / fs
+    # put all of it together again
+    list_parts = [X_p, X_a, Y_p, Y_a, Z_p, Z_a, Rot_X, Rot_Y, Rot_Z]
+    pre_pro_data = np.concatenate(list_parts, axis=0)
+    pre_pro_data = pd.DataFrame(pre_pro_data, columns=['accX', 'accY', 'accZ', 'gyroX', 'gyroY', 'gyroZ', 'part'])
 
-    acc_xp = np.mean(acc_calibrated[points.loc['accX+', 'Start']:points.loc['accX+', 'End'], :], axis=0)
-    acc_xn = np.mean(acc_calibrated[points.loc['accX-', 'Start']:points.loc['accX-', 'End'], :], axis=0)
-    acc_yp = np.mean(acc_calibrated[points.loc['accY+', 'Start']:points.loc['accY+', 'End'], :], axis=0)
-    acc_yn = np.mean(acc_calibrated[points.loc['accY-', 'Start']:points.loc['accY-', 'End'], :], axis=0)
-    acc_zp = np.mean(acc_calibrated[points.loc['accZ+', 'Start']:points.loc['accZ+', 'End'], :], axis=0)
-    acc_zn = np.mean(acc_calibrated[points.loc['accZ-', 'Start']:points.loc['accZ-', 'End'], :], axis=0)
+    if debug_plot:
+        # plot the resulting data
+        fig = plt.figure(figsize=(20, 10))
+        gs = plt.GridSpec(2, 2)
+        ax3 = fig.add_subplot(gs[0, 0])
+        ax3.plot(pre_pro_data.iloc[:, 0:3])
+        ax3.set_title('Preprocessed Accelerometer Data')
+        ax4 = fig.add_subplot(gs[0, 1])
+        ax4.plot(pre_pro_data.iloc[:, 3:6])
+        ax4.set_title('Preprocessed Gyroscope Data')
+        ax5 = fig.add_subplot(gs[1, :])
+        ax5.plot(pre_pro_data.iloc[:, 0:6])
+        ax5.set_title('Preprocessed Sensor Data')
 
-    angle_rot_x = angles_calibrated[points.loc['gyroX', 'End'], :] - angles_calibrated[points.loc['gyroX', 'Start'], :]
-    angle_rot_y = angles_calibrated[points.loc['gyroY', 'End'], :] - angles_calibrated[points.loc['gyroY', 'Start'], :]
-    angle_rot_z = angles_calibrated[points.loc['gyroZ', 'End'], :] - angles_calibrated[points.loc['gyroZ', 'Start'], :]
-
-    print(acc_xp)
-    print(acc_xn)
-    print(acc_yp)
-    print(acc_yn)
-    print(acc_zp)
-    print(acc_zn)
-
-    print(angle_rot_x)
-    print(angle_rot_y)
-    print(angle_rot_z)
-
-
-def reverseCalibration(acc, gyro, calib_mat):
-    """
-    Reverse calibration of calibrated input data arrays acc, gyro
-    :param calib_mat:
-    :param acc: Acceleration x,y,z (numpy ndarray, first dimension samples, second dimension different x,y,z)
-    :param gyro: Gyroscope x,y,z (numpy ndarray, first dimension samples, second dimension different x,y,z)
-    :return: calibrated acceleration, calibrated gyroscope (numpy ndarray)
-    """
-    # TODO: Reimplement
-    raise NotImplemented('Reverse FerrarisCalibration is currently not implemented')
-
-    # # Precomputation of combined rotation/scaling matrix
-    # accel_mat = np.matmul(calib_mat.K_g, calib_mat.R_g)
-    # gyro_mat = np.matmul(calib_mat.K_a, calib_mat.R_a)
-    #
-    # # Initialize Calibrated arrays
-    # acc_reverse = np.zeros(acc.shape)
-    # gyro_reverse = np.zeros(gyro.shape)
-    #
-    # # Do reverse calibration calibration!
-    # for i in np.arange(0, acc.shape[0]):
-    #     acc_reverse[i, :] = np.transpose(np.matmul(accel_mat, np.transpose(acc[i, :]))) + calib_mat.b_a
-    #     gyro_reverse[i, :] = np.transpose(np.matmul(gyro_mat, np.transpose(gyro[i, :]))) + calib_mat.b_g + np.transpose(
-    #         np.matmul(calib_mat.K_ga, np.transpose([acc[i, :]])))
-    #     # acc_calib[i,:]=np.transpose(np.matmul(accel_mat,(np.transpose([acc[i,:]])-b_a)))
-    #     # gyro_calib[i,:]=np.transpose(np.matmul(gyro_mat,(np.transpose([gyro[i,:]])-np.matmul(K_ga,np.transpose([acc_calib[i,:]]))-b_g)))
-    #
-    # return acc_reverse, gyro_reverse
+    return pre_pro_data

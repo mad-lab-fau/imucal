@@ -2,7 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 # import datareader.datareader as dr
-from imucal import ferraris_calibration as cal, pre_calibrate as pc
+import imucal.ferraris_calibration
+import imucal.helper
+from imucal import ferraris_calibration as cal
 from NilsPodLib import session as sensor
 
 import optparse
@@ -47,7 +49,7 @@ if sensorType is "miPodV3":
 # imu_data = dr.read_mipod(path+filename, only_6D_imu=True)
 
 # get and read the preprocessed_data
-allData = pc.get_prepro_data(imu_data, debug_plot=True)
+allData = imucal.ferraris_calibration.find_calibration_sections_interactive(imu_data, debug_plot=True)
 
 # Bring data in data structure for the calibration
 X_p = np.array(allData[allData['part'] == 1])[:, :6]
@@ -71,7 +73,7 @@ print('My Matrices:')
 calib_mat.print()
 
 # Plot the calibration. In this step, the calibration working phase is called
-cal.plotCalibration(allData, calib_mat, fs=samplingRate_Hz)
+imucal.helper.plotCalibration(allData, calib_mat, fs=samplingRate_Hz)
 
 # check whether saving works
 if save:
