@@ -121,6 +121,6 @@ class CalibrationInfo:
 
     def calibrate(self, acc, gyro):
         acc_out = self.calibrate_acc(acc)
-        gyro_out = self.calibrate_gyro(gyro, acc_out.T)
+        gyro_out = self.calibrate_gyro(gyro, acc_out)
 
         return acc_out, gyro_out
