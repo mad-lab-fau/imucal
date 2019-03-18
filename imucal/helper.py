@@ -1,16 +1,16 @@
 import numpy as np
-from matplotlib import pyplot as plt
 
 from imucal.calibration_info import CalibrationInfo
 
 
-def plotCalibration(data, calib_mat: CalibrationInfo, fs: float):
+def plot_calibration(data, calib_mat: CalibrationInfo, fs: float):
     """Plot the FerrarisCalibration result uncalibrated vs calibrated.
 
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
     :param calib_mat: calibration matrices
     :param fs: samplingrate for integration
     """
+    from matplotlib import pyplot as plt
 
     acc = data.loc[:, ['accX', 'accY', 'accZ']].values
     gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].values
@@ -75,7 +75,7 @@ def plotCalibration(data, calib_mat: CalibrationInfo, fs: float):
     return
 
 
-def checkCalibration(data, calib_mat: CalibrationInfo, points, fs: float):
+def check_calibration(data, calib_mat: CalibrationInfo, points, fs: float):
     """
     Prints calibration relevant paramers (function may be deleted)
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
@@ -83,6 +83,7 @@ def checkCalibration(data, calib_mat: CalibrationInfo, points, fs: float):
     :param points: pandas array with start and end of all fields in calibration data
     :param fs: sampling rate
     """
+    from matplotlib import pyplot as plt
 
     acc = data.loc[:, ['accX', 'accY', 'accZ']].as_matrix()
     gyro = data.loc[:, ['gyroX', 'gyroY', 'gyroZ']].as_matrix()
@@ -123,7 +124,7 @@ def checkCalibration(data, calib_mat: CalibrationInfo, points, fs: float):
     print(angle_rot_z)
 
 
-def reverseCalibration(acc, gyro, calib_mat):
+def reverse_calibration(acc, gyro, calib_mat):
     """
     Reverse calibration of calibrated input data arrays acc, gyro
     :param calib_mat:

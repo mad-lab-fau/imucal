@@ -1,6 +1,5 @@
 import json
 
-import h5py
 import numpy as np
 
 
@@ -49,6 +48,7 @@ class CalibrationInfo:
         Saves calibration matrices to hdf5 fileformat
         :param filename: filename (including h5 at end)
         """
+        import h5py
 
         with h5py.File(filename, 'w') as hdf:
             for k, v in self.__dict__.items():
@@ -64,11 +64,12 @@ class CalibrationInfo:
 
     @classmethod
     def from_hdf5(cls, path):
-        """
-        Reads calibration data stored in hdf5 fileformat (created by CalibrationInfo save_to_hdf5)
-        :param filename: filename
+        """Reads calibration data stored in hdf5 fileformat (created by CalibrationInfo save_to_hdf5).
+
+        :param path: filename
         :return: CalibrationInfo object
         """
+        import h5py
 
         with h5py.File(path, 'r') as hdf:
             values = dict()
@@ -99,11 +100,11 @@ class CalibrationInfo:
 
     def calibrate_acc(self, acc):
         # Check if all required paras are initialized to throw appropriate error messages:
-        PARAS = ('K_a', 'R_a', 'b_a')
-        for v in PARAS:
+        paras = ('K_a', 'R_a', 'b_a')
+        for v in paras:
             if getattr(self, v, None) is None:
                 raise ValueError(
-                    '{} need to initialised before an acc calibration can be performed. {} is missing'.format(PARAS, v))
+                    '{} need to initialised before an acc calibration can be performed. {} is missing'.format(paras, v))
 
         # Combine Scaling and rotation matrix to one matrix
         acc_mat = np.linalg.inv(self.R_a) @ np.linalg.inv(self.K_a)

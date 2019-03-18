@@ -73,7 +73,7 @@ print('My Matrices:')
 calib_mat.print()
 
 # Plot the calibration. In this step, the calibration working phase is called
-imucal.helper.plotCalibration(allData, calib_mat, fs=samplingRate_Hz)
+imucal.helper.plot_calibration(allData, calib_mat, fs=samplingRate_Hz)
 
 # check whether saving works
 if save:

@@ -2,14 +2,15 @@ from typing import Optional, Iterable
 
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 from numpy.linalg import inv
+
 from imucal.calibration_info import CalibrationInfo
 
 FERRARIS_SECTIONS = (
-        'acc_x_p', 'acc_x_a', 'acc_y_p', 'acc_y_a', 'acc_z_p', 'acc_z_a', 'gyr_x_p', 'gyr_x_a', 'gyr_y_p', 'gyr_y_a',
-        'gyr_z_p', 'gyr_z_a', 'acc_x_rot', 'acc_y_rot', 'acc_z_rot', 'gyr_x_rot', 'gyr_y_rot', 'gyr_z_rot'
-    )
+    'acc_x_p', 'acc_x_a', 'acc_y_p', 'acc_y_a', 'acc_z_p', 'acc_z_a', 'gyr_x_p', 'gyr_x_a', 'gyr_y_p', 'gyr_y_a',
+    'gyr_z_p', 'gyr_z_a', 'acc_x_rot', 'acc_y_rot', 'acc_z_rot', 'gyr_x_rot', 'gyr_y_rot', 'gyr_z_rot'
+)
+
 
 class FerrarisCalibration:
     acc_x_p: np.ndarray
@@ -192,9 +193,11 @@ def find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, deb
                    Two labels for each axis. Makes 6 in total.
     The space between the labels of a single position is kept, everything else is discarded.
 
-    :param imu_data: pandas data frame with accX/Y/Z, gyroX/Y/Z
+    :param acc: numpy array with the shape (n, 3) where n is the number of samples
+    :param gyro: numpy array with the shape (n, 3) where n is the number of samples
     :param debug_plot: set true to see, whether data cutting was successful
     """
+    from matplotlib import pyplot as plt
 
     # remove the unnecessary data
     allData = np.concatenate((np.array(acc), np.array(gyro)), axis=1)
