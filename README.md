@@ -1,5 +1,17 @@
 # IMU Calibration
 
+## Installation
+
+HTTPS (this will ask you for your Gitlab username and pw):
+```
+pip install git+https://mad-srv.informatik.uni-erlangen.de/lo94zeny/sensorcalibration.git
+```
+
+SSH (this will ask you for your SSH-key pw, if set):
+```
+pip install git+ssh://git@mad-srv.informatik.uni-erlangen.de/lo94zeny/sensorcalibration.git
+```
+
 ## Ferraris
 
 This package implements the IMU-infield calibration based on Ferraris1995.
