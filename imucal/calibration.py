@@ -69,24 +69,21 @@ class Calibration:
     def compute_calibration_matrix(self) -> CalibrationInfo:
         cal_mat = CalibrationInfo()
 
-        # Note this implementation uses median instead of mean in an attempt to be robust against outlier values during
-        # calibration.
-
         ###############################################################################################################
         # Compute Acceleration Matrix
 
         # Calculate means from all static phases and stack them into 3x3 matrices
-        # TODO: Check transpose
+        # Note: Each measurement should be a column
         U_a_p = np.vstack((
-            np.median(self.acc_x_p, axis=0),
-            np.median(self.acc_y_p, axis=0),
-            np.median(self.acc_y_p, axis=0),
-        ))
+            np.mean(self.acc_x_p, axis=0),
+            np.mean(self.acc_y_p, axis=0),
+            np.mean(self.acc_z_p, axis=0),
+        )).T
         U_a_n = np.vstack((
-            np.median(self.acc_x_a, axis=0),
-            np.median(self.acc_y_a, axis=0),
-            np.median(self.acc_y_a, axis=0),
-        ))
+            np.mean(self.acc_x_a, axis=0),
+            np.mean(self.acc_y_a, axis=0),
+            np.mean(self.acc_z_a, axis=0),
+        )).T
 
         # Eq. 19
         U_a_s = U_a_p + U_a_n
@@ -97,7 +94,7 @@ class Calibration:
 
         # Bias Vector
         b_a = np.diag(B_a)
-        cal_mat.b_a = b_a
+        cal_mat.b_a = b_a[:, None]
 
         # Compute Scaling and Rotation
         # No need for bias correction, since it cancels out!
@@ -122,7 +119,7 @@ class Calibration:
         # One static phase would be sufficient, but why not use all of them if you have them.
         # Note that this calibration ignores any influences due to the earth rotation.
 
-        b_g = np.median(np.vstack((
+        b_g = np.mean(np.vstack((
             self.gyr_x_p,
             self.gyr_x_a,
             self.gyr_y_p,
@@ -130,23 +127,35 @@ class Calibration:
             self.gyr_z_p,
             self.gyr_z_a,
         )), axis=0)
-        cal_mat.b_g = b_g
+
+# TODO: Remove again after testing
+        gyro_stat = np.concatenate(([np.mean(self.gyr_x_p, axis=0)],
+                                    [np.mean(self.gyr_x_a, axis=0)],
+                                    [np.mean(self.gyr_y_p, axis=0)],
+                                    [np.mean(self.gyr_y_a, axis=0)],
+                                    [np.mean(self.gyr_z_p, axis=0)],
+                                    [np.mean(self.gyr_z_a, axis=0)]), axis=0)
+        b_g = np.mean(gyro_stat, axis=0)
+
+        cal_mat.b_g = b_g[:, None]
 
         # Acceleration sensitivity
 
+        # Note: Each measurement should be a column? or should it
+        # TODO: Important I think this is wrong and needs to be transposed
         U_g_p = np.vstack((
-            np.median(self.gyr_x_p, axis=0),
-            np.median(self.gyr_y_p, axis=0),
-            np.median(self.gyr_y_p, axis=0),
+            np.mean(self.gyr_x_p, axis=0),
+            np.mean(self.gyr_y_p, axis=0),
+            np.mean(self.gyr_z_p, axis=0),
         ))
-        U_g_n = np.vstack((
-            np.median(self.gyr_x_a, axis=0),
-            np.median(self.gyr_y_a, axis=0),
-            np.median(self.gyr_y_a, axis=0),
+        U_g_a = np.vstack((
+            np.mean(self.gyr_x_a, axis=0),
+            np.mean(self.gyr_y_a, axis=0),
+            np.mean(self.gyr_z_a, axis=0),
         ))
 
         # Eq. 9
-        K_ga = (U_g_p - U_g_n) / (2 * self.grav)
+        K_ga = (U_g_p - U_g_a) / (2 * self.grav)
         cal_mat.K_ga = K_ga
 
         # Gyroscope Scaling and Rotation
@@ -162,13 +171,13 @@ class Calibration:
         # Integrate gyro readings
         # Eg. 13/14
         W_s = np.zeros((3, 3))
-        W_s[0, :] = np.sum(gyr_x_rot_cor, axis=0) / self.sampling_rate
-        W_s[1, :] = np.sum(gyr_y_rot_cor, axis=0) / self.sampling_rate
-        W_s[2, :] = np.sum(gyr_z_rot_cor, axis=0) / self.sampling_rate
+        W_s[:, 0] = np.sum(gyr_x_rot_cor, axis=0) / self.sampling_rate
+        W_s[:, 1] = np.sum(gyr_y_rot_cor, axis=0) / self.sampling_rate
+        W_s[:, 2] = np.sum(gyr_z_rot_cor, axis=0) / self.sampling_rate
 
         # Eq.15
         expected_angles = self.EXPECTED_ANGLE * np.identity(3)
-        multiplied = expected_angles @ inv(W_s)
+        multiplied = W_s @ inv(expected_angles)
 
         # Eq. 12
         k_g_sq = np.diag(multiplied @ multiplied.T)
