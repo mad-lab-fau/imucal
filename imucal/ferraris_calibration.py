@@ -7,7 +7,7 @@ from numpy.linalg import inv
 from imucal.calibration_info import CalibrationInfo
 
 
-class Calibration:
+class FerrarisCalibration:
     acc_x_p: np.ndarray
     acc_x_a: np.ndarray
     acc_y_p: np.ndarray
@@ -180,7 +180,7 @@ class Calibration:
 
 
 def plotCalibration(data, calib_mat: CalibrationInfo, fs: float):
-    """Plot the Calibration result uncalibrated vs calibrated.
+    """Plot the FerrarisCalibration result uncalibrated vs calibrated.
 
     :param data: pandas Dataframe with columns [accX, accY, accZ, gyroX. gyroY, gyroZ]
     :param calib_mat: calibration matrices
@@ -307,7 +307,7 @@ def reverseCalibration(acc, gyro, calib_mat):
     :return: calibrated acceleration, calibrated gyroscope (numpy ndarray)
     """
     # TODO: Reimplement
-    raise NotImplemented('Reverse Calibration is currently not implemented')
+    raise NotImplemented('Reverse FerrarisCalibration is currently not implemented')
 
     # # Precomputation of combined rotation/scaling matrix
     # accel_mat = np.matmul(calib_mat.K_g, calib_mat.R_g)

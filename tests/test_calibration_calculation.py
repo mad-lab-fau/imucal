@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 
-from imucal.calibration import Calibration
+from imucal.ferraris_calibration import FerrarisCalibration
 
 
 @pytest.fixture()
@@ -21,7 +21,7 @@ def example_calibration_data():
 def test_example_calibration(example_calibration_data):
     data, sampling_rate, calib = example_calibration_data
 
-    cal = Calibration.from_df(data, sampling_rate, acc_cols=('accX', 'accY', 'accZ'), gyro_cols=('gyroX', 'gyroY', 'gyroZ'))
+    cal = FerrarisCalibration.from_df(data, sampling_rate, acc_cols=('accX', 'accY', 'accZ'), gyro_cols=('gyroX', 'gyroY', 'gyroZ'))
     cal_mat = cal.compute_calibration_matrix()
 
     ## Uncomment if you want to save the new cal matrix to update the regression test
@@ -162,7 +162,7 @@ def scaling_data(default_data, default_expected):
 @pytest.mark.parametrize('test_data', ['k_ga_data', 'bias_data', 'scaling_data'])
 def test_simulations(test_data, request):
     test_data = request.getfixturevalue(test_data)
-    cal = Calibration(**test_data[0])
+    cal = FerrarisCalibration(**test_data[0])
     cal_mat = cal.compute_calibration_matrix()
 
     for para, val in test_data[1].items():

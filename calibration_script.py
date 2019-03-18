@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 # import datareader.datareader as dr
-from imucal import calibration as cal, pre_calibrate as pc
+from imucal import ferraris_calibration as cal, pre_calibrate as pc
 from NilsPodLib import session as sensor
 
 import optparse
@@ -23,7 +23,7 @@ plt.close('all')
 
 # Read the uncalibrated data
 # subject = '11'
-# path = 'D:/Data\Distance_Running_Data_Set/Subject' + subject + '/Calibration/'
+# path = 'D:/Data\Distance_Running_Data_Set/Subject' + subject + '/FerrarisCalibration/'
 # filename = 'right.csv'   # ToDo S05, left
 save = True
 
