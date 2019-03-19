@@ -68,7 +68,7 @@ import pandas as pd
 
 section_list = pd.read_csv('./calibration_sections.csv', index_col=0)
 sampling_rate = 100 #Hz 
-# This will open an interactive plot, where you can select the start and the stop sample of each region
+# This will recreate the calibration
 cal = FerrarisCalibration.from_section_list(data, section_list, sampling_rate=sampling_rate)
 ```
 
