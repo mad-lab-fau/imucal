@@ -14,7 +14,7 @@ setup(
     classifiers=[
     ],
 
-    packages=find_packages('imucal'),
+    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=[
         'pandas',
         'numpy'
