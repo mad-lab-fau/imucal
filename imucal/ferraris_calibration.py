@@ -248,6 +248,9 @@ def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
     # sort the labels in ascending order
     section_list.sort()
 
+    if len(section_list) != 18:
+        raise ValueError('9 regions (18 markers) are expected, but {} markers were set.'.format(len(section_list)))
+
     section_list = pd.DataFrame(np.array(section_list).reshape((-1, 2)), columns=('start', 'end'),
                                 index=FerrarisCalibration.FERRARIS_SECTIONS)
     return section_list
