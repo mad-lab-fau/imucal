@@ -241,7 +241,7 @@ def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
 
     # remove the unnecessary data
 
-    plot = _PlottingHelper(acc, gyro)
+    plot = _PlottingHelper(acc, gyro, len(FerrarisCalibration.FERRARIS_SECTIONS) * 2)
 
     section_list = plot.section_list
 
@@ -261,9 +261,11 @@ class _PlottingHelper:
     acc_list_markers = None
     gyro_list_markers = None
 
-    def __init__(self, acc, gyro, master=None):
+    def __init__(self, acc, gyro, expected_labels, master=None):
         from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
         import tkinter as tk
+
+        self.text_label = 'labels {{}}/{}'.format(expected_labels)
 
         if not master:
             master = tk.Tk()
@@ -280,6 +282,10 @@ class _PlottingHelper:
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         self.canvas.mpl_connect('button_press_event', self._onclick)
+
+        self.label_text = tk.Text(master, height=1, width=80)
+        self.label_text.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.label_text.insert(tk.END, self.text_label.format(str(0)))
 
         toolbar = NavigationToolbar2Tk(self.canvas, master)
         toolbar.update()
@@ -306,6 +312,7 @@ class _PlottingHelper:
         return fig, (ax1, ax2)
 
     def _onclick(self, event):
+        import tkinter as tk
         # switch to the move cursor
         # set a marker with doubleclick left
         # remove the last marker with doubleclick right
@@ -328,6 +335,9 @@ class _PlottingHelper:
             self.section_list.remove(x)
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
+
+        self.label_text.delete('1.0', tk.END)
+        self.label_text.insert(tk.END, self.text_label.format(str(len(self.section_list))))
 
 
 def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame):
