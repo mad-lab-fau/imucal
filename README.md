@@ -4,12 +4,12 @@
 
 HTTPS (this will ask you for your Gitlab username and pw):
 ```
-pip install git+https://mad-srv.informatik.uni-erlangen.de/lo94zeny/sensorcalibration.git
+pip install git+https://mad-srv.informatik.uni-erlangen.de/MadLab/GaitAnalysis/sensorcalibration.git
 ```
 
 SSH (this will ask you for your SSH-key pw, if set):
 ```
-pip install git+ssh://git@mad-srv.informatik.uni-erlangen.de/lo94zeny/sensorcalibration.git
+pip install git+ssh://git@mad-srv.informatik.uni-erlangen.de/MadLab/GaitAnalysis/sensorcalibration.git
 ```
 
 ## Ferraris
