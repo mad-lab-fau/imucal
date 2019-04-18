@@ -1,2 +1,3 @@
 from .ferraris_calibration import FerrarisCalibration
 from .ferraris_calibration_info import FerrarisCalibrationInfo
+from .calibration_info import CalibrationInfo

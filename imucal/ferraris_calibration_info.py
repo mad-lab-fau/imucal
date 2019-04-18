@@ -2,8 +2,11 @@ import json
 
 import numpy as np
 
+from imucal.calibration_info import CalibrationInfo
 
-class FerrarisCalibrationInfo:
+
+class FerrarisCalibrationInfo(CalibrationInfo):
+    CAL_TYPE = 'Ferraris'
     K_a: np.ndarray
     R_a: np.ndarray
     b_a: np.ndarray
@@ -41,7 +44,9 @@ class FerrarisCalibrationInfo:
         return True
 
     def _to_list_dict(self):
-        return {key: getattr(self, key).tolist() for key in self._fields}
+        d = {key: getattr(self, key).tolist() for key in self._fields}
+        d['cal_type'] = self.CAL_TYPE
+        return d
 
     def to_hdf5(self, filename):
         """
