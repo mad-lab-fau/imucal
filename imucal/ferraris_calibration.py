@@ -65,8 +65,8 @@ class FerrarisCalibration:
             gyro_cols = list(cls.GYRO_COLS)
 
         grav = grav or cls.DEFAULT_GRAV
-        acc_df = df[acc_cols]
-        gyro_df = df[gyro_cols]
+        acc_df = df[list(acc_cols)]
+        gyro_df = df[list(gyro_cols)]
         acc_dict = acc_df.groupby(level=0).apply(lambda x: x.values).to_dict()
         gyro_dict = gyro_df.groupby(level=0).apply(lambda x: x.values).to_dict()
         acc_dict = {'acc_' + k: v for k, v in acc_dict.items()}
