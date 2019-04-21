@@ -89,7 +89,8 @@ class CalibrationInfo:
         import h5py
 
         with h5py.File(filename, 'w') as hdf:
-            for k, v in self.__dict__.items():
+            d = {key: getattr(self, key).tolist() for key in self._fields}
+            for k, v in d.items():
                 hdf.create_dataset(k, data=v)
             hdf['cal_type'] = self.CAL_TYPE
 
