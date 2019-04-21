@@ -52,8 +52,14 @@ class CalibrationInfo:
         return cls(**raw_json)
 
     @classmethod
+    def _get_subclasses(cls):
+        for subclass in cls.__subclasses__():
+            yield from subclass._get_subclasses()
+            yield subclass
+
+    @classmethod
     def _find_subclass_from_cal_type(cls, cal_type):
-        return next(x for x in CalibrationInfo.__subclasses__() if x.CAL_TYPE == cal_type)
+        return next(x for x in CalibrationInfo._get_subclasses() if x.CAL_TYPE == cal_type)
 
     def to_json(self):
         data_dict = self._to_list_dict()
