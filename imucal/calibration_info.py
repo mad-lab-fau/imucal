@@ -15,6 +15,12 @@ class CalibrationInfo:
     def calibrate(self, acc, gyro):
         raise NotImplementedError('This method needs to be implemented by a subclass')
 
+    def calibrate_gyro(self, gyro):
+        raise NotImplementedError('This method needs to be implemented by a subclass')
+
+    def calibrate_acc(self, acc):
+        raise NotImplementedError('This method needs to be implemented by a subclass')
+
     def __init__(self, **kwargs):
         for field in self._fields:
             setattr(self, field, kwargs.get(field, None))
