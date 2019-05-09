@@ -6,6 +6,7 @@ from imucal.calibration_info import CalibrationInfo
 
 
 class FerrarisCalibrationInfo(CalibrationInfo):
+    # TODO: Add version for Turntable to make sure it is possible to differentiate the two
     CAL_TYPE = 'Ferraris'
     K_a: np.ndarray
     R_a: np.ndarray
