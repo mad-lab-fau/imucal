@@ -33,6 +33,7 @@ class FerrarisCalibration:
 
     sampling_rate: float
     grav: float
+    expected_angle: float
 
     EXPECTED_ANGLE: float = 360.
     DEFAULT_GRAV: float = 9.81
@@ -42,12 +43,14 @@ class FerrarisCalibration:
 
     _fields = tuple('{}_{}'.format(x, y) for x, y in product(('acc', 'gyr'), FERRARIS_SECTIONS))
 
-    def __init__(self, sampling_rate: float, grav: Optional[float] = None, **kwargs) -> None:
+    def __init__(self, sampling_rate: float, grav: Optional[float] = None, expected_angle: Optional[float] = None,
+                 **kwargs) -> None:
         for field in self._fields:
             setattr(self, field, kwargs.get(field, None))
 
         self.sampling_rate = sampling_rate
         self.grav = grav or self.DEFAULT_GRAV
+        self.expected_angle = expected_angle or self.EXPECTED_ANGLE
         super().__init__()
 
     @classmethod
@@ -55,6 +58,7 @@ class FerrarisCalibration:
                 df: pd.DataFrame,
                 sampling_rate: float,
                 grav: Optional[float] = None,
+                expected_angle: Optional[float] = None,
                 acc_cols: Optional[Iterable[str]] = None,
                 gyro_cols: Optional[Iterable[str]] = None
                 ) -> T:
@@ -72,7 +76,7 @@ class FerrarisCalibration:
         acc_dict = {'acc_' + k: v for k, v in acc_dict.items()}
         gyro_dict = {'gyr_' + k: v for k, v in gyro_dict.items()}
 
-        return cls(sampling_rate, grav, **acc_dict, **gyro_dict)
+        return cls(sampling_rate, grav, expected_angle, **acc_dict, **gyro_dict)
 
     @classmethod
     def from_section_list(cls: Type[T],
@@ -80,16 +84,18 @@ class FerrarisCalibration:
                           section_list: pd.DataFrame,
                           sampling_rate: float,
                           grav: Optional[float] = None,
+                          expected_angle: Optional[float] = None,
                           acc_cols: Optional[Iterable[str]] = None,
                           gyro_cols: Optional[Iterable[str]] = None
                           ) -> T:
         df = _convert_data_from_section_list_to_df(data, section_list)
-        return cls.from_df(df, sampling_rate, grav=grav, acc_cols=acc_cols, gyro_cols=gyro_cols)
+        return cls.from_df(df, sampling_rate, expected_angle, grav=grav, acc_cols=acc_cols, gyro_cols=gyro_cols)
 
     @classmethod
     def from_interactive_plot(cls: Type[T],
                               data: pd.DataFrame,
                               sampling_rate: float,
+                              expected_angle: Optional[float] = None,
                               grav: Optional[float] = None,
                               acc_cols: Optional[Iterable[str]] = None,
                               gyro_cols: Optional[Iterable[str]] = None
@@ -104,7 +110,7 @@ class FerrarisCalibration:
         gyro = data[gyro_cols].values
 
         section_list = _find_calibration_sections_interactive(acc, gyro)
-        return cls.from_section_list(data, section_list, sampling_rate, grav=grav, acc_cols=acc_cols,
+        return cls.from_section_list(data, section_list, sampling_rate, expected_angle, grav=grav, acc_cols=acc_cols,
                                      gyro_cols=gyro_cols), section_list
 
     def compute_calibration_matrix(self) -> FerrarisCalibrationInfo:
@@ -207,7 +213,7 @@ class FerrarisCalibration:
         W_s[:, 2] = np.sum(gyr_z_rot_cor, axis=0) / self.sampling_rate
 
         # Eq.15
-        expected_angles = self.EXPECTED_ANGLE * np.identity(3)
+        expected_angles = self.expected_angle * np.identity(3)
         multiplied = W_s @ inv(expected_angles)
 
         # Eq. 12
