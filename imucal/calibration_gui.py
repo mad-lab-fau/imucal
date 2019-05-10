@@ -7,7 +7,7 @@ class CalibrationGui:
         from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
         import tkinter as tk
 
-        self.text_label = 'labels {{}}/{}'.format(expected_labels)
+        self.text_label = 'labels {{}}/{}'.format(len(expected_labels))
 
         if not master:
             master = tk.Tk()
