@@ -17,10 +17,12 @@ class CalibrationGui:
         cmap = matplotlib.cm.get_cmap('Set3')
         self.colors = {k: matplotlib.colors.to_hex(cmap(i/12)) for i, k in enumerate(expected_labels)}
 
-        self.text_label = 'missing_labels {{}}/{}'.format(len(expected_labels) * 2)
+        self.text_label = 'Labels set: {{}}/{}'.format(len(expected_labels))
 
         if not master:
             master = tk.Tk()
+
+        master.bind('<Return>', lambda x: self._select_next(self.labels.curselection()[0]))
 
         # reset variables
         self.section_list = OrderedDict(((k, [None, None]) for k in expected_labels))
@@ -49,41 +51,38 @@ class CalibrationGui:
         toolbar = NavigationToolbar2Tk(self.canvas, master)
         toolbar.update()
 
+        self.labels.selection_anchor(0)
+        self.labels.selection_set(0)
+
         master.mainloop()
 
     def _create_sidebar(self):
-        self.missing_labels = tk.Listbox(master=self.side_bar, width=30)
-        self.missing_labels.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.labels = tk.Listbox(master=self.side_bar, width=30)
+        self.labels.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        self.existing_labels = tk.Listbox(master=self.side_bar)
-        self.existing_labels.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1)
-        self.existing_labels.bind('<Double-1>', lambda x: self._exisiting_label_clicked())
+        for key in self.section_list:
+            self.labels.insert(tk.END, key)
 
-        self._update_list_boxes()
+        self._update_list_box()
 
-    def _exisiting_label_clicked(self):
-        selected_key = self.existing_labels.get(tk.ACTIVE)
-        self.section_list[selected_key] = [None, None]
-        self._update_list_boxes()
-        self._update_marker(selected_key)
+    def _select_next(self, current):
+        next_val = (current + 1) % self.labels.size()
 
-    def _update_list_boxes(self):
-        self.existing_labels.delete(0, tk.END)
-        for item in [k for k, v in self.section_list.items() if all(v)]:
-            self.existing_labels.insert(tk.END, item)
-            self.existing_labels.itemconfig(self.existing_labels.size() - 1, {'bg': self.colors[item]})
+        if all(list(self.section_list.values())[next_val]):
+            if self._n_labels() == len(self.section_list):
+                return
 
-        old_active = self.missing_labels.get(tk.ACTIVE)
-        self.missing_labels.delete(0, tk.END)
-        new_missing = [k for k, v in self.section_list.items() if not all(v)]
-        for item in new_missing:
-            self.missing_labels.insert(tk.END, item)
-            self.missing_labels.itemconfig(self.missing_labels.size() - 1, {'bg': self.colors[item]})
+            return self._select_next(next_val)
 
-        if old_active not in self.missing_labels.get(0, tk.END):
-            self.missing_labels.activate(0)
-        else:
-            self.missing_labels.activate(new_missing.index(old_active))
+        self.labels.selection_clear(0, tk.END)
+        self.labels.selection_anchor(next_val)
+        self.labels.selection_set(next_val)
+
+    def _update_list_box(self):
+        for i, (key, val) in enumerate(self.section_list.items()):
+            self.labels.itemconfig(i, {'bg': self.colors[key]})
+            if all(val):
+                self.labels.itemconfig(i, {'fg': '#a5a9af'})
 
     def _create_figure(self, acc, gyro):
         from matplotlib.figure import Figure
@@ -108,7 +107,7 @@ class CalibrationGui:
         if event.button not in [1, 3]:
             return
 
-        selected_key = self.missing_labels.get(tk.ACTIVE)
+        selected_key = self.labels.get(self.labels.curselection())
 
         if event.button == 1:
             x = int(event.xdata)
@@ -123,9 +122,9 @@ class CalibrationGui:
         self._update_marker(selected_key)
 
         self.label_text.delete('1.0', tk.END)
-        self.label_text.insert(tk.END, self.text_label.format(str(len(self.section_list))))
+        self.label_text.insert(tk.END, self.text_label.format(str(self._n_labels())))
 
-        self._update_list_boxes()
+        self._update_list_box()
 
     def _update_marker(self, key):
 
@@ -149,4 +148,7 @@ class CalibrationGui:
 
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
+
+    def _n_labels(self):
+        return sum((all(v) for v in self.section_list.values()))
 
