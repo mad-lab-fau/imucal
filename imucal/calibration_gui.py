@@ -12,6 +12,20 @@ class CalibrationGui:
     gyro_list_markers = None
     expected_labels = None
 
+    manual = """
+    Mark the start and end point of each section listed in the sidebar in the plots.
+    The section that is currently labeled is marked in blue in the sidebar.
+    You can use either <return> (<Enter>) to advance to the next section, which has missing labels
+    or click a section label manual.
+    
+    To create a mark click either with the left or the right mouse button on the plot.
+    For each section you can place one RightClick and one LeftClick label.
+    It does not matter, which you place first.
+    If both labels are placed, the region in between them is colored.
+    Now you can either press Enter (or click on any other label in the sidebar) to continue with labeling the next
+    section or you can adjust the labels by repeated left and right clicks until you satisfied. 
+    """
+
     def __init__(self, acc, gyro, expected_labels, master=None):
         self.expected_labels = expected_labels
         cmap = matplotlib.cm.get_cmap('Set3')
@@ -59,11 +73,16 @@ class CalibrationGui:
     def _create_sidebar(self):
         self.labels = tk.Listbox(master=self.side_bar, width=30)
         self.labels.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        help_button = tk.Button(master=self.side_bar, height=2, text='Help', command=self._show_help)
+        help_button.pack(side=tk.BOTTOM, fill=tk.BOTH)
 
         for key in self.section_list:
             self.labels.insert(tk.END, key)
 
         self._update_list_box()
+
+    def _show_help(self):
+        tk.messagebox.showinfo('Window', self.manual)
 
     def _select_next(self, current):
         next_val = (current + 1) % self.labels.size()
@@ -91,13 +110,13 @@ class CalibrationGui:
         ax1 = fig.add_subplot(211)
         ax1.plot(acc)
         ax1.grid(True)
-        ax1.set_title("Set a label at start/end of accelerometer placements (12 in total)")
+        ax1.set_title("Use this plot to find the static regions for acc calibration")
         ax1.set_xlabel("time [s]")
         ax1.set_ylabel("acceleration [m/s^2]")
         ax2 = fig.add_subplot(212, sharex=ax1)
         ax2.plot(gyro)
         ax2.grid(True)
-        ax2.set_title("Set a label at start/end of gyroscope rotation (6 in total)")
+        ax2.set_title("Use this plot to find the single axis rotatins for gyro calibration")
         ax2.set_xlabel("time[s]")
         ax2.set_ylabel("rotation [°/s]")
         fig.tight_layout()

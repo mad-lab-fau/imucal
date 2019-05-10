@@ -232,14 +232,6 @@ def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
     """
     Prepares the calibration data for the later calculation of calibration matrices.
 
-    Operations manual:
-    Use the move cursor and a double click to place a label at the plot.
-    Accelerometer: Place the labels where the data is steady.
-                   Two labels for each position +x,-x,+y,-y,+z,-z. That makes in total 12 labels.
-    Gyroscope:     Place the labels where the sensor is rotated around a axis.
-                   Two labels for each axis. Makes 6 in total.
-    The space between the labels of a single position is kept, everything else is discarded.
-
     :param acc: numpy array with the shape (n, 3) where n is the number of samples
     :param gyro: numpy array with the shape (n, 3) where n is the number of samples
     :param debug_plot: set true to see, whether data cutting was successful
