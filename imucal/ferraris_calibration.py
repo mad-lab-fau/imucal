@@ -234,11 +234,11 @@ def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
 
     Operations manual:
     Use the move cursor and a double click to place a label at the plot.
-    Accelerometer: Place the labels where the data is steady.
-                   Two labels for each position +x,-x,+y,-y,+z,-z. That makes in total 12 labels.
-    Gyroscope:     Place the labels where the sensor is rotated around a axis.
-                   Two labels for each axis. Makes 6 in total.
-    The space between the labels of a single position is kept, everything else is discarded.
+    Accelerometer: Place the missing_labels where the data is steady.
+                   Two missing_labels for each position +x,-x,+y,-y,+z,-z. That makes in total 12 missing_labels.
+    Gyroscope:     Place the missing_labels where the sensor is rotated around a axis.
+                   Two missing_labels for each axis. Makes 6 in total.
+    The space between the missing_labels of a single position is kept, everything else is discarded.
 
     :param acc: numpy array with the shape (n, 3) where n is the number of samples
     :param gyro: numpy array with the shape (n, 3) where n is the number of samples
@@ -251,7 +251,7 @@ def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
 
     section_list = plot.section_list
 
-    # sort the labels in ascending order
+    # sort the missing_labels in ascending order
     section_list.sort()
 
     if len(section_list) != 18:
