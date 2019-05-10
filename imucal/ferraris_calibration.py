@@ -90,7 +90,7 @@ class FerrarisCalibration:
                           gyro_cols: Optional[Iterable[str]] = None
                           ) -> T:
         df = _convert_data_from_section_list_to_df(data, section_list)
-        return cls.from_df(df, sampling_rate, expected_angle, grav=grav, acc_cols=acc_cols, gyro_cols=gyro_cols)
+        return cls.from_df(df, sampling_rate, expected_angle=expected_angle, grav=grav, acc_cols=acc_cols, gyro_cols=gyro_cols)
 
     @classmethod
     def from_interactive_plot(cls: Type[T],
@@ -111,7 +111,7 @@ class FerrarisCalibration:
         gyro = data[gyro_cols].values
 
         section_list = _find_calibration_sections_interactive(acc, gyro)
-        return cls.from_section_list(data, section_list, sampling_rate, expected_angle, grav=grav, acc_cols=acc_cols,
+        return cls.from_section_list(data, section_list, sampling_rate, expected_angle=expected_angle, grav=grav, acc_cols=acc_cols,
                                      gyro_cols=gyro_cols), section_list
 
     def compute_calibration_matrix(self) -> FerrarisCalibrationInfo:
@@ -247,18 +247,16 @@ def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
 
     # remove the unnecessary data
 
-    plot = CalibrationGui(acc, gyro, len(FerrarisCalibration.FERRARIS_SECTIONS) * 2)
+    plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS)
 
     section_list = plot.section_list
 
-    # sort the missing_labels in ascending order
-    section_list.sort()
+    check_all = (all(v) for v in section_list.values())
+    if not all(check_all):
+        raise ValueError('Some regions are missing in the section list. Label all regions before closing the plot')
 
-    if len(section_list) != 18:
-        raise ValueError('9 regions (18 markers) are expected, but {} markers were set.'.format(len(section_list)))
+    section_list = pd.DataFrame(section_list, index=('start', 'end')).T
 
-    section_list = pd.DataFrame(np.array(section_list).reshape((-1, 2)), columns=('start', 'end'),
-                                index=FerrarisCalibration.FERRARIS_SECTIONS)
     return section_list
 
 
