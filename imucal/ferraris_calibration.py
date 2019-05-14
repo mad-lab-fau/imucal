@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from numpy.linalg import inv
 
+from imucal import CalibrationInfo
 from imucal.calibration_gui import CalibrationGui
 from imucal.ferraris_calibration_info import FerrarisCalibrationInfo
 
@@ -41,6 +42,8 @@ class FerrarisCalibration:
     ACC_COLS = ('acc_x', 'acc_y', 'acc_z')
     GYRO_COLS = ('gyr_x', 'gyr_y', 'gyr_z')
     FERRARIS_SECTIONS = ('x_p', 'x_a', 'y_p', 'y_a', 'z_p', 'z_a', 'x_rot', 'y_rot', 'z_rot')
+
+    _CALIBRATION_INFO = FerrarisCalibrationInfo
 
     _fields = tuple('{}_{}'.format(x, y) for x, y in product(('acc', 'gyr'), FERRARIS_SECTIONS))
 
@@ -114,8 +117,8 @@ class FerrarisCalibration:
         return cls.from_section_list(data, section_list, sampling_rate, expected_angle=expected_angle, grav=grav, acc_cols=acc_cols,
                                      gyro_cols=gyro_cols), section_list
 
-    def compute_calibration_matrix(self) -> FerrarisCalibrationInfo:
-        cal_mat = FerrarisCalibrationInfo()
+    def compute_calibration_matrix(self) -> CalibrationInfo:
+        cal_mat = self._CALIBRATION_INFO()
 
         ###############################################################################################################
         # Compute Acceleration Matrix
