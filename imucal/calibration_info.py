@@ -111,7 +111,7 @@ class CalibrationInfo:
 
         with h5py.File(path, 'r') as hdf:
             values = dict()
-            subcls = cls._find_subclass_from_cal_type(hdf['cal_type'].value)
+            subcls = cls._find_subclass_from_cal_type(hdf['cal_type'][...])
             for k in subcls._fields:
                 values[k] = np.array(hdf.get(k))
 
