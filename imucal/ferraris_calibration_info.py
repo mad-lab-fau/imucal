@@ -44,7 +44,6 @@ class FerrarisCalibrationInfo(CalibrationInfo):
 
     def _calibrate_gyro(self, gyro, calibrated_acc):
         # Combine Scaling and rotation matrix to one matrix
-        # TODO: Error check for initialized paras
         gyro_mat = np.matmul(np.linalg.inv(self.R_g), np.linalg.inv(self.K_g))
         tmp = self._calibrate_gyro_offsets(gyro, calibrated_acc)
 
@@ -52,6 +51,13 @@ class FerrarisCalibrationInfo(CalibrationInfo):
         return gyro_out.T
 
     def calibrate(self, acc, gyro):
+        # Check if all required paras are initialized to throw appropriate error messages:
+        for v in self._fields:
+            if getattr(self, v, None) is None:
+                raise ValueError(
+                    '{} need to initialised before an acc calibration can be performed. {} is missing'.format(
+                        self._fields, v))
+
         acc_out = self.calibrate_acc(acc)
         gyro_out = self._calibrate_gyro(gyro, acc_out)
 
