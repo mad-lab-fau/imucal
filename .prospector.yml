@@ -1,0 +1,25 @@
+strictness: veryhigh
+doc-warnings: true
+
+pep8:
+  options:
+    max-line-length: 120
+  disable:
+    - E127
+
+pep257:
+  disable:
+    - D203
+    - D213
+    - D105
+    - D406
+    - D407
+
+pylint:
+  run: false
+  options:
+    max-line-length: 120
+    disable:
+      - too-many-ancestors
+      - too-few-public-methods
+      - invalid-unary-operand-type

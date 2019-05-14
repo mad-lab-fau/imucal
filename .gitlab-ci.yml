@@ -1,0 +1,28 @@
+stages:
+  - testing
+
+.python_base: &python_base
+  tags:
+    - docker
+  image: python:3.6
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
+  cache:
+    paths:
+      - "$CI_PROJECT_DIR/pip-cache"
+    key: "$CI_PROJECT_ID"
+  before_script:
+    - pip install tox
+
+test:
+  stage: testing
+  <<: *python_base
+  script:
+    - tox -e test
+
+lint:
+  stage: testing
+  <<: *python_base
+  script:
+    - tox -e lint
+  allow_failure: true
