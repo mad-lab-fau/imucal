@@ -183,7 +183,7 @@ class FerrarisCalibration:
 
         # Acceleration sensitivity
 
-        # Note: Each measurement should be a column? or should it
+        # Note: Each measurement should be a column
         U_g_p = np.vstack((
             np.mean(self.gyr_x_p, axis=0),
             np.mean(self.gyr_y_p, axis=0),
