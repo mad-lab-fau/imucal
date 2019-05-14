@@ -1,8 +1,6 @@
 from collections import OrderedDict
 from itertools import chain
 
-import matplotlib
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import tkinter as tk
 
 
@@ -27,6 +25,9 @@ class CalibrationGui:
     """
 
     def __init__(self, acc, gyro, expected_labels, master=None):
+        import matplotlib
+        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+
         self.expected_labels = expected_labels
         cmap = matplotlib.cm.get_cmap('Set3')
         self.colors = {k: matplotlib.colors.to_hex(cmap(i/12)) for i, k in enumerate(expected_labels)}
