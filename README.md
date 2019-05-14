@@ -43,8 +43,8 @@ cal.gyr_z_a = data_gyr_z_a
 ```
 
 If the data was recorded as a single continuous stream, we first need to identify the different regions in the data.
-If the regions were recorded in the correct order (`'x_p', 'x_a', 'y_p', 'y_a', 'z_p', 'z_a', 'x_rot', 'y_rot', 'z_rot'`) the `from_interactive_plot` method can be used to extract them manually.
-For this and for moth other methods, we expect the data to be a `pd.DataFrame` with the columns `'acc_x', 'acc_y', 'acc_z, 'gyr_x', 'gyr_y', 'gyr_z'`, where each column represents the datastream of one sensor axis.
+The `from_interactive_plot` method can be used to extract them manually using a GUI.
+For this and for most other methods, we expect the data to be a `pd.DataFrame` with the columns `'acc_x', 'acc_y', 'acc_z, 'gyr_x', 'gyr_y', 'gyr_z'`, where each column represents the datastream of one sensor axis.
 
 Note: The expected column names can be overwritten
 
