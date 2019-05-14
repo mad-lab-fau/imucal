@@ -37,7 +37,12 @@ class FerrarisCalibrationInfo(CalibrationInfo):
 
         return acc_out.T
 
-    def calibrate_gyro(self, gyro, calibrated_acc):
+    def calibrate_gyro(self, gyro):
+        raise NotImplementedError('The Ferraris calibration does not provide a dedicated gyro calibration, because'
+                                  'the accelerometer data is required for this step anyway. Use the general `calibrate`'
+                                  'method to calibrate the gyro and the acc together.')
+
+    def _calibrate_gyro(self, gyro, calibrated_acc):
         # Combine Scaling and rotation matrix to one matrix
         # TODO: Error check for initialized paras
         gyro_mat = np.matmul(np.linalg.inv(self.R_g), np.linalg.inv(self.K_g))
@@ -48,6 +53,6 @@ class FerrarisCalibrationInfo(CalibrationInfo):
 
     def calibrate(self, acc, gyro):
         acc_out = self.calibrate_acc(acc)
-        gyro_out = self.calibrate_gyro(gyro, acc_out)
+        gyro_out = self._calibrate_gyro(gyro, acc_out)
 
         return acc_out, gyro_out

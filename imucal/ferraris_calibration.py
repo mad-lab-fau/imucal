@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from numpy.linalg import inv
 
-from imucal import CalibrationInfo
+from imucal.calibration_info import CalibrationInfo
 from imucal.calibration_gui import CalibrationGui
 from imucal.ferraris_calibration_info import FerrarisCalibrationInfo
 
