@@ -5,6 +5,7 @@ import tkinter as tk
 
 import pandas as pd
 
+
 class CalibrationGui:
     section_list = None
     acc_list_markers = None
@@ -25,7 +26,7 @@ class CalibrationGui:
     section or you can adjust the labels by repeated left and right clicks until you satisfied.
     """
 
-    def __init__(self, acc, gyro, expected_labels, master=None):
+    def __init__(self, acc, gyro, expected_labels, title=None, master=None):
         import matplotlib
         from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
@@ -38,6 +39,7 @@ class CalibrationGui:
         if not master:
             master = tk.Tk()
 
+        master.title(title or 'Calibration Gui')
         master.bind('<Return>', lambda x: self._select_next(self.labels.curselection()[0]))
 
         # reset variables

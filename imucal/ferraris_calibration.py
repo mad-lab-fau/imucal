@@ -233,13 +233,15 @@ class FerrarisCalibration:
         return cal_mat
 
 
-def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
+def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, title: Optional[str] = None):
     """Prepares the calibration data for the later calculation of calibration matrices.
 
-    :param acc: numpy array with the shape (n, 3) where n is the number of samples
-    :param gyro: numpy array with the shape (n, 3) where n is the number of samples
+    Args:
+        acc: numpy array with the shape (n, 3) where n is the number of samples
+        gyro: numpy array with the shape (n, 3) where n is the number of samples
+        title: optional title for the Calibration GUI
     """
-    plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS)
+    plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS, title=title)
 
     section_list = plot.section_list
 
