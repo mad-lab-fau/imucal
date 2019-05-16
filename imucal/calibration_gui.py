@@ -3,11 +3,7 @@ from itertools import chain
 
 import tkinter as tk
 
-import numpy as np
 import pandas as pd
-
-from imucal import FerrarisCalibration
-
 
 class CalibrationGui:
     section_list = None
@@ -178,26 +174,6 @@ class CalibrationGui:
 
     def _n_labels(self):
         return sum((all(v) for v in self.section_list.values()))
-
-
-def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
-    """Prepares the calibration data for the later calculation of calibration matrices.
-
-    :param acc: numpy array with the shape (n, 3) where n is the number of samples
-    :param gyro: numpy array with the shape (n, 3) where n is the number of samples
-    :param debug_plot: set true to see, whether data cutting was successful
-    """
-    plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS)
-
-    section_list = plot.section_list
-
-    check_all = (all(v) for v in section_list.values())
-    if not all(check_all):
-        raise ValueError('Some regions are missing in the section list. Label all regions before closing the plot')
-
-    section_list = pd.DataFrame(section_list, index=('start', 'end')).T
-
-    return section_list
 
 
 def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame):

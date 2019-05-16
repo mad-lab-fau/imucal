@@ -6,8 +6,7 @@ import pandas as pd
 from numpy.linalg import inv
 
 from imucal.calibration_info import CalibrationInfo
-from imucal.calibration_gui import _find_calibration_sections_interactive, \
-    _convert_data_from_section_list_to_df
+from imucal.calibration_gui import _convert_data_from_section_list_to_df, CalibrationGui
 from imucal.ferraris_calibration_info import FerrarisCalibrationInfo
 
 T = TypeVar('T', bound='FerrarisCalibration')
@@ -232,3 +231,22 @@ class FerrarisCalibration:
         cal_mat.R_g = R_g
 
         return cal_mat
+
+
+def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
+    """Prepares the calibration data for the later calculation of calibration matrices.
+
+    :param acc: numpy array with the shape (n, 3) where n is the number of samples
+    :param gyro: numpy array with the shape (n, 3) where n is the number of samples
+    """
+    plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS)
+
+    section_list = plot.section_list
+
+    check_all = (all(v) for v in section_list.values())
+    if not all(check_all):
+        raise ValueError('Some regions are missing in the section list. Label all regions before closing the plot')
+
+    section_list = pd.DataFrame(section_list, index=('start', 'end')).T
+
+    return section_list
