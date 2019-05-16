@@ -88,8 +88,8 @@ class CalibrationInfo:
         return subclass._from_list_dict(raw_json)
 
     def to_hdf5(self, filename):
-        """
-        Saves calibration matrices to hdf5 fileformat
+        """Save calibration matrices to hdf5 fileformat.
+
         :param filename: filename (including h5 at end)
         """
         import h5py
@@ -102,7 +102,7 @@ class CalibrationInfo:
 
     @classmethod
     def from_hdf5(cls, path):
-        """Reads calibration data stored in hdf5 fileformat (created by FerrarisCalibrationInfo save_to_hdf5).
+        """Read calibration data stored in hdf5 fileformat (created by FerrarisCalibrationInfo save_to_hdf5).
 
         :param path: filename
         :return: FerrarisCalibrationInfo object

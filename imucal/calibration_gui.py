@@ -3,6 +3,11 @@ from itertools import chain
 
 import tkinter as tk
 
+import numpy as np
+import pandas as pd
+
+from imucal import FerrarisCalibration
+
 
 class CalibrationGui:
     section_list = None
@@ -15,13 +20,13 @@ class CalibrationGui:
     The section that is currently labeled is marked in blue in the sidebar.
     You can use either <return> (<Enter>) to advance to the next section, which has missing labels
     or click a section label manual.
-    
+
     To create a mark click either with the left or the right mouse button on the plot.
     For each section you can place one RightClick and one LeftClick label.
     It does not matter, which you place first.
     If both labels are placed, the region in between them is colored.
     Now you can either press Enter (or click on any other label in the sidebar) to continue with labeling the next
-    section or you can adjust the labels by repeated left and right clicks until you satisfied. 
+    section or you can adjust the labels by repeated left and right clicks until you satisfied.
     """
 
     def __init__(self, acc, gyro, expected_labels, master=None):
@@ -30,7 +35,7 @@ class CalibrationGui:
 
         self.expected_labels = expected_labels
         cmap = matplotlib.cm.get_cmap('Set3')
-        self.colors = {k: matplotlib.colors.to_hex(cmap(i/12)) for i, k in enumerate(expected_labels)}
+        self.colors = {k: matplotlib.colors.to_hex(cmap(i / 12)) for i, k in enumerate(expected_labels)}
 
         self.text_label = 'Labels set: {{}}/{}'.format(len(expected_labels))
 
@@ -161,8 +166,10 @@ class CalibrationGui:
                 self.gyro_list_markers[key].append(marker_gyro)
 
         if all(self.section_list[key]):
-            a_acc = self.axs[0].axvspan(self.section_list[key][0], self.section_list[key][1], alpha=0.5, color=self.colors[key])
-            a_gyr = self.axs[1].axvspan(self.section_list[key][0], self.section_list[key][1], alpha=0.5, color=self.colors[key])
+            a_acc = self.axs[0].axvspan(self.section_list[key][0], self.section_list[key][1], alpha=0.5,
+                                        color=self.colors[key])
+            a_gyr = self.axs[1].axvspan(self.section_list[key][0], self.section_list[key][1], alpha=0.5,
+                                        color=self.colors[key])
             self.acc_list_markers[key].append(a_acc)
             self.gyro_list_markers[key].append(a_gyr)
 
@@ -172,3 +179,31 @@ class CalibrationGui:
     def _n_labels(self):
         return sum((all(v) for v in self.section_list.values()))
 
+
+def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray):
+    """Prepares the calibration data for the later calculation of calibration matrices.
+
+    :param acc: numpy array with the shape (n, 3) where n is the number of samples
+    :param gyro: numpy array with the shape (n, 3) where n is the number of samples
+    :param debug_plot: set true to see, whether data cutting was successful
+    """
+    plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS)
+
+    section_list = plot.section_list
+
+    check_all = (all(v) for v in section_list.values())
+    if not all(check_all):
+        raise ValueError('Some regions are missing in the section list. Label all regions before closing the plot')
+
+    section_list = pd.DataFrame(section_list, index=('start', 'end')).T
+
+    return section_list
+
+
+def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame):
+    out = dict()
+
+    for label, row in section_list.iterrows():
+        out[label] = data.iloc[row.start:row.end]
+
+    return pd.concat(out)

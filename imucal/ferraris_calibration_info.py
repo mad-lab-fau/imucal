@@ -1,5 +1,3 @@
-import json
-
 import numpy as np
 
 from imucal.calibration_info import CalibrationInfo
