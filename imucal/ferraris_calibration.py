@@ -92,6 +92,37 @@ class FerrarisCalibration:
                           acc_cols: Optional[Iterable[str]] = None,
                           gyro_cols: Optional[Iterable[str]] = None
                           ) -> T:
+        """Create a Calibration object based on a valid section list.
+
+        A section list marks the start and the endpoints of each required section in the data object.
+        A valid section list is usually created using `FerrarisCalibration.from_interactive_plot()`.
+        This section list can be stored on disk and this method can be used to turn it back into a valid calibration
+        object.
+
+        Examples:
+            >>> from imucal import FerrarisCalibration
+            >>> import pandas as pd
+            >>> # Load a valid section list from disk. Note the `index_col=0` to preserve correct format!
+            >>> section_list = pd.read_csv('./calibration_sections.csv', index_col=0)
+            >>> sampling_rate = 100 #Hz
+            >>> data = ... # my data as 6 col pandas dataframe
+            >>> cal = FerrarisCalibration.from_section_list(data, section_list, sampling_rate=sampling_rate)
+            < FerrarisCalibration object at ... >
+
+        Args:
+            data: 6 column dataframe (3 acc, 3 gyro)
+            section_list: A pandas dataframe representing a section list
+            sampling_rate: sampling rate of the data
+            expected_angle: expected rotation angle for the gyroscope rotation. If None defaults to
+                FerrarisCalibration.EXPECTED_ANGLE
+            grav: The expected value of the gravitational acceleration. Defaults to FerrarisCalibration.DEFAULT_GRAV
+            acc_cols: The name of the 3 acceleration columns in order x,y,z. Defaults to FerrarisCalibration.ACC_COLS
+            gyro_cols: The name of the 3 acceleration columns in order x,y,z. Defaults to FerrarisCalibration.GYRO_COLS
+
+        Returns:
+            FerrarisCalibration: Final calibration object
+
+        """
         df = _convert_data_from_section_list_to_df(data, section_list)
         return cls.from_df(df, sampling_rate, expected_angle=expected_angle, grav=grav, acc_cols=acc_cols,
                            gyro_cols=gyro_cols)
@@ -105,7 +136,37 @@ class FerrarisCalibration:
                               acc_cols: Optional[Iterable[str]] = None,
                               gyro_cols: Optional[Iterable[str]] = None
                               ) -> Tuple[T, pd.DataFrame]:
-        # TODO: proper documentation
+        """Create a Calibration object by selecting the individual signal sections manually in an interactive GUI.
+
+        This will open a Tkinter Window that allows you to label the start and the end all required sections for a
+        Ferraris Calibration.
+        See the class docstring for more detailed explanations of these sections.
+
+        Examples:
+            >>> from imucal import FerrarisCalibration
+            >>> sampling_rate = 100 #Hz
+            >>> data = ... # my data as 6 col pandas dataframe
+            >>> # This will open an interactive plot, where you can select the start and the stop sample of each region
+            >>> cal, section_list = FerrarisCalibration.from_interactive_plot(data, sampling_rate=sampling_rate)
+            >>> section_list.to_csv('./calibration_sections.csv')  # This is optional, but recommended
+            >>> cal
+            < FerrarisCalibration object at ... >
+
+        Args:
+            data: 6 column dataframe (3 acc, 3 gyro)
+            sampling_rate: sampling rate of the data
+            expected_angle: expected rotation angle for the gyroscope rotation. If None defaults to
+                FerrarisCalibration.EXPECTED_ANGLE
+            grav: The expected value of the gravitational acceleration. Defaults to FerrarisCalibration.DEFAULT_GRAV
+            acc_cols: The name of the 3 acceleration columns in order x,y,z. Defaults to FerrarisCalibration.ACC_COLS
+            gyro_cols: The name of the 3 acceleration columns in order x,y,z. Defaults to FerrarisCalibration.GYRO_COLS
+
+        Returns:
+            FerrarisCalibration: Final calibration object
+            pd.DataFrame: Section list representing the start and stop of each section. It is advised to save this to
+                disk to avoid repeated manual labeling. FerrarisCalibration.from_section_list() can be used to recreate
+                the calibration object
+        """
         if acc_cols is None:
             acc_cols = list(cls.ACC_COLS)
         if gyro_cols is None:
