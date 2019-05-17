@@ -1,3 +1,4 @@
+"""Calculate a Ferraris calibration from sensor data."""
 from itertools import product
 from typing import Optional, Iterable, TypeVar, Type, Tuple
 
@@ -13,6 +14,40 @@ T = TypeVar('T', bound='FerrarisCalibration')
 
 
 class FerrarisCalibration:
+    """Calculate a Ferraris calibration matrizes based on a set of calibration movements.
+
+    The Ferraris calibration is derived based on a well defined series of data recordings:
+
+    x_p: positive x-axis of sensor is aligned with gravity
+    x_a: negative x-axis of sensor is aligned with gravity
+    y_p: positive y-axis of sensor is aligned with gravity
+    y_a: negative y-axis of sensor is aligned with gravity
+    z_p: positive z-axis of sensor is aligned with gravity
+    z_a: negative z-axis of sensor is aligned with gravity
+
+    x_rot: sensor is rotated around the x-axis for a well known angle (typically 360 deg)
+    y_rot: sensor is rotated around the y-axis for a well known angle (typically 360 deg)
+    z_rot: sensor is rotated around the z-axis for a well known angle (typically 360 deg)
+
+    All sections need to be recorded for a sensor and then annotated.
+    In particular for the rotation, it is important to annotate the data directly at the end and the beginning of the
+    rotation to avoid noise and artifact degrading the integration results .
+
+    This class offers various helper constructors to support the annotation process.
+
+    Examples:
+        >>> from imucal import FerrarisCalibration
+        >>> sampling_rate = 100 #Hz
+        >>> data = ... # my data as 6 col pandas dataframe
+        >>> # This will open an interactive plot, where you can select the start and the stop sample of each region
+        >>> cal, section_list = FerrarisCalibration.from_interactive_plot(data, sampling_rate=sampling_rate)
+        >>> section_list.to_csv('./calibration_sections.csv')  # This is optional, but recommended
+        >>> calibration_info = cal.compute_calibration_matrix()  # Calculate the actual matrizes.
+        >>> calibration_info
+        < FerrarisCalibration object at ... >
+
+    """
+
     acc_x_p: np.ndarray
     acc_x_a: np.ndarray
     acc_y_p: np.ndarray
@@ -49,6 +84,20 @@ class FerrarisCalibration:
 
     def __init__(self, sampling_rate: float, grav: Optional[float] = None, expected_angle: Optional[float] = None,
                  **kwargs) -> None:
+        """Create a Calibration object.
+
+        Usually you would want to use one of the provided "from" constructors instead of directly using the init.
+
+        Args:
+            data: 6 column dataframe (3 acc, 3 gyro)
+            sampling_rate: sampling rate of the data
+            expected_angle: expected rotation angle for the gyroscope rotation. If None defaults to
+                FerrarisCalibration.EXPECTED_ANGLE
+            grav: The expected value of the gravitational acceleration. Defaults to FerrarisCalibration.DEFAULT_GRAV
+            kwargs: A 3D numpy array for each section (acc and gyro separately) required by the ferraris calibration.
+                The arguments need to be named acc/gyr_section (e.g. acc_x_p)
+
+        """
         for field in self._fields:
             setattr(self, field, kwargs.get(field, None))
 
@@ -66,13 +115,48 @@ class FerrarisCalibration:
                 acc_cols: Optional[Iterable[str]] = None,
                 gyro_cols: Optional[Iterable[str]] = None
                 ) -> T:
-        # TODO: need proper documentation
+        """Create a Calibration object based on a dataframe which has all required sections labeled.
+
+        The expected Dataframe has the section label as index and has at least the 6 required data columns.
+        The index must contain all sections as specified by FerrarisCalibration.FERRARIS_SECTIONS.
+
+        >>> print(example_df)
+                acc_x acc_y   acc_z  gyr_x  gyr_y  gyr_z
+        part
+        x_a   -2052.0 -28.0   -73.0    1.0    0.0   -5.0
+        x_a   -2059.0 -29.0   -77.0    2.0   -3.0   -5.0
+        x_a   -2054.0 -25.0   -71.0    3.0   -2.0   -3.0
+        ...       ...   ...     ...    ...    ...    ...
+        z_rot   -36.0  35.0  2079.0    2.0   -5.0   -2.0
+        z_rot   -28.0  36.0  2092.0    6.0   -5.0   -4.0
+        z_rot   -36.0  21.0  2085.0    5.0   -4.0   -4.0
+
+        Examples:
+            >>> from imucal import FerrarisCalibration
+            >>> import pandas as pd
+            >>> sampling_rate = 100 #Hz
+            >>> df = ... # A valid DataFrame with all sections in the index
+            >>> cal = FerrarisCalibration.from_dict(df, sampling_rate=sampling_rate)
+            < FerrarisCalibration object at ... >
+
+        Args:
+            df: 6 column dataframe (3 acc, 3 gyro)
+            sampling_rate: sampling rate of the data
+            expected_angle: expected rotation angle for the gyroscope rotation. If None defaults to
+                FerrarisCalibration.EXPECTED_ANGLE
+            grav: The expected value of the gravitational acceleration. Defaults to FerrarisCalibration.DEFAULT_GRAV
+            acc_cols: The name of the 3 acceleration columns in order x,y,z. Defaults to FerrarisCalibration.ACC_COLS
+            gyro_cols: The name of the 3 acceleration columns in order x,y,z. Defaults to FerrarisCalibration.GYRO_COLS
+
+        Returns:
+            FerrarisCalibration: Final calibration object
+
+        """
         if acc_cols is None:
             acc_cols = list(cls.ACC_COLS)
         if gyro_cols is None:
             gyro_cols = list(cls.GYRO_COLS)
 
-        grav = grav or cls.DEFAULT_GRAV
         acc_df = df[list(acc_cols)]
         gyro_df = df[list(gyro_cols)]
         acc_dict = acc_df.groupby(level=0).apply(lambda x: x.values).to_dict()
@@ -166,6 +250,7 @@ class FerrarisCalibration:
             pd.DataFrame: Section list representing the start and stop of each section. It is advised to save this to
                 disk to avoid repeated manual labeling. FerrarisCalibration.from_section_list() can be used to recreate
                 the calibration object
+
         """
         if acc_cols is None:
             acc_cols = list(cls.ACC_COLS)
@@ -181,6 +266,10 @@ class FerrarisCalibration:
                                      gyro_cols=gyro_cols), section_list
 
     def compute_calibration_matrix(self) -> CalibrationInfo:
+        """Compute the calibration Information.
+
+        This actually performs the Ferraris calibration following the original publication equation by equation.
+        """
         cal_mat = self._CALIBRATION_INFO()
 
         ###############################################################################################################
@@ -295,7 +384,7 @@ class FerrarisCalibration:
 
 
 def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, title: Optional[str] = None):
-    """Prepares the calibration data for the later calculation of calibration matrices.
+    """Prepare the calibration data for the later calculation of calibration matrices.
 
     Args:
         acc: numpy array with the shape (n, 3) where n is the number of samples
