@@ -80,31 +80,6 @@ class FerrarisCalibrationInfo(CalibrationInfo):
                       ' together.'.format(self.CAL_TYPE))
         return self._calibrate_gyro(gyro, calibrated_acc=None)
 
-    def _calibrate_gyro(self, gyro, calibrated_acc=None):
-        # Check if all required paras are initialized to throw appropriate error messages:
-        required = ['K_g', 'R_g', 'b_g']
-        if calibrated_acc is not None:
-            required += ['K_ga']
-        for v in required:
-            if getattr(self, v, None) is None:
-                raise ValueError(
-                    '{} need to initialised before an gyro calibration can be performed. {} is missing'.format(
-                        required, v))
-        # Combine Scaling and rotation matrix to one matrix
-        gyro_mat = np.matmul(np.linalg.inv(self.R_g), np.linalg.inv(self.K_g))
-        tmp = self._calibrate_gyro_offsets(gyro, calibrated_acc)
-
-        gyro_out = gyro_mat @ tmp.T
-        return gyro_out.T
-
-    def _calibrate_gyro_offsets(self, gyro, calibrated_acc=None):
-        if calibrated_acc is None:
-            d_ga = np.array(0)
-        else:
-            d_ga = (self.K_ga @ calibrated_acc.T)
-        offsets = d_ga.T + self.b_g
-        return gyro - offsets
-
     def calibrate(self, acc: np.ndarray, gyro: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Calibrate the accelerometer and the gyroscope.
 
@@ -131,6 +106,31 @@ class FerrarisCalibrationInfo(CalibrationInfo):
         gyro_out = self._calibrate_gyro(gyro, acc_out)
 
         return acc_out, gyro_out
+
+    def _calibrate_gyro(self, gyro, calibrated_acc=None):
+        # Check if all required paras are initialized to throw appropriate error messages:
+        required = ['K_g', 'R_g', 'b_g']
+        if calibrated_acc is not None:
+            required += ['K_ga']
+        for v in required:
+            if getattr(self, v, None) is None:
+                raise ValueError(
+                    '{} need to initialised before an gyro calibration can be performed. {} is missing'.format(
+                        required, v))
+        # Combine Scaling and rotation matrix to one matrix
+        gyro_mat = np.matmul(np.linalg.inv(self.R_g), np.linalg.inv(self.K_g))
+        tmp = self._calibrate_gyro_offsets(gyro, calibrated_acc)
+
+        gyro_out = gyro_mat @ tmp.T
+        return gyro_out.T
+
+    def _calibrate_gyro_offsets(self, gyro, calibrated_acc=None):
+        if calibrated_acc is None:
+            d_ga = np.array(0)
+        else:
+            d_ga = (self.K_ga @ calibrated_acc.T)
+        offsets = d_ga.T + self.b_g
+        return gyro - offsets
 
 
 class TurntableCalibrationInfo(FerrarisCalibrationInfo):
