@@ -6,7 +6,6 @@ import numpy as np
 from imucal.calibration_info import CalibrationInfo
 
 
-# TODO: Add version for Turntable to make sure it is possible to differentiate the two
 # TODO: Add example to docstring
 class FerrarisCalibrationInfo(CalibrationInfo):
     """Calibration object that represents all the required information to apply a Ferraris calibration to a dataset.
@@ -117,3 +116,42 @@ class FerrarisCalibrationInfo(CalibrationInfo):
         gyro_out = self._calibrate_gyro(gyro, acc_out)
 
         return acc_out, gyro_out
+
+
+class TurntableCalibrationInfo(FerrarisCalibrationInfo):
+    """Calibration object that represents all the required information to apply a Turntable calibration to a dataset.
+
+    A Turntable calibration is identical to a Ferraris calibration.
+    However, because the parameters are calculated using a calibration table instead of hand rotations,
+    higher precision is expected.
+
+    Attributes:
+        K_a: Scaling matrix for the acceleration
+        R_a: Rotation matrix for the acceleration
+        b_a: Acceleration bias
+        K_g: Scaling matrix for the gyroscope
+        R_g: Rotation matrix for the gyroscope
+        K_ga: Influence of acceleration on gyroscope
+        b_g: gyroscope bias
+
+    """
+
+    CAL_TYPE = 'Turntable'
+
+    def calibrate_gyro(self, gyro: np.ndarray) -> np.ndarray:
+        """Calibrate the gyroscope.
+
+        Warning:
+            This is not supported for the TurntableCalibration, as it is not possible to calibrate the gyroscope alone.
+            Use `TurntableCalibrationnInfo.calibrate` instead.
+
+        Args:
+          gyro: 3D gyroscope values
+
+        Raises:
+            NotImplementedError: Always
+
+        """
+        raise NotImplementedError('The Turntable calibration does not provide a dedicated gyro calibration, because'
+                                  'the accelerometer data is required for this step anyway. Use the general `calibrate`'
+                                  'method to calibrate the gyro and the acc together.')

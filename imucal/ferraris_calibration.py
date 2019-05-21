@@ -8,13 +8,13 @@ from numpy.linalg import inv
 
 from imucal.calibration_info import CalibrationInfo
 from imucal.calibration_gui import _convert_data_from_section_list_to_df, CalibrationGui
-from imucal.ferraris_calibration_info import FerrarisCalibrationInfo
+from imucal.ferraris_calibration_info import FerrarisCalibrationInfo, TurntableCalibrationInfo
 
 T = TypeVar('T', bound='FerrarisCalibration')
 
 
 class FerrarisCalibration:
-    """Calculate a Ferraris calibration matrizes based on a set of calibration movements.
+    """Calculate a Ferraris calibration matrices based on a set of calibration movements.
 
     The Ferraris calibration is derived based on a well defined series of data recordings:
 
@@ -381,6 +381,21 @@ class FerrarisCalibration:
         cal_mat.R_g = R_g
 
         return cal_mat
+
+
+class TurntableCalibration(FerrarisCalibration):
+    """Calculate a Ferraris calibration matrices based on a turntable measurement.
+
+    This calibration is basically identical to the FerrarisCalibration.
+    However, the calibrate method will return a `TurntableCalibrationInfo` to indicate the expected higher precission
+    of this calibration method.
+
+    Further this Calibration expects rotations of 270 deg by default, as this is common for many turntables.
+    """
+
+    _CALIBRATION_INFO = TurntableCalibrationInfo
+
+    expected_angle = 270
 
 
 def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, title: Optional[str] = None):
