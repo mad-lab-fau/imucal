@@ -1,5 +1,12 @@
 # IMU Calibration
 
+This package provides methods to calculate and apply calibrations for IMUs based on multiple different methods.
+
+So far supported are:
+
+- Ferraris Calibration (Ferraris1995)
+- Ferraris Calibration using a Turntable
+
 ## Installation
 
 HTTPS (this will ask you for your Gitlab username and pw):
@@ -12,14 +19,15 @@ SSH (this will ask you for your SSH-key pw, if set):
 pip install git+ssh://git@mad-srv.informatik.uni-erlangen.de/MadLab/GaitAnalysis/sensorcalibration.git
 ```
 
-## Ferraris
+## Calibrations
+### Ferraris
 
 This package implements the IMU-infield calibration based on Ferraris1995.
 This calibration methods requires the IMU data from 6 static positions (3 axis parallel and antiparallel to gravitation vector) and 3 rotations around the 3 main axis.
 In this implementation these parts are referred to as follows `{acc,gry}_{x,y,z}_{p,a}` for the static regions and `{acc,gry}_{x,y,z}_rot` for the rotations.
 As example, `acc_y_a` would be the 3D-acceleration data measured during a static phase, where the **y-axis** was oriented **antiparallel** to the gravitation.
 
-### Creating a new Calibration Object
+#### Creating a new Calibration Object
 
 If the data of all of these sections is already available separately as numpy arrays of the shape `(n x 3)`, where `n` is the number of samples in each section, they can be directly used to initialize a Calibration object:
 
@@ -72,7 +80,7 @@ sampling_rate = 100 #Hz
 cal = FerrarisCalibration.from_section_list(data, section_list, sampling_rate=sampling_rate)
 ```
 
-### Performing the Calibration
+#### Performing the Calibration
 
 When the calibration object was successful initialized, you can obtain the calibration by simply calling `compute_calibration_matrix`:
 
@@ -100,7 +108,7 @@ from imucal import FerrarisCalibrationInfo
 cal_mat = FerrarisCalibrationInfo.from_hdf5('./calibration.h5') 
 ```
 
-### Applying the Calibration
+#### Applying the Calibration
 
 The `FerrarisCalibrationInfo` object can be used to apply the Calibration to new data from the same sensor:
 
@@ -109,3 +117,30 @@ calibrated_acc, calibrated_gyro = cal_mat.calibrate(acc, gyro)
 ```
 
 `acc` and `gyro` are expected to be numpy arrays in the shape (n x 3)
+
+
+### Turntable Calibration
+
+The turntable calibration uses some sort of instumeted turntable to perform the orientation changes and rotations for the Ferraris calibration.
+It is fundamentally identical to the simple Ferraris calibration, however to indicate the expected difference in precision, this calibration method is implemented as seperate classes.
+The interface is identical to the Ferraris calibration and all methods shown above can be used.
+
+**Note**: By default the Turntable calibration expects 270 deg rotations instead of 360 deg
+
+```python
+# obtain the calibration
+from imucal import TurntableCalibration
+
+sampling_rate = 100 #Hz 
+# This will open an interactive plot, where you can select the start and the stop sample of each region
+cal, section_list = TurntableCalibration.from_interactive_plot(data, sampling_rate=sampling_rate)
+cal_mat = cal.compute_calibration_matrix()
+cal_mat.to_json_file('./calibration.json')
+
+# Apply the calibration
+from imucal import TurntableCalibrationInfo
+
+cal_mat = TurntableCalibrationInfo.from_json_file('./calibration.json') 
+
+calibrated_acc, calibrated_gyro = cal_mat.calibrate(acc, gyro)
+```
