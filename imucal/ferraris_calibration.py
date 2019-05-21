@@ -18,16 +18,16 @@ class FerrarisCalibration:
 
     The Ferraris calibration is derived based on a well defined series of data recordings:
 
-    x_p: positive x-axis of sensor is aligned with gravity
-    x_a: negative x-axis of sensor is aligned with gravity
-    y_p: positive y-axis of sensor is aligned with gravity
-    y_a: negative y-axis of sensor is aligned with gravity
-    z_p: positive z-axis of sensor is aligned with gravity
-    z_a: negative z-axis of sensor is aligned with gravity
+    `x_p`: positive x-axis of sensor is aligned with gravity
+    `x_a`: negative x-axis of sensor is aligned with gravity
+    `y_p`: positive y-axis of sensor is aligned with gravity
+    `y_a`: negative y-axis of sensor is aligned with gravity
+    `z_p`: positive z-axis of sensor is aligned with gravity
+    `z_a`: negative z-axis of sensor is aligned with gravity
 
-    x_rot: sensor is rotated around the x-axis for a well known angle (typically 360 deg)
-    y_rot: sensor is rotated around the y-axis for a well known angle (typically 360 deg)
-    z_rot: sensor is rotated around the z-axis for a well known angle (typically 360 deg)
+    `x_rot`: sensor is rotated around the x-axis for a well known angle (typically 360 deg)
+    `y_rot`: sensor is rotated around the y-axis for a well known angle (typically 360 deg)
+    `z_rot`: sensor is rotated around the z-axis for a well known angle (typically 360 deg)
 
     All sections need to be recorded for a sensor and then annotated.
     In particular for the rotation, it is important to annotate the data directly at the end and the beginning of the

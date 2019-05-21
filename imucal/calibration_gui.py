@@ -1,12 +1,30 @@
+"""Helper providing a small GUI to label timeseries data."""
+import tkinter as tk
 from collections import OrderedDict
 from itertools import chain
+from typing import Sequence, Optional
 
-import tkinter as tk
-
+import numpy as np
 import pandas as pd
 
 
 class CalibrationGui:
+    """A Gui that can be used to label the different required sections of a calibration.
+
+    For details see the `manual` string.
+
+    Example:
+        >>> # This will launch the GUI and block execution until closed
+        >>> gui = CalibrationGui(acc, gyro, ['label1', 'label2'])
+        >>> # While the GUI is open the sections are labeled. Once closed the next line is executed
+        >>> labels = gui.section_list
+        >>> labels['label1']  # First value is start, second value is end of region
+        (12, 355)
+        >>> labels['label2']  # First value is start, second value is end of region
+        (500, 758)
+
+    """
+
     section_list = None
     acc_list_markers = None
     gyro_list_markers = None
@@ -26,7 +44,17 @@ class CalibrationGui:
     section or you can adjust the labels by repeated left and right clicks until you satisfied.
     """
 
-    def __init__(self, acc, gyro, expected_labels, title=None, master=None):
+    def __init__(self, acc: np.ndarray, gyro: np.ndarray, expected_labels: Sequence[str], title: Optional[str] = None,
+                 master: Optional[tk.Frame] = None):
+        """Launch new GUI instance.
+
+        Args:
+            acc: 3D array containing all acceleration data
+            gyro: 3D array containing all gyroscope data
+            expected_labels: list of all label names that should be labeled
+            title: Title displayed in the titlebar of the GUI
+            master: Parent window if GUI should be embedded in larger application
+        """
         import matplotlib
         from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
