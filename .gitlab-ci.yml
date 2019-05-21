@@ -25,4 +25,3 @@ lint:
   <<: *python_base
   script:
     - tox -e lint
-  allow_failure: true
