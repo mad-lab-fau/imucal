@@ -41,7 +41,7 @@ class CalibrationGui:
     It does not matter, which you place first.
     If both labels are placed, the region in between them is colored.
     Now you can either press Enter (or click on any other label in the sidebar) to continue with labeling the next
-    section or you can adjust the labels by repeated left and right clicks until you satisfied.
+    section or you can adjust the labels by repeated left and right clicks until you're satisfied.
     """
 
     def __init__(self, acc: np.ndarray, gyro: np.ndarray, expected_labels: Sequence[str], title: Optional[str] = None,
@@ -148,9 +148,9 @@ class CalibrationGui:
         ax2 = fig.add_subplot(212, sharex=ax1)
         ax2.plot(gyro)
         ax2.grid(True)
-        ax2.set_title("Use this plot to find the single axis rotatins for gyro calibration")
-        ax2.set_xlabel("time[s]")
-        ax2.set_ylabel("rotation [°/s]")
+        ax2.set_title("Use this plot to find the single axis rotations for gyro calibration")
+        ax2.set_xlabel("time [s]")
+        ax2.set_ylabel("angular velocity [°/s]")
         fig.tight_layout()
         return fig, (ax1, ax2)
 
