@@ -23,6 +23,8 @@ class FerrarisCalibrationInfo(CalibrationInfo):
     """
 
     CAL_TYPE = 'Ferraris'
+    ACC_UNIT = 'm/s^2'
+    GYRO_UNIT = 'deg/s'
     K_a: np.ndarray
     R_a: np.ndarray
     b_a: np.ndarray

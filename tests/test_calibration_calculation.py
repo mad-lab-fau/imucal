@@ -25,11 +25,14 @@ def test_example_calibration(example_calibration_data):
                                       gyro_cols=('gyroX', 'gyroY', 'gyroZ'))
     cal_mat = cal.compute_calibration_matrix()
 
-    # Uncomment if you want to save the new cal matrix to update the regression test
-    # cal_mat.to_json_file(Path(__file__).parent / '_test_data/example_data.csv')
+    # # Uncomment if you want to save the new cal matrix to update the regression test
+    # cal_mat.to_json_file(Path(__file__).parent / '_test_data/example_cal.json')
 
     for val in cal_mat._fields:
         assert_array_almost_equal(getattr(cal_mat, val), getattr(calib, val), 5, err_msg=val)
+
+    for val in ['CAL_TYPE', 'ACC_UNIT', 'GYRO_UNIT']:
+        assert getattr(calib, val) == getattr(cal_mat, val), val
 
 
 @pytest.fixture()

@@ -12,6 +12,8 @@ class CalibrationInfo:
     """Abstract BaseClass for all Calibration Info objects."""
 
     CAL_TYPE = None
+    ACC_UNIT = None
+    GYRO_UNIT = None
 
     _cal_type_explanation = """
     Note:
@@ -76,6 +78,9 @@ class CalibrationInfo:
         for field in self._fields:
             setattr(self, field, kwargs.get(field, None))
 
+        self.ACC_UNIT = kwargs.get('acc_unit', self.ACC_UNIT)
+        self.GYRO_UNIT = kwargs.get('gyro_unit', self.GYRO_UNIT)
+
     def __repr__(self):
         out = self.__class__.__name__ + '('
         for val in self._fields:
@@ -92,6 +97,14 @@ class CalibrationInfo:
         if not self._fields == other._fields:
             return False
 
+        # Test method equal
+        if not self.CAL_TYPE == other.CAL_TYPE:
+            return False
+
+        # Test units
+        if (not self.ACC_UNIT == other.ACC_UNIT) or (not self.GYRO_UNIT == other.GYRO_UNIT):
+            return False
+
         # Test Calibration values
         for v1, v2 in zip(self.__dict__.values(), other.__dict__.values()):
             if not np.array_equal(v1, v2):
@@ -101,6 +114,8 @@ class CalibrationInfo:
     def _to_list_dict(self):
         d = {key: getattr(self, key).tolist() for key in self._fields}
         d['cal_type'] = self.CAL_TYPE
+        d['acc_unit'] = self.ACC_UNIT
+        d['gyro_unit'] = self.GYRO_UNIT
         return d
 
     @classmethod
@@ -175,6 +190,8 @@ class CalibrationInfo:
             for k, v in d.items():
                 hdf.create_dataset(k, data=v)
             hdf['cal_type'] = self.CAL_TYPE
+            hdf['acc_unit'] = self.ACC_UNIT
+            hdf['gyro_unit'] = self.GYRO_UNIT
 
     @classmethod
     def from_hdf5(cls, path: Union[str, Path]):
