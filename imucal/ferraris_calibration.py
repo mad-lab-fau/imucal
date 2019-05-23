@@ -18,16 +18,19 @@ class FerrarisCalibration:
 
     The Ferraris calibration is derived based on a well defined series of data recordings:
 
-    `x_p`: positive x-axis of sensor is aligned with gravity
-    `x_a`: negative x-axis of sensor is aligned with gravity
-    `y_p`: positive y-axis of sensor is aligned with gravity
-    `y_a`: negative y-axis of sensor is aligned with gravity
-    `z_p`: positive z-axis of sensor is aligned with gravity
-    `z_a`: negative z-axis of sensor is aligned with gravity
+    `x_p`: positive x-axis of sensor is aligned with gravity (x-acc measures +1g)
+    `x_a`: negative x-axis of sensor is aligned with gravity (x-acc measures -1g)
+    `y_p`: positive y-axis of sensor is aligned with gravity (y-acc measures +1g)
+    `y_a`: negative y-axis of sensor is aligned with gravity (y-acc measures -1g)
+    `z_p`: positive z-axis of sensor is aligned with gravity (z-acc measures +1g)
+    `z_a`: negative z-axis of sensor is aligned with gravity (z-acc measures -1g)
 
-    `x_rot`: sensor is rotated around the x-axis for a well known angle (typically 360 deg)
-    `y_rot`: sensor is rotated around the y-axis for a well known angle (typically 360 deg)
-    `z_rot`: sensor is rotated around the z-axis for a well known angle (typically 360 deg)
+    `x_rot`: sensor is rotated clockwise in the `x_p` position around the x-axis (x-gyro shows negative values) for a
+        well known angle (typically 360 deg)
+    `y_rot`: sensor is rotated clockwise in the `y_p` position around the y-axis (y-gyro shows negative values) for a
+        well known angle (typically 360 deg)
+    `z_rot`: sensor is rotated clockwise in the `z_p` position around the z-axis (z-gyro shows negative values) for a
+        well known angle (typically 360 deg)
 
     All sections need to be recorded for a sensor and then annotated.
     In particular for the rotation, it is important to annotate the data directly at the end and the beginning of the
@@ -72,7 +75,7 @@ class FerrarisCalibration:
     grav: float
     expected_angle: float
 
-    EXPECTED_ANGLE: float = 360.
+    EXPECTED_ANGLE: float = -360.  # +360 for anti-clockwise rotation, -360 for clockwise rotation
     DEFAULT_GRAV: float = 9.81
     ACC_COLS = ('acc_x', 'acc_y', 'acc_z')
     GYRO_COLS = ('gyr_x', 'gyr_y', 'gyr_z')

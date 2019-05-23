@@ -73,9 +73,9 @@ def default_data():
     data['acc_y_rot'] = np.repeat(np.array([[0, 9.81, 0]]), 100, axis=0)
     data['acc_z_rot'] = np.repeat(np.array([[0, 0, 9.81]]), 100, axis=0)
 
-    data['gyr_x_rot'] = np.repeat(np.array([[360., 0, 0]]), 100, axis=0)
-    data['gyr_y_rot'] = np.repeat(np.array([[0, 360., 0]]), 100, axis=0)
-    data['gyr_z_rot'] = np.repeat(np.array([[0, 0, 360.]]), 100, axis=0)
+    data['gyr_x_rot'] = -np.repeat(np.array([[360., 0, 0]]), 100, axis=0)
+    data['gyr_y_rot'] = -np.repeat(np.array([[0, 360., 0]]), 100, axis=0)
+    data['gyr_z_rot'] = -np.repeat(np.array([[0, 0, 360.]]), 100, axis=0)
 
     return data
 
