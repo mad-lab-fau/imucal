@@ -34,7 +34,17 @@ class FerrarisCalibration:
 
     All sections need to be recorded for a sensor and then annotated.
     In particular for the rotation, it is important to annotate the data directly at the end and the beginning of the
-    rotation to avoid noise and artifact degrading the integration results .
+    rotation to avoid noise and artifact degrading the integration results.
+
+    Note:
+        Depending on how the axis of your respective sensor coordinate system are defined and how you perform the
+        calibration, you might need to change the `grav` and `expected_angle` parameter.
+
+        Typical situations are:
+            - If you define the positive axis direction as the direction, where the acc measures -g, change `grav` to
+                -9.81 m/s^2
+            - If you perform a counter-clockwise rotation during the calibration, set `expected_angle` to +360
+            - For combinations of both, both parameter might need to be adapted
 
     This class offers various helper constructors to support the annotation process.
 
