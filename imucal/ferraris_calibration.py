@@ -403,12 +403,13 @@ class TurntableCalibration(FerrarisCalibration):
     However, the calibrate method will return a `TurntableCalibrationInfo` to indicate the expected higher precission
     of this calibration method.
 
-    Further this Calibration expects rotations of 270 deg by default, as this is common for many turntables.
+    Further this Calibration expects rotations of 720 deg by default, as this is common for many turntables.
+    For further information on the sign of the expected rotation angle see the `FerrarisCalibration`.
     """
 
     _CALIBRATION_INFO = TurntableCalibrationInfo
 
-    expected_angle = 270
+    expected_angle = -720
 
 
 def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, title: Optional[str] = None):
