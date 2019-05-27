@@ -19,4 +19,7 @@ setup(
         'pandas',
         'numpy'
     ],
+    extras_require={
+        'full': ['matplotlib>=2.2']
+    }
 )
