@@ -131,6 +131,7 @@ class CalibrationInfo:
 
     @classmethod
     def find_subclass_from_cal_type(cls, cal_type):
+        """Get a SensorCalibration subclass that handles the specified calibration type."""
         return next(x for x in CalibrationInfo._get_subclasses() if x.CAL_TYPE == cal_type)
 
     def to_json(self) -> str:
