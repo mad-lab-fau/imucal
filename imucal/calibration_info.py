@@ -130,7 +130,7 @@ class CalibrationInfo:
             yield subclass
 
     @classmethod
-    def _find_subclass_from_cal_type(cls, cal_type):
+    def find_subclass_from_cal_type(cls, cal_type):
         return next(x for x in CalibrationInfo._get_subclasses() if x.CAL_TYPE == cal_type)
 
     def to_json(self) -> str:
@@ -150,7 +150,7 @@ class CalibrationInfo:
 
         """
         raw_json = json.loads(json_str)
-        subclass = cls._find_subclass_from_cal_type(raw_json['cal_type'])
+        subclass = cls.find_subclass_from_cal_type(raw_json['cal_type'])
         return subclass._from_list_dict(raw_json)
 
     def to_json_file(self, path: Union[str, Path]):
@@ -174,7 +174,7 @@ class CalibrationInfo:
 
         """
         raw_json = json.load(open(path, 'r'))
-        subclass = cls._find_subclass_from_cal_type(raw_json['cal_type'])
+        subclass = cls.find_subclass_from_cal_type(raw_json['cal_type'])
         return subclass._from_list_dict(raw_json)
 
     def to_hdf5(self, path: Union[str, Path]):
@@ -208,7 +208,7 @@ class CalibrationInfo:
 
         with h5py.File(path, 'r') as hdf:
             values = dict()
-            subcls = cls._find_subclass_from_cal_type(hdf['cal_type'][...])
+            subcls = cls.find_subclass_from_cal_type(hdf['cal_type'][...])
             for k in subcls._fields:
                 values[k] = np.array(hdf.get(k))
 
