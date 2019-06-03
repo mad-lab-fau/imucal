@@ -86,16 +86,17 @@ class CalibrationGui:
         self.fig, self.axs = self._create_figure(acc, gyro)
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.main_area)
-        self.canvas.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=1)
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         self.canvas.mpl_connect('button_press_event', self._onclick)
 
-        self.label_text = tk.Text(master, height=1, width=80)
-        self.label_text.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.label_text = tk.Text(self.main_area, height=1, width=80)
+        self.label_text.pack(side=tk.TOP, fill=tk.X, expand=0)
         self.label_text.insert(tk.END, self.text_label.format(str(0)))
 
-        toolbar = NavigationToolbar2Tk(self.canvas, master)
+        toolbar = NavigationToolbar2Tk(self.canvas, self.main_area)
         toolbar.update()
+        toolbar.pack(side=tk.TOP, fill=tk.X, expand=0)
 
         self.labels.selection_anchor(0)
         self.labels.selection_set(0)
