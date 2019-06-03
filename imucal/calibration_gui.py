@@ -158,7 +158,7 @@ class CalibrationGui:
         return fig, (ax1, ax2)
 
     def _onclick(self, event):
-        if event.button not in [1, 3]:
+        if event.button not in [1, 3] or self.canvas.toolbar._active:
             return
 
         selected_key = self.labels.get(self.labels.curselection())
