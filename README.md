@@ -132,7 +132,7 @@ The turntable calibration uses some sort of instumeted turntable to perform the 
 It is fundamentally identical to the simple Ferraris calibration, however to indicate the expected difference in precision, this calibration method is implemented as seperate classes.
 The interface is identical to the Ferraris calibration and all methods shown above can be used.
 
-**Note**: By default the Turntable calibration expects 270 deg rotations instead of 360 deg
+**Note**: By default the Turntable calibration expects 720 deg rotations instead of 360 deg
 
 ```python
 # obtain the calibration
