@@ -419,6 +419,7 @@ def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, ti
         acc: numpy array with the shape (n, 3) where n is the number of samples
         gyro: numpy array with the shape (n, 3) where n is the number of samples
         title: optional title for the Calibration GUI
+
     """
     plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS, title=title)
 

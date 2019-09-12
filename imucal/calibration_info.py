@@ -44,6 +44,7 @@ class CalibrationInfo:
         Args:
             acc: 3D acceleration
             gyro: 3D gyroscope values
+
         """
         raise NotImplementedError('This method needs to be implemented by a subclass')
 
@@ -55,6 +56,7 @@ class CalibrationInfo:
 
         Args:
           gyro: 3D gyroscope values
+
         """
         raise NotImplementedError('This method needs to be implemented by a subclass')
 
@@ -66,6 +68,7 @@ class CalibrationInfo:
 
         Args:
           acc: 3D acceleration
+
         """
         raise NotImplementedError('This method needs to be implemented by a subclass')
 
@@ -74,6 +77,7 @@ class CalibrationInfo:
 
         Args:
             kwargs: Matrices for all fields specified in `self._fields`
+
         """
         for field in self._fields:
             setattr(self, field, kwargs.get(field, None))
@@ -159,6 +163,7 @@ class CalibrationInfo:
 
         Args:
             path: path to the json file
+
         """
         data_dict = self._to_list_dict()
         return json.dump(data_dict, open(path, 'w'))
@@ -183,6 +188,7 @@ class CalibrationInfo:
 
         Args:
             path: path to the hdf5 file
+
         """
         import h5py
 

@@ -54,6 +54,7 @@ class CalibrationGui:
             expected_labels: list of all label names that should be labeled
             title: Title displayed in the titlebar of the GUI
             master: Parent window if GUI should be embedded in larger application
+
         """
         import matplotlib
         from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
