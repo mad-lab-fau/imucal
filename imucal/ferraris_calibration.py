@@ -409,7 +409,7 @@ class TurntableCalibration(FerrarisCalibration):
 
     _CALIBRATION_INFO = TurntableCalibrationInfo
 
-    expected_angle = -720
+    EXPECTED_ANGLE: float = -720.
 
 
 def _find_calibration_sections_interactive(acc: np.ndarray, gyro: np.ndarray, title: Optional[str] = None):

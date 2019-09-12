@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_array_almost_equal
 
 from imucal import FerrarisCalibrationInfo
-from imucal.ferraris_calibration import FerrarisCalibration
+from imucal.ferraris_calibration import FerrarisCalibration, TurntableCalibration
 
 import pandas as pd
 
@@ -171,3 +171,18 @@ def test_simulations(test_data, request):
 
     for para, val in test_data[1].items():
         assert_array_almost_equal(getattr(cal_mat, para), val, err_msg=para)
+
+
+def test_turntable_calibration(default_data, default_expected):
+    cal = TurntableCalibration(**default_data)
+    cal_mat = cal.compute_calibration_matrix()
+
+    keys = set(default_expected.keys()) - {'K_g'}
+    for para in keys:
+        assert_array_almost_equal(getattr(cal_mat, para), default_expected[para], err_msg=para)
+
+    assert_array_almost_equal(getattr(cal_mat, 'K_g'), default_expected['K_g']/2, err_msg='K_g')
+
+    assert cal.EXPECTED_ANGLE == -720
+
+
