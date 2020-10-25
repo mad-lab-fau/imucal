@@ -352,10 +352,18 @@ class FerrarisCalibration:
         # Calculate means from all static phases and stack them into 3x3 matrices
         # Note: Each measurement should be a column
         U_a_p = np.vstack(  # noqa: invalid-name
-            (np.mean(self.acc_x_p, axis=0), np.mean(self.acc_y_p, axis=0), np.mean(self.acc_z_p, axis=0),)
+            (
+                np.mean(self.acc_x_p, axis=0),
+                np.mean(self.acc_y_p, axis=0),
+                np.mean(self.acc_z_p, axis=0),
+            )
         ).T
         U_a_n = np.vstack(  # noqa: invalid-name
-            (np.mean(self.acc_x_a, axis=0), np.mean(self.acc_y_a, axis=0), np.mean(self.acc_z_a, axis=0),)
+            (
+                np.mean(self.acc_x_a, axis=0),
+                np.mean(self.acc_y_a, axis=0),
+                np.mean(self.acc_z_a, axis=0),
+            )
         ).T
 
         # Eq. 19
@@ -393,7 +401,17 @@ class FerrarisCalibration:
         # Note that this calibration ignores any influences due to the earth rotation.
 
         b_g = np.mean(
-            np.vstack((self.gyr_x_p, self.gyr_x_a, self.gyr_y_p, self.gyr_y_a, self.gyr_z_p, self.gyr_z_a,)), axis=0,
+            np.vstack(
+                (
+                    self.gyr_x_p,
+                    self.gyr_x_a,
+                    self.gyr_y_p,
+                    self.gyr_y_a,
+                    self.gyr_z_p,
+                    self.gyr_z_a,
+                )
+            ),
+            axis=0,
         )
 
         cal_mat.b_g = b_g
@@ -402,10 +420,18 @@ class FerrarisCalibration:
 
         # Note: Each measurement should be a column
         U_g_p = np.vstack(  # noqa: invalid_name
-            (np.mean(self.gyr_x_p, axis=0), np.mean(self.gyr_y_p, axis=0), np.mean(self.gyr_z_p, axis=0),)
+            (
+                np.mean(self.gyr_x_p, axis=0),
+                np.mean(self.gyr_y_p, axis=0),
+                np.mean(self.gyr_z_p, axis=0),
+            )
         ).T
         U_g_a = np.vstack(  # noqa: invalid_name
-            (np.mean(self.gyr_x_a, axis=0), np.mean(self.gyr_y_a, axis=0), np.mean(self.gyr_z_a, axis=0),)
+            (
+                np.mean(self.gyr_x_a, axis=0),
+                np.mean(self.gyr_y_a, axis=0),
+                np.mean(self.gyr_z_a, axis=0),
+            )
         ).T
 
         # Eq. 9
