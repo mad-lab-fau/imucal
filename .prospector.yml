@@ -1,25 +1,51 @@
 strictness: veryhigh
 doc-warnings: true
 
+ignore-paths:
+  - docs
+  - tests
+  - dodo.py
+  - examples
+  - example_data
+
 pep8:
   options:
     max-line-length: 120
   disable:
     - E127
+    - W391
+    - E203 # ignoring white space before colon :
 
 pep257:
+  options:
+    convention: numpy
   disable:
-    - D203
-    - D213
-    - D105
-    - D406
-    - D407
+    - D404
+    - D100  # Missing docstring in public module, handled by pylint
+    - D101  # Missing docstring in public class, handled by pylint
+    - D102  # Missing docstring in public method, handled by pylint
+    - D103  # Missing docstring in public function, handled by pylint
+    - D104  # Missing docstring in public package, handled by pylint
+    - D107  # Missing docstrings in __init__, we don't have them by convention
+    - D203  # Blank line required before class docstring
+    - D213  # Docstring Summary should start in second line
+
 
 pylint:
-  run: false
   options:
     max-line-length: 120
-    disable:
-      - too-many-ancestors
-      - too-few-public-methods
-      - invalid-unary-operand-type
+    variable-rgx: "[a-z_][a-z0-9_]{0,30}$"  # Allow for single letter variable names
+    argument-rgx: "[a-z_][a-z0-9_]{0,30}$"  # Allow for single letter argument names
+    class-rgx: "[A-Z_][a-zA-Z0-9]*"  # Allow for single letter class names
+  disable:
+    - too-many-ancestors
+    - too-few-public-methods
+    - too-many-arguments
+    - too-many-instance-attributes
+    - abstract-method
+    - invalid-unary-operand-type
+    - too-many-locals # ignore the use of more than 15 local variables
+    - invalid-unary-operand-type
+    - protected-access
+    - too-many-lines
+

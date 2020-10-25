@@ -9,24 +9,19 @@ So far supported are:
 
 ## Installation
 
-HTTPS (this will ask you for your Gitlab username and pw):
 ```
-pip install git+https://mad-srv.informatik.uni-erlangen.de/MadLab/GaitAnalysis/sensorcalibration.git --upgrade
-```
-
-SSH (this will ask you for your SSH-key pw, if set):
-```
-pip install git+ssh://git@mad-srv.informatik.uni-erlangen.de/MadLab/GaitAnalysis/sensorcalibration.git --upgrade
+pip install imucal
 ```
 
-For certain features (calibration GUI) you also need matplotlib (version >2.2).
+To use the included calibration GUI you also need matplotlib (version >2.2).
 You can install it using:
 
 ```
-pip install 'matplotlib>=2.2'
+pip install imucal[calplot]
 ```
 
 ## Calibrations
+
 ### Ferraris
 
 This package implements the IMU-infield calibration based on Ferraris1995.

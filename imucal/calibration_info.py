@@ -5,15 +5,15 @@ from typing import Iterable, Tuple, Union, TypeVar
 
 import numpy as np
 
-CalInfo = TypeVar('CalInfo', bound='CalibrationInfo')
+CalInfo = TypeVar("CalInfo", bound="CalibrationInfo")
 
 
 class CalibrationInfo:
     """Abstract BaseClass for all Calibration Info objects."""
 
     CAL_TYPE = None
-    ACC_UNIT = None
-    GYRO_UNIT = None
+    acc_unit = None
+    gyro_unit = None
 
     _cal_type_explanation = """
     Note:
@@ -34,19 +34,22 @@ class CalibrationInfo:
     @property
     def _fields(self) -> Iterable[str]:
         """List of Calibration parameters that are required."""
-        raise NotImplementedError('This method needs to be implemented by a subclass')
+        raise NotImplementedError("This method needs to be implemented by a subclass")
 
     def calibrate(self, acc: np.ndarray, gyro: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Abstract method to perform a calibration on both acc and gyro.
 
         This absolutely needs to implement by any daughter class
 
-        Args:
-            acc: 3D acceleration
-            gyro: 3D gyroscope values
+        Parameter
+        ---------
+        acc :
+            3D acceleration
+        gyro :
+            3D gyroscope values
 
         """
-        raise NotImplementedError('This method needs to be implemented by a subclass')
+        raise NotImplementedError("This method needs to be implemented by a subclass")
 
     def calibrate_gyro(self, gyro: np.ndarray) -> np.ndarray:
         """Abstract method to perform a calibration on both acc and gyro.
@@ -54,11 +57,13 @@ class CalibrationInfo:
         This can implement by any daughter class, if separte calibration of acc makes sense for the calibration type.
         If not, an explicit error should be thrown
 
-        Args:
-          gyro: 3D gyroscope values
+        Parameter
+        ---------
+        gro :
+            3D gyroscope values
 
         """
-        raise NotImplementedError('This method needs to be implemented by a subclass')
+        raise NotImplementedError("This method needs to be implemented by a subclass")
 
     def calibrate_acc(self, acc: np.ndarray) -> np.ndarray:
         """Abstract method to perform a calibration on the gyro.
@@ -66,36 +71,39 @@ class CalibrationInfo:
         This can implement by any daughter class, if separte calibration of acc makes sense for the calibration type.
         If not, an explicit error should be thrown
 
-        Args:
-          acc: 3D acceleration
+        Parameter
+        ---------
+        acc :
+            3D acceleration
 
         """
-        raise NotImplementedError('This method needs to be implemented by a subclass')
+        raise NotImplementedError("This method needs to be implemented by a subclass")
 
     def __init__(self, **kwargs):
         """Create new CalibrationInfo instance.
 
-        Args:
-            kwargs: Matrices for all fields specified in `self._fields`
+        Parameter
+        ---------
+        kwargs :
+            Matrices for all fields specified in `self._fields`
 
         """
         for field in self._fields:
             setattr(self, field, kwargs.get(field, None))
 
-        self.ACC_UNIT = kwargs.get('acc_unit', self.ACC_UNIT)
-        self.GYRO_UNIT = kwargs.get('gyro_unit', self.GYRO_UNIT)
-
     def __repr__(self):
-        out = self.__class__.__name__ + '('
+        """Show a proper string representation of a CalibrationInfo object."""
+        out = self.__class__.__name__ + "("
         for val in self._fields:
-            out += '\n' + val + ' =\n' + getattr(self, val).__repr__() + ',\n'
-        out += '\n)'
+            out += "\n" + val + " =\n" + getattr(self, val).__repr__() + ",\n"
+        out += "\n)"
         return out
 
     def __eq__(self, other):
+        """Check if two calibrations are identical."""
         # Check type:
         if not isinstance(other, self.__class__):
-            raise ValueError('Comparison is only defined between two {} object!'.format(self.__class__.__name__))
+            raise ValueError("Comparison is only defined between two {} object!".format(self.__class__.__name__))
 
         # Test keys equal:
         if not self._fields == other._fields:
@@ -106,7 +114,7 @@ class CalibrationInfo:
             return False
 
         # Test units
-        if (not self.ACC_UNIT == other.ACC_UNIT) or (not self.GYRO_UNIT == other.GYRO_UNIT):
+        if (not self.acc_unit == other.acc_unit) or (not self.gyro_unit == other.gyro_unit):
             return False
 
         # Test Calibration values
@@ -117,9 +125,7 @@ class CalibrationInfo:
 
     def _to_list_dict(self):
         d = {key: getattr(self, key).tolist() for key in self._fields}
-        d['cal_type'] = self.CAL_TYPE
-        d['acc_unit'] = self.ACC_UNIT
-        d['gyro_unit'] = self.GYRO_UNIT
+        d["cal_type"] = self.CAL_TYPE
         return d
 
     @classmethod
@@ -147,75 +153,93 @@ class CalibrationInfo:
     def from_json(cls, json_str: str) -> CalInfo:
         """Create a calibration object from a json string (created by `CalibrationInfo.to_json`).
 
-        Args:
-            json_str: valid json string object
+        Parameter
+        ---------
+        json_str: valid json string object
 
-        Returns:
-            A CalibrationInfo object. The exact child class is determined by the `cal_type` key in the json string.
+        Returns
+        -------
+        cal_info
+            A CalibrationInfo object.
+            The exact child class is determined by the `cal_type` key in the json string.
 
         """
         raw_json = json.loads(json_str)
-        subclass = cls.find_subclass_from_cal_type(raw_json['cal_type'])
+        subclass = cls.find_subclass_from_cal_type(raw_json["cal_type"])
         return subclass._from_list_dict(raw_json)
 
     def to_json_file(self, path: Union[str, Path]):
         """Dump acc calibration matrices into a file in json format.
 
-        Args:
-            path: path to the json file
+        Parameter
+        ---------
+        path :
+            path to the json file
 
         """
         data_dict = self._to_list_dict()
-        return json.dump(data_dict, open(path, 'w'))
+        return json.dump(data_dict, open(path, "w"))
 
     @classmethod
     def from_json_file(cls, path: Union[str, Path]) -> CalInfo:
         """Create a calibration object from a valid json file (created by `CalibrationInfo.to_json_file`).
 
-        Args:
-            path: path to the json file
+        Parameter
+        ---------
+        path :
+            Path to the json file
 
-        Returns:
-            A CalibrationInfo object. The exact child class is determined by the `cal_type` key in the json string.
+        Returns
+        -------
+        cal_info
+            A CalibrationInfo object.
+            The exact child class is determined by the `cal_type` key in the json string.
 
         """
-        raw_json = json.load(open(path, 'r'))
-        subclass = cls.find_subclass_from_cal_type(raw_json['cal_type'])
+        raw_json = json.load(open(path, "r"))
+        subclass = cls.find_subclass_from_cal_type(raw_json["cal_type"])
         return subclass._from_list_dict(raw_json)
 
     def to_hdf5(self, path: Union[str, Path]):
         """Save calibration matrices to hdf5 file format.
 
-        Args:
-            path: path to the hdf5 file
+        Parameter
+        ---------
+        path :
+            Path to the hdf5 file
 
         """
-        import h5py
+        import h5py  # noqa: import-outside-toplevel
 
-        with h5py.File(path, 'w') as hdf:
+        with h5py.File(path, "w") as hdf:
             d = {key: getattr(self, key).tolist() for key in self._fields}
             for k, v in d.items():
                 hdf.create_dataset(k, data=v)
-            hdf['cal_type'] = self.CAL_TYPE
-            hdf['acc_unit'] = self.ACC_UNIT
-            hdf['gyro_unit'] = self.GYRO_UNIT
+            hdf["cal_type"] = self.CAL_TYPE
+            hdf["acc_unit"] = self.acc_unit
+            hdf["gyro_unit"] = self.gyro_unit
 
     @classmethod
     def from_hdf5(cls, path: Union[str, Path]):
         """Read calibration data stored in hdf5 fileformat (created by `CalibrationInfo.save_to_hdf5`).
 
-        Args:
-            path: path to the hdf5 file
+        Parameter
+        ---------
+        path :
+            Path to the hdf5 file
 
-        Returns:
-            A CalibrationInfo object. The exact child class is determined by the `cal_type` key in the hdf5 file.
+        Returns
+        -------
+        cal_info
+            A CalibrationInfo object.
+            The exact child class is determined by the `cal_type` key in the json string.
 
         """
-        import h5py
+        import h5py  # noqa: import-outside-toplevel
 
-        with h5py.File(path, 'r') as hdf:
+        with h5py.File(path, "r") as hdf:
             values = dict()
-            subcls = cls.find_subclass_from_cal_type(hdf['cal_type'][...])
+            subcls = cls.find_subclass_from_cal_type(hdf["cal_type"][...])
             for k in subcls._fields:
                 values[k] = np.array(hdf.get(k))
 
