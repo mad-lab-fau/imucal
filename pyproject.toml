@@ -4,6 +4,17 @@ version = "0.1.0"
 description = "A Python library to calibrate 6 DOF IMUs"
 authors = ["Arne Küderle <arne.kuederle@fau.de>"]
 license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/mad-lab-fau/imucal"
+repository = "https://github.com/mad-lab-fau/imucal"
+# TODO: Set up sphinx docs
+#documentation = "https://imcucal.nilspodlib.readthedocs.io/en/latest/"
+keywords = ["sensors", "scientific", "IMU", "accelerometer"]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics"
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
