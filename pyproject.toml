@@ -2,7 +2,11 @@
 name = "imucal"
 version = "1.0.0"
 description = "A Python library to calibrate 6 DOF IMUs"
-authors = ["Arne Küderle <arne.kuederle@fau.de>"]
+authors = [
+    "Arne Küderle <arne.kuederle@fau.de>",
+    "Nils Roth <nils.roth@fau.de>",
+    "Robert Richer <robert.richer@fau.de"
+]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/mad-lab-fau/imucal"
