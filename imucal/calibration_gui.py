@@ -110,7 +110,6 @@ class CalibrationGui:
         self.label_text = tk.Text(self.main_area, height=1, width=80)
         self.label_text.pack(side=tk.TOP, fill=tk.X, expand=0)
         self.label_text.insert(tk.END, self.text_label.format(str(0)))
-
         toolbar = NavigationToolbar2Tk(self.canvas, self.main_area)
         toolbar.update()
         toolbar.pack(side=tk.TOP, fill=tk.X, expand=0)
@@ -154,7 +153,8 @@ class CalibrationGui:
                 self.labels.itemconfig(i, {"fg": "#a5a9af"})
 
     def _onclick(self, event):
-        if event.button not in [1, 3] or self.canvas.toolbar._active:
+        # Only listen to left and right mouse clicks and only if we are not in zoom or drag mode.
+        if event.button not in [1, 3] or str(self.canvas.toolbar.mode):
             return
 
         selected_key = self.labels.get(self.labels.curselection())
