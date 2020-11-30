@@ -1,5 +1,5 @@
 # IMU Calibration
-![PyPI](https://img.shields.io/pypi/v/imucal)
+[![PyPI](https://img.shields.io/pypi/v/imucal)](https://pypi.org/project/imucal/)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/imucal)
 
 This package provides methods to calculate and apply calibrations for IMUs based on multiple different methods.
