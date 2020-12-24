@@ -4,7 +4,8 @@ from copy import deepcopy
 import numpy as np
 import pytest
 
-from imucal.ferraris_calibration_info import FerrarisCalibrationInfo
+from imucal import CalibrationInfo
+from imucal.ferraris_calibration_info import FerrarisCalibrationInfo, TurntableCalibrationInfo
 
 
 @pytest.fixture()
@@ -41,15 +42,15 @@ def sample_cal_dict():
     return sample_data
 
 
-@pytest.fixture()
-def sample_cal(sample_cal_dict):
-    return FerrarisCalibrationInfo(**sample_cal_dict)
+@pytest.fixture(params=(FerrarisCalibrationInfo, TurntableCalibrationInfo))
+def sample_cal(sample_cal_dict, request):
+    return request.param(**sample_cal_dict)
 
 
-@pytest.fixture()
-def sample_cal_with_units(sample_cal_dict):
+@pytest.fixture(params=(FerrarisCalibrationInfo, TurntableCalibrationInfo))
+def sample_cal_with_units(sample_cal_dict, request):
     return (
-        FerrarisCalibrationInfo(**sample_cal_dict),
+        request.param(**sample_cal_dict),
         {"acc_unit": sample_cal_dict["acc_unit"], "gyro_unit": sample_cal_dict["gyro_unit"]},
     )
 
@@ -66,12 +67,12 @@ def test_equal_wrong_type(sample_cal):
 def test_equal_data(sample_cal, sample_cal_dict):
     not_equal = sample_cal_dict
     not_equal["K_a"] = not_equal["K_a"] - 1
-    assert not (sample_cal == FerrarisCalibrationInfo(**not_equal))
+    assert not (sample_cal == sample_cal.__class__(**not_equal))
 
 
 def test_json_roundtrip(sample_cal_with_units):
     sample_cal = sample_cal_with_units[0]
-    out = FerrarisCalibrationInfo.from_json(sample_cal.to_json())
+    out = CalibrationInfo.from_json(sample_cal.to_json())
     assert sample_cal == out
     assert sample_cal_with_units[1]["acc_unit"] == out.acc_unit
     assert sample_cal_with_units[1]["gyro_unit"] == out.gyro_unit
@@ -81,7 +82,7 @@ def test_json_file_roundtrip(sample_cal_with_units):
     sample_cal = sample_cal_with_units[0]
     with tempfile.NamedTemporaryFile(mode="w+") as f:
         sample_cal.to_json_file(f.name)
-        out = FerrarisCalibrationInfo.from_json_file(f.name)
+        out = CalibrationInfo.from_json_file(f.name)
     assert sample_cal == out
     assert sample_cal_with_units[1]["acc_unit"] == out.acc_unit
     assert sample_cal_with_units[1]["gyro_unit"] == out.gyro_unit
@@ -91,7 +92,7 @@ def test_hdf5_file_roundtrip(sample_cal_with_units):
     sample_cal = sample_cal_with_units[0]
     with tempfile.NamedTemporaryFile(mode="w+") as f:
         sample_cal.to_hdf5(f.name)
-        out = FerrarisCalibrationInfo.from_hdf5(f.name)
+        out = CalibrationInfo.from_hdf5(f.name)
     assert sample_cal == out
     assert sample_cal_with_units[1]["acc_unit"] == out.acc_unit
     assert sample_cal_with_units[1]["gyro_unit"] == out.gyro_unit
