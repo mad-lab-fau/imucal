@@ -1,19 +1,32 @@
 """Base Class for all CalibrationInfo objects."""
 import json
+from dataclasses import dataclass, fields, asdict
 from pathlib import Path
-from typing import Iterable, Tuple, Union, TypeVar
+from typing import Tuple, Union, TypeVar, ClassVar, Optional
 
 import numpy as np
 
 CalInfo = TypeVar("CalInfo", bound="CalibrationInfo")
 
 
+class NumpyEncoder(json.JSONEncoder):
+    """Custom encoder for numpy array."""
+
+    def default(self, obj):  # noqa: arguments-differ
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+
+@dataclass(eq=False)
 class CalibrationInfo:
     """Abstract BaseClass for all Calibration Info objects."""
 
-    CAL_TYPE = None
-    acc_unit = None
-    gyro_unit = None
+    CAL_TYPE: ClassVar[str]  # noqa: invalid-name
+    acc_unit: Optional[str] = None
+    gyro_unit: Optional[str] = None
+
+    _cal_paras: ClassVar[Tuple[str, ...]]
 
     _cal_type_explanation = """
     Note:
@@ -30,11 +43,6 @@ class CalibrationInfo:
     """
 
     __doc__ += _cal_type_explanation
-
-    @property
-    def _fields(self) -> Iterable[str]:
-        """List of Calibration parameters that are required."""
-        raise NotImplementedError("This method needs to be implemented by a subclass")
 
     def calibrate(self, acc: np.ndarray, gyro: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Abstract method to perform a calibration on both acc and gyro.
@@ -79,59 +87,45 @@ class CalibrationInfo:
         """
         raise NotImplementedError("This method needs to be implemented by a subclass")
 
-    def __init__(self, **kwargs):
-        """Create new CalibrationInfo instance.
-
-        Parameter
-        ---------
-        kwargs :
-            Matrices for all fields specified in `self._fields`
-
-        """
-        for field in self._fields:
-            setattr(self, field, kwargs.get(field, None))
-
-    def __repr__(self):
-        """Show a proper string representation of a CalibrationInfo object."""
-        out = self.__class__.__name__ + "("
-        for val in self._fields:
-            out += "\n" + val + " =\n" + getattr(self, val).__repr__() + ",\n"
-        out += "\n)"
-        return out
-
     def __eq__(self, other):
-        """Check if two calibrations are identical."""
+        """Check if two calibrations are identical.
+
+        Note, we use a custom function for that, as we need to compare the numpy arrays.
+        """
         # Check type:
         if not isinstance(other, self.__class__):
             raise ValueError("Comparison is only defined between two {} object!".format(self.__class__.__name__))
 
         # Test keys equal:
-        if not self._fields == other._fields:
+        if fields(self) != fields(other):
             return False
 
         # Test method equal
         if not self.CAL_TYPE == other.CAL_TYPE:
             return False
 
-        # Test units
-        if (not self.acc_unit == other.acc_unit) or (not self.gyro_unit == other.gyro_unit):
-            return False
-
-        # Test Calibration values
-        for v1, v2 in zip(self.__dict__.values(), other.__dict__.values()):
-            if not np.array_equal(v1, v2):
+        # Test all values
+        for f in fields(self):
+            a1 = getattr(self, f.name)
+            a2 = getattr(other, f.name)
+            if isinstance(a1, np.ndarray):
+                equal = np.array_equal(a1, a2)
+            else:
+                equal = a1 == a2
+            if not equal:
                 return False
         return True
 
     def _to_list_dict(self):
-        d = {key: getattr(self, key).tolist() for key in self._fields}
+        d = asdict(self)
         d["cal_type"] = self.CAL_TYPE
         return d
 
     @classmethod
     def _from_list_dict(cls, list_dict):
-        raw_json = {k: np.array(v) for k, v in list_dict.items()}
-        return cls(**raw_json)
+        for k in cls._cal_paras:
+            list_dict[k] = np.array(list_dict[k])
+        return cls(**list_dict)
 
     @classmethod
     def _get_subclasses(cls):
@@ -147,7 +141,7 @@ class CalibrationInfo:
     def to_json(self) -> str:
         """Convert all calibration matrices into a json string."""
         data_dict = self._to_list_dict()
-        return json.dumps(data_dict, indent=4)
+        return json.dumps(data_dict, indent=4, cls=NumpyEncoder)
 
     @classmethod
     def from_json(cls, json_str: str) -> CalInfo:
@@ -165,7 +159,7 @@ class CalibrationInfo:
 
         """
         raw_json = json.loads(json_str)
-        subclass = cls.find_subclass_from_cal_type(raw_json["cal_type"])
+        subclass = cls.find_subclass_from_cal_type(raw_json.pop("cal_type"))
         return subclass._from_list_dict(raw_json)
 
     def to_json_file(self, path: Union[str, Path]):
@@ -178,7 +172,7 @@ class CalibrationInfo:
 
         """
         data_dict = self._to_list_dict()
-        return json.dump(data_dict, open(path, "w"))
+        return json.dump(data_dict, open(path, "w"), cls=NumpyEncoder)
 
     @classmethod
     def from_json_file(cls, path: Union[str, Path]) -> CalInfo:
@@ -197,7 +191,7 @@ class CalibrationInfo:
 
         """
         raw_json = json.load(open(path, "r"))
-        subclass = cls.find_subclass_from_cal_type(raw_json["cal_type"])
+        subclass = cls.find_subclass_from_cal_type(raw_json.pop("cal_type"))
         return subclass._from_list_dict(raw_json)
 
     def to_hdf5(self, path: Union[str, Path]):
@@ -212,7 +206,7 @@ class CalibrationInfo:
         import h5py  # noqa: import-outside-toplevel
 
         with h5py.File(path, "w") as hdf:
-            d = {key: getattr(self, key).tolist() for key in self._fields}
+            d = {key: getattr(self, key).tolist() for key in self._cal_paras}
             for k, v in d.items():
                 hdf.create_dataset(k, data=v)
             hdf["cal_type"] = self.CAL_TYPE
@@ -240,7 +234,11 @@ class CalibrationInfo:
         with h5py.File(path, "r") as hdf:
             values = dict()
             subcls = cls.find_subclass_from_cal_type(hdf["cal_type"][...])
-            for k in subcls._fields:
-                values[k] = np.array(hdf.get(k))
+            for k in fields(subcls):
+                tmp = hdf.get(k.name)
+                if k.name in cls._cal_paras:
+                    values[k.name] = np.array(tmp)
+                else:
+                    values[k.name] = tmp.value
 
         return subcls(**values)

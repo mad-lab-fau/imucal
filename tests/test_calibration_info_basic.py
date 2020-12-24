@@ -35,6 +35,8 @@ def sample_cal_dict():
             ]
         ),
         "b_g": np.array([1.9693536, -4.46624421, -3.65097072]),
+        "acc_unit": "custom_acc_unit",
+        "gyro_unit": "custom_gyro_unit",
     }
     return sample_data
 
@@ -42,6 +44,14 @@ def sample_cal_dict():
 @pytest.fixture()
 def sample_cal(sample_cal_dict):
     return FerrarisCalibrationInfo(**sample_cal_dict)
+
+
+@pytest.fixture()
+def sample_cal_with_units(sample_cal_dict):
+    return (
+        FerrarisCalibrationInfo(**sample_cal_dict),
+        {"acc_unit": sample_cal_dict["acc_unit"], "gyro_unit": sample_cal_dict["gyro_unit"]},
+    )
 
 
 def test_equal(sample_cal):
@@ -59,19 +69,29 @@ def test_equal_data(sample_cal, sample_cal_dict):
     assert not (sample_cal == FerrarisCalibrationInfo(**not_equal))
 
 
-def test_json_roundtrip(sample_cal):
-    assert sample_cal == FerrarisCalibrationInfo.from_json(sample_cal.to_json())
+def test_json_roundtrip(sample_cal_with_units):
+    sample_cal = sample_cal_with_units[0]
+    out = FerrarisCalibrationInfo.from_json(sample_cal.to_json())
+    assert sample_cal == out
+    assert sample_cal_with_units[1]["acc_unit"] == out.acc_unit
+    assert sample_cal_with_units[1]["gyro_unit"] == out.gyro_unit
 
 
-def test_json_file_roundtrip(sample_cal):
+def test_json_file_roundtrip(sample_cal_with_units):
+    sample_cal = sample_cal_with_units[0]
     with tempfile.NamedTemporaryFile(mode="w+") as f:
         sample_cal.to_json_file(f.name)
         out = FerrarisCalibrationInfo.from_json_file(f.name)
     assert sample_cal == out
+    assert sample_cal_with_units[1]["acc_unit"] == out.acc_unit
+    assert sample_cal_with_units[1]["gyro_unit"] == out.gyro_unit
 
 
-def test_hdf5_file_roundtrip(sample_cal):
+def test_hdf5_file_roundtrip(sample_cal_with_units):
+    sample_cal = sample_cal_with_units[0]
     with tempfile.NamedTemporaryFile(mode="w+") as f:
         sample_cal.to_hdf5(f.name)
         out = FerrarisCalibrationInfo.from_hdf5(f.name)
     assert sample_cal == out
+    assert sample_cal_with_units[1]["acc_unit"] == out.acc_unit
+    assert sample_cal_with_units[1]["gyro_unit"] == out.gyro_unit

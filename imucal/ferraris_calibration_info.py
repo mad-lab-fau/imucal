@@ -1,6 +1,7 @@
 """Wrapper object to hold calibration matrices for a Ferraris Calibration."""
 import warnings
-from typing import Tuple
+from dataclasses import dataclass
+from typing import Tuple, ClassVar, Optional
 
 import numpy as np
 
@@ -8,6 +9,7 @@ from imucal.calibration_info import CalibrationInfo
 
 
 # TODO: Add example to docstring
+@dataclass(eq=False)
 class FerrarisCalibrationInfo(CalibrationInfo):
     """Calibration object that represents all the required information to apply a Ferraris calibration to a dataset.
 
@@ -30,20 +32,21 @@ class FerrarisCalibrationInfo(CalibrationInfo):
 
     """
 
-    CAL_TYPE = "Ferraris"
-    acc_unit = "m/s^2"
-    gyro_unit = "deg/s"
-    K_a: np.ndarray
-    R_a: np.ndarray
-    b_a: np.ndarray
-    K_g: np.ndarray
-    R_g: np.ndarray
-    K_ga: np.ndarray
-    b_g: np.ndarray
+    CAL_TYPE: ClassVar[str] = "Ferraris"  # noqa: invalid-name
 
-    _fields = ("K_a", "R_a", "b_a", "K_g", "R_g", "K_ga", "b_g")
+    acc_unit: str = "m/s^2"
+    gyro_unit: str = "deg/s"
+    K_a: Optional[np.ndarray] = None  # noqa: invalid-name
+    R_a: Optional[np.ndarray] = None  # noqa: invalid-name
+    b_a: Optional[np.ndarray] = None
+    K_g: Optional[np.ndarray] = None  # noqa: invalid-name
+    R_g: Optional[np.ndarray] = None  # noqa: invalid-name
+    K_ga: Optional[np.ndarray] = None  # noqa: invalid-name
+    b_g: Optional[np.ndarray] = None
 
     __doc__ += CalibrationInfo._cal_type_explanation
+
+    _cal_paras: ClassVar[Tuple[str, ...]] = ("K_a", "R_a", "b_a", "K_g", "R_g", "K_ga", "b_g")
 
     def calibrate_acc(self, acc: np.ndarray) -> np.ndarray:
         """Calibrate the accelerometer.
@@ -121,11 +124,11 @@ class FerrarisCalibrationInfo(CalibrationInfo):
 
         """
         # Check if all required paras are initialized to throw appropriate error messages:
-        for v in self._fields:
+        for v in self._cal_paras:
             if getattr(self, v, None) is None:
                 raise ValueError(
                     "{} need to initialised before an acc calibration can be performed. {} is missing".format(
-                        self._fields, v
+                        self._cal_paras, v
                     )
                 )
 

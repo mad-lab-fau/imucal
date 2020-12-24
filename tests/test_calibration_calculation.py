@@ -28,7 +28,7 @@ def test_example_calibration(example_calibration_data):
     # # Uncomment if you want to save the new cal matrix to update the regression test
     # cal_mat.to_json_file(Path(__file__).parent / '_test_data/example_cal.json')
 
-    for val in cal_mat._fields:
+    for val in cal_mat._cal_paras:
         assert_array_almost_equal(getattr(cal_mat, val), getattr(calib, val), 5, err_msg=val)
 
     for val in ["CAL_TYPE", "acc_unit", "gyro_unit"]:
