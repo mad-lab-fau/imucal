@@ -236,7 +236,7 @@ class CalibrationInfo:
             subcls = cls.find_subclass_from_cal_type(hdf["cal_type"][...])
             for k in fields(subcls):
                 tmp = hdf.get(k.name)
-                if k.name in cls._cal_paras:
+                if k.name in subcls._cal_paras:
                     values[k.name] = np.array(tmp)
                 else:
                     values[k.name] = tmp.value
