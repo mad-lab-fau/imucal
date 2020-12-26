@@ -24,7 +24,9 @@ class CalibrationInfo:
 
     CAL_TYPE: ClassVar[str]  # noqa: invalid-name
     acc_unit: Optional[str] = None
-    gyro_unit: Optional[str] = None
+    gyr_unit: Optional[str] = None
+    from_acc_unit: Optional[str] = None
+    from_gyr_unit: Optional[str] = None
 
     _cal_paras: ClassVar[Tuple[str, ...]]
 
@@ -172,7 +174,7 @@ class CalibrationInfo:
 
         """
         data_dict = self._to_list_dict()
-        return json.dump(data_dict, open(path, "w"), cls=NumpyEncoder)
+        return json.dump(data_dict, open(path, "w"), cls=NumpyEncoder, indent=4)
 
     @classmethod
     def from_json_file(cls, path: Union[str, Path]) -> CalInfo:
@@ -211,7 +213,7 @@ class CalibrationInfo:
                 hdf.create_dataset(k, data=v)
             hdf["cal_type"] = self.CAL_TYPE
             hdf["acc_unit"] = self.acc_unit
-            hdf["gyro_unit"] = self.gyro_unit
+            hdf["gyro_unit"] = self.gyr_unit
 
     @classmethod
     def from_hdf5(cls, path: Union[str, Path]):

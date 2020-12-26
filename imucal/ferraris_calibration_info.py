@@ -35,7 +35,9 @@ class FerrarisCalibrationInfo(CalibrationInfo):
     CAL_TYPE: ClassVar[str] = "Ferraris"  # noqa: invalid-name
 
     acc_unit: str = "m/s^2"
-    gyro_unit: str = "deg/s"
+    gyr_unit: str = "deg/s"
+    from_acc_unit: str = "a.u."
+    from_gyr_unit: str = "a.u."
     K_a: Optional[np.ndarray] = None  # noqa: invalid-name
     R_a: Optional[np.ndarray] = None  # noqa: invalid-name
     b_a: Optional[np.ndarray] = None
