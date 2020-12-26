@@ -208,12 +208,12 @@ class CalibrationInfo:
         import h5py  # noqa: import-outside-toplevel
 
         with h5py.File(path, "w") as hdf:
-            d = {key: getattr(self, key).tolist() for key in self._cal_paras}
-            for k, v in d.items():
-                hdf.create_dataset(k, data=v)
+            for k in fields(self):
+                if k.name in self._cal_paras:
+                    hdf.create_dataset(k.name, data=getattr(self, k.name).tolist())
+                else:
+                    hdf[k.name] = getattr(self, k.name)
             hdf["cal_type"] = self.CAL_TYPE
-            hdf["acc_unit"] = self.acc_unit
-            hdf["gyro_unit"] = self.gyr_unit
 
     @classmethod
     def from_hdf5(cls, path: Union[str, Path]):
