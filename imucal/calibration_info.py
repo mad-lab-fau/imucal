@@ -27,6 +27,7 @@ class CalibrationInfo:
     gyr_unit: Optional[str] = None
     from_acc_unit: Optional[str] = None
     from_gyr_unit: Optional[str] = None
+    comment: Optional[str] = None
 
     _cal_paras: ClassVar[Tuple[str, ...]]
 
@@ -209,10 +210,12 @@ class CalibrationInfo:
 
         with h5py.File(path, "w") as hdf:
             for k in fields(self):
+                value = getattr(self, k.name)
                 if k.name in self._cal_paras:
-                    hdf.create_dataset(k.name, data=getattr(self, k.name).tolist())
+                    hdf.create_dataset(k.name, data=value.tolist())
                 else:
-                    hdf[k.name] = getattr(self, k.name)
+                    if value:
+                        hdf[k.name] = value
             hdf["cal_type"] = self.CAL_TYPE
 
     @classmethod
@@ -240,7 +243,10 @@ class CalibrationInfo:
                 tmp = hdf.get(k.name)
                 if k.name in subcls._cal_paras:
                     values[k.name] = np.array(tmp)
-                else:
+                elif tmp:
                     values[k.name] = tmp.value
+                else:
+                    values[k.name] = None
+
 
         return subcls(**values)
