@@ -41,6 +41,7 @@ def sample_cal_dict():
         "gyr_unit": "custom_gyro_unit",
         "from_acc_unit": "custom_from_acc_unit",
         "from_gyr_unit": "custom_from_gyr_unit",
+        "comment": "my custom comment",
     }
     return sample_data
 
@@ -59,19 +60,6 @@ def sample_cal(sample_cal_dict, request):
     return info_class(**sample_cal_dict)
 
 
-@pytest.fixture(params=(FerrarisCalibrationInfo, TurntableCalibrationInfo))
-def sample_cal_with_units(sample_cal_dict, request):
-    return (
-        request.param(**sample_cal_dict),
-        {
-            "acc_unit": sample_cal_dict["acc_unit"],
-            "gyr_unit": sample_cal_dict["gyr_unit"],
-            "from_acc_unit": sample_cal_dict["from_acc_unit"],
-            "from_gyr_unit": sample_cal_dict["from_gyr_unit"],
-        },
-    )
-
-
 def test_equal(sample_cal):
     assert sample_cal == deepcopy(sample_cal)
 
@@ -87,35 +75,20 @@ def test_equal_data(sample_cal, sample_cal_dict):
     assert not (sample_cal == sample_cal.__class__(**not_equal))
 
 
-def test_json_roundtrip(sample_cal_with_units):
-    sample_cal = sample_cal_with_units[0]
+def test_json_roundtrip(sample_cal):
     out = CalibrationInfo.from_json(sample_cal.to_json())
     assert sample_cal == out
-    assert sample_cal_with_units[1]["acc_unit"] == out.acc_unit
-    assert sample_cal_with_units[1]["gyr_unit"] == out.gyr_unit
-    assert sample_cal_with_units[1]["from_acc_unit"] == out.from_acc_unit
-    assert sample_cal_with_units[1]["from_gyr_unit"] == out.from_gyr_unit
 
 
-def test_json_file_roundtrip(sample_cal_with_units):
-    sample_cal = sample_cal_with_units[0]
+def test_json_file_roundtrip(sample_cal):
     with tempfile.NamedTemporaryFile(mode="w+") as f:
         sample_cal.to_json_file(f.name)
         out = CalibrationInfo.from_json_file(f.name)
     assert sample_cal == out
-    assert sample_cal_with_units[1]["acc_unit"] == out.acc_unit
-    assert sample_cal_with_units[1]["gyr_unit"] == out.gyr_unit
-    assert sample_cal_with_units[1]["from_acc_unit"] == out.from_acc_unit
-    assert sample_cal_with_units[1]["from_gyr_unit"] == out.from_gyr_unit
 
 
-def test_hdf5_file_roundtrip(sample_cal_with_units):
-    sample_cal = sample_cal_with_units[0]
+def test_hdf5_file_roundtrip(sample_cal):
     with tempfile.NamedTemporaryFile(mode="w+") as f:
         sample_cal.to_hdf5(f.name)
         out = CalibrationInfo.from_hdf5(f.name)
     assert sample_cal == out
-    assert sample_cal_with_units[1]["acc_unit"] == out.acc_unit
-    assert sample_cal_with_units[1]["gyr_unit"] == out.gyr_unit
-    assert sample_cal_with_units[1]["from_acc_unit"] == out.from_acc_unit
-    assert sample_cal_with_units[1]["from_gyr_unit"] == out.from_gyr_unit
