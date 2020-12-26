@@ -207,7 +207,7 @@ class CalibrationGui:
         return sum((all(v) for v in self.section_list.values()))
 
 
-def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame):
+def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame) -> pd.DataFrame:
     out = dict()
 
     for label, row in section_list.iterrows():
