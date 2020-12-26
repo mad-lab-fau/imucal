@@ -1,5 +1,6 @@
 import tempfile
 from copy import deepcopy
+from dataclasses import dataclass
 
 import numpy as np
 import pytest
@@ -44,9 +45,18 @@ def sample_cal_dict():
     return sample_data
 
 
-@pytest.fixture(params=(FerrarisCalibrationInfo, TurntableCalibrationInfo))
+@dataclass(eq=False)
+class CustomFerraris(FerrarisCalibrationInfo):
+    CAL_TYPE = "Custom Ferraris"
+    custom_field: str = "default_custom_value"
+
+
+@pytest.fixture(params=(FerrarisCalibrationInfo, TurntableCalibrationInfo, CustomFerraris))
 def sample_cal(sample_cal_dict, request):
-    return request.param(**sample_cal_dict)
+    info_class = request.param
+    if info_class == CustomFerraris:
+        sample_cal_dict["custom_field"] = "custom_value"
+    return info_class(**sample_cal_dict)
 
 
 @pytest.fixture(params=(FerrarisCalibrationInfo, TurntableCalibrationInfo))
