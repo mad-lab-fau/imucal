@@ -2,9 +2,10 @@
 import json
 from dataclasses import dataclass, fields, asdict
 from pathlib import Path
-from typing import Tuple, Union, TypeVar, ClassVar, Optional
+from typing import Tuple, Union, TypeVar, ClassVar, Optional, Type
 
 import numpy as np
+from typing_extensions import Literal
 
 CalInfo = TypeVar("CalInfo", bound="CalibrationInfo")
 
@@ -147,7 +148,7 @@ class CalibrationInfo:
         return json.dumps(data_dict, indent=4, cls=NumpyEncoder)
 
     @classmethod
-    def from_json(cls, json_str: str) -> CalInfo:
+    def from_json(cls: Type[CalInfo], json_str: str) -> CalInfo:
         """Create a calibration object from a json string (created by `CalibrationInfo.to_json`).
 
         Parameter
@@ -178,7 +179,7 @@ class CalibrationInfo:
         return json.dump(data_dict, open(path, "w"), cls=NumpyEncoder, indent=4)
 
     @classmethod
-    def from_json_file(cls, path: Union[str, Path]) -> CalInfo:
+    def from_json_file(cls: Type[CalInfo], path: Union[str, Path]) -> CalInfo:
         """Create a calibration object from a valid json file (created by `CalibrationInfo.to_json_file`).
 
         Parameter
@@ -219,7 +220,7 @@ class CalibrationInfo:
             hdf["cal_type"] = self.CAL_TYPE
 
     @classmethod
-    def from_hdf5(cls, path: Union[str, Path]):
+    def from_hdf5(cls: Type[CalInfo], path: Union[str, Path]):
         """Read calibration data stored in hdf5 fileformat (created by `CalibrationInfo.save_to_hdf5`).
 
         Parameter
@@ -249,3 +250,48 @@ class CalibrationInfo:
                     values[k.name] = None
 
         return subcls(**values)
+
+
+def load_calibration_info(
+    path: Union[Path, str],
+    format: Optional[Literal["hdf", "json"]] = None,
+    base_class: Type[CalibrationInfo] = CalibrationInfo,
+):
+    """Load any calibration info object from file.
+
+    Parameters
+    ----------
+    path
+        Path name to the file (can be .json or .hdf)
+    format
+        Format of the file (either `hdf` or `json`).
+        If None, we try to figure out the correct format based on the file suffix.
+    base_class
+        This method finds the correct calibration info type by inspecting all subclasses of `base_class`.
+        Usually that should be kept at the default value.
+
+    Notes
+    -----
+    This function determines the correct calibration info class to use based on the `cal_type` parameter stored in the
+    file.
+    For this to work, the correct calibration info class must be accessible.
+    This means, if you created a new calibration info class, you need to make sure that it is imported (or at least
+    the file it is defined in), before using this function.
+
+    """
+    format_options = {"json": "from_json_file", "hdf": "from_hdf5"}
+    path = Path(path)
+    if format is None:
+        # Determine format from file ending:
+        suffix = path.suffix
+        if suffix == "json":
+            format = "json"
+        elif suffix in ["hdf", "h5"]:
+            format = "hdf"
+        else:
+            raise ValueError("The loader format could not be determined from the file suffix."
+                             "Please specify `format` explicitly.")
+    if format not in format_options:
+        raise ValueError("`format` must be one of {}".format(list(format_options.keys())))
+
+    return getattr(base_class, format_options[format])(path)
