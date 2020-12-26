@@ -248,5 +248,4 @@ class CalibrationInfo:
                 else:
                     values[k.name] = None
 
-
         return subcls(**values)
