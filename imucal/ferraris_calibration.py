@@ -1,5 +1,5 @@
 """Calculate a Ferraris calibration from sensor data."""
-from typing import Optional, TypeVar, Type, NamedTuple, Iterable, Tuple
+from typing import Optional, TypeVar, Type, NamedTuple, Iterable, Tuple, ClassVar
 
 import numpy as np
 import pandas as pd
@@ -10,9 +10,12 @@ from imucal.calibration_info import CalibrationInfo
 from imucal.ferraris_calibration_info import FerrarisCalibrationInfo, TurntableCalibrationInfo
 
 T = TypeVar("T", bound="FerrarisCalibration")
+FERRARIS_SECTIONS = ("x_p", "x_a", "y_p", "y_a", "z_p", "z_a", "x_rot", "y_rot", "z_rot")
 
 
 class FerrarisSignalRegions(NamedTuple):
+    """NamedTuple containing all signal regions required for a Ferraris Calibration. """
+
     acc_x_p: np.ndarray
     acc_x_a: np.ndarray
     acc_y_p: np.ndarray
@@ -33,9 +36,8 @@ class FerrarisSignalRegions(NamedTuple):
     gyr_y_rot: np.ndarray
     gyr_z_rot: np.ndarray
 
-    FERRARIS_SECTIONS = ("x_p", "x_a", "y_p", "y_a", "z_p", "z_a", "x_rot", "y_rot", "z_rot")
-
     def validate(self):
+        """Validate that all fields are populated with numpy arrays."""
         for k in self._fields:
             if not isinstance(getattr(self, k), np.ndarray) or len(getattr(self, k)) == 0:
                 raise ValueError("The the signal region {} is no valid numpy array.")
@@ -314,7 +316,7 @@ def ferraris_regions_from_df(
     """Create a Calibration object based on a dataframe which has all required sections labeled.
 
     The expected Dataframe has the section label as index and has at least the 6 required data columns.
-    The index must contain all sections as specified by `FerrarisCalibration.FERRARIS_SECTIONS`.
+    The index must contain all the following sections: {}.
 
     Examples
     --------
@@ -336,8 +338,8 @@ def ferraris_regions_from_df(
     >>> regions
     FerrarisSignalRegions(x_a=array([...]), ..., z_rot=array([...]))
 
-    Parameter
-    ---------
+    Parameters
+    ----------
     df :
         6 column dataframe (3 acc, 3 gyro)
     acc_cols :
@@ -348,6 +350,11 @@ def ferraris_regions_from_df(
     Returns
     -------
     ferraris_cal_obj : FerrarisSignalRegions
+
+    See Also
+    --------
+    ferraris_regions_from_interactive_plot
+    ferraris_regions_from_section_list
 
     """
     acc_cols = list(acc_cols)
@@ -363,6 +370,9 @@ def ferraris_regions_from_df(
     return FerrarisSignalRegions(**acc_dict, **gyro_dict)
 
 
+ferraris_regions_from_df.__doc__ = ferraris_regions_from_df.__doc__.format(FERRARIS_SECTIONS)
+
+
 def ferraris_regions_from_section_list(
     data: pd.DataFrame,
     section_list: pd.DataFrame,
@@ -376,8 +386,8 @@ def ferraris_regions_from_section_list(
     This section list can be stored on disk and this method can be used to turn it back into a valid calibration
     object.
 
-    Parameter
-    ---------
+    Parameters
+    ----------
     df :
         6 column dataframe (3 acc, 3 gyro)
     section_list :
@@ -405,6 +415,11 @@ def ferraris_regions_from_section_list(
     >>> regions = ferraris_regions_from_section_list(df)
     >>> regions
     FerrarisSignalRegions(x_a=array([...]), ..., z_rot=array([...]))
+
+    See Also
+    --------
+    ferraris_regions_from_interactive_plot
+    ferraris_regions_from_df
 
     """
     df = _convert_data_from_section_list_to_df(data, section_list)
@@ -434,8 +449,8 @@ def ferraris_regions_from_interactive_plot(
     >>> regions
     FerrarisSignalRegions(x_a=array([...]), ..., z_rot=array([...]))
 
-    Parameter
-    ---------
+    Parameters
+    ----------
     df :
         6 column dataframe (3 acc, 3 gyro)
     acc_cols :
@@ -451,7 +466,12 @@ def ferraris_regions_from_interactive_plot(
     section_list : pd.DataFrame
         Section list representing the start and stop of each section.
         It is advised to save this to disk to avoid repeated manual labeling.
-        `ferraris_regions_from_section_list` can be used to recreate the regions object
+        :py:func:`~imucal.ferraris_regions_from_section_list` can be used to recreate the regions object
+
+    See Also
+    --------
+    ferraris_regions_from_section_list
+    ferraris_regions_from_df
 
     """
     acc = data[acc_cols].to_numpy()
