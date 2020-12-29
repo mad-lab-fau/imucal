@@ -60,7 +60,7 @@ Helper Functions to generate valid input data for Ferraris like calibrations.
    :toctree: generated
    :template: class.rst
 
-    ferraris_calibration.FerrarisSignalRegions
+    FerrarisSignalRegions
 
 Label GUI
 =========
