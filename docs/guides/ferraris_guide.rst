@@ -14,7 +14,7 @@ Compared to directly calibrating the Gyroscope using a defined rate of rotation,
 angle.
 This makes it feasible to perform the calibration without the use of expensive equipment.
 
-What I need:
+What I need
 ===========
 
 1. A 6 DOF sensor unit that can record or stream the raw IMU data.
