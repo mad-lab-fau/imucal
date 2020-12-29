@@ -254,7 +254,7 @@ class CalibrationInfo:
 
 def load_calibration_info(
     path: Union[Path, str],
-    format: Optional[Literal["hdf", "json"]] = None,
+    file_type: Optional[Literal["hdf", "json"]] = None,
     base_class: Type[CalibrationInfo] = CalibrationInfo,
 ):
     """Load any calibration info object from file.
@@ -263,7 +263,7 @@ def load_calibration_info(
     ----------
     path
         Path name to the file (can be .json or .hdf)
-    format
+    file_type
         Format of the file (either `hdf` or `json`).
         If None, we try to figure out the correct format based on the file suffix.
     base_class
@@ -281,17 +281,17 @@ def load_calibration_info(
     """
     format_options = {"json": "from_json_file", "hdf": "from_hdf5"}
     path = Path(path)
-    if format is None:
+    if file_type is None:
         # Determine format from file ending:
         suffix = path.suffix
         if suffix == "json":
-            format = "json"
+            file_type = "json"
         elif suffix in ["hdf", "h5"]:
-            format = "hdf"
+            file_type = "hdf"
         else:
             raise ValueError("The loader format could not be determined from the file suffix."
                              "Please specify `format` explicitly.")
-    if format not in format_options:
+    if file_type not in format_options:
         raise ValueError("`format` must be one of {}".format(list(format_options.keys())))
 
-    return getattr(base_class, format_options[format])(path)
+    return getattr(base_class, format_options[file_type])(path)

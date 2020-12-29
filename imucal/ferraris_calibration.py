@@ -1,20 +1,20 @@
 """Calculate a Ferraris calibration from sensor data."""
-from typing import Optional, TypeVar, Type, NamedTuple, Iterable, Tuple, ClassVar
+from typing import Optional, TypeVar, Type, NamedTuple, Iterable, Tuple
 
 import numpy as np
 import pandas as pd
 from numpy.linalg import inv
+from typing_extensions import ClassVar
 
 from imucal.calibration_gui import CalibrationGui, _convert_data_from_section_list_to_df
 from imucal.calibration_info import CalibrationInfo
 from imucal.ferraris_calibration_info import FerrarisCalibrationInfo, TurntableCalibrationInfo
 
 T = TypeVar("T", bound="FerrarisCalibration")
-FERRARIS_SECTIONS = ("x_p", "x_a", "y_p", "y_a", "z_p", "z_a", "x_rot", "y_rot", "z_rot")
 
 
 class FerrarisSignalRegions(NamedTuple):
-    """NamedTuple containing all signal regions required for a Ferraris Calibration. """
+    """NamedTuple containing all signal regions required for a Ferraris Calibration."""
 
     acc_x_p: np.ndarray
     acc_x_a: np.ndarray
@@ -48,25 +48,51 @@ class FerrarisCalibration:
 
     The Ferraris calibration is derived based on a well defined series of data recordings:
 
-    `x_p`: positive x-axis of sensor is aligned with gravity (x-acc measures +1g)
-    `x_a`: negative x-axis of sensor is aligned with gravity (x-acc measures -1g)
-    `y_p`: positive y-axis of sensor is aligned with gravity (y-acc measures +1g)
-    `y_a`: negative y-axis of sensor is aligned with gravity (y-acc measures -1g)
-    `z_p`: positive z-axis of sensor is aligned with gravity (z-acc measures +1g)
-    `z_a`: negative z-axis of sensor is aligned with gravity (z-acc measures -1g)
+    =====  ======================================================================
+    Static Holds
+    -----------------------------------------------------------------------------
+    Name   Explanation
+    =====  ======================================================================
+    `x_p`  positive x-axis of sensor is aligned with gravity (x-acc measures +1g)
+    `x_a`  negative x-axis of sensor is aligned with gravity (x-acc measures -1g)
+    `y_p`  positive y-axis of sensor is aligned with gravity (y-acc measures +1g)
+    `y_a`  negative y-axis of sensor is aligned with gravity (y-acc measures -1g)
+    `z_p`  positive z-axis of sensor is aligned with gravity (z-acc measures +1g)
+    `z_a`  negative z-axis of sensor is aligned with gravity (z-acc measures -1g)
+    =====  ======================================================================
 
-    `x_rot`: sensor is rotated clockwise in the `x_p` position around the x-axis (x-gyro shows negative values) for a
-        well known angle (typically 360 deg)
-    `y_rot`: sensor is rotated clockwise in the `y_p` position around the y-axis (y-gyro shows negative values) for a
-        well known angle (typically 360 deg)
-    `z_rot`: sensor is rotated clockwise in the `z_p` position around the z-axis (z-gyro shows negative values) for a
-        well known angle (typically 360 deg)
+    =======  ========================================================================================================
+    Rotations
+    -----------------------------------------------------------------------------------------------------------------
+    Name     Explanation
+    =======  ========================================================================================================
+    `x_rot`  sensor is rotated clockwise in the `x_p` position around the x-axis (x-gyro shows negative values) for a
+             well known angle (typically 360 deg)
+    `y_rot`  sensor is rotated clockwise in the `y_p` position around the y-axis (y-gyro shows negative values) for a
+             well known angle (typically 360 deg)
+    `z_rot`  sensor is rotated clockwise in the `z_p` position around the z-axis (z-gyro shows negative values) for a
+             well known angle (typically 360 deg)
+    =======  ========================================================================================================
 
     All sections need to be recorded for a sensor and then annotated.
-    In particular for the rotation, it is important to annotate the data directly at the end and the beginning of the
-    rotation to avoid noise and artifact degrading the integration results.
-    This class offers various helper constructors to support the annotation process.
+    This class then takes the data of each section (represented as a
+    :class:`~imucal.FerrarisSignalRegions` object) and calculates the calibration matrizes for
+    the gyroscope and accelerometer.
 
+    As it is quite tedious to obtain the data of each section in a seperate array, you should make use of the available
+    helper functions to turn a continous recording into annotated sections (See the See also section)
+
+    Parameters
+    ----------
+    sampling_rate :
+        Sampling rate of the data
+    expected_angle :
+        expected rotation angle for the gyroscope rotation.
+    grav :
+        The expected value of the gravitational acceleration.
+    calibration_info_class :
+        The calibration Info class to use to store the final calibration information.
+        This should be a FerrarisCalibrationInfo or a custom subclass.
 
     Notes
     -----
@@ -82,15 +108,31 @@ class FerrarisCalibration:
 
     Examples
     --------
-    >>> from imucal import FerrarisCalibration
+    >>> from imucal import FerrarisCalibration, ferraris_regions_from_interactive_plot
     >>> sampling_rate = 100 #Hz
     >>> data = ... # my data as 6 col pandas dataframe
     >>> # This will open an interactive plot, where you can select the start and the stop sample of each region
-    >>> cal, section_list = FerrarisCalibration.from_interactive_plot(data, sampling_rate=sampling_rate)
-    >>> section_list.to_csv('./calibration_sections.csv')  # This is optional, but recommended
-    >>> calibration_info = cal.compute()  # Calculate the actual matrizes.
+    >>> section_data, section_list = ferraris_regions_from_interactive_plot(data, sampling_rate=sampling_rate)
+    >>> section_list.to_csv('./calibration_sections.csv')  # Store the annotated section list as reference for the
+    ...                                                    # future
+    >>> cal = FerrarisCalibration()  # Create new calibration object
+    >>> calibration_info = cal.compute(  # Calculate the actual matrizes.
+    ...     section_data,
+    ...     sampling_rate_hz=sampling_rate,
+    ...     from_acc_unit="a.u.",
+    ...     from_gyr_unit="a.u.",
+    ...     comment="my custom comment."
+    ...)
     >>> calibration_info_class
     < FerrarisCalibration object at ... >
+
+    See Also
+    --------
+    imucal.ferraris_regions_from_df: Generate valid sections from preannotated dataframe.
+    imucal.ferraris_regions_from_interactive_plot: Generate valid sections via manual annotation in an interactive
+        GUI.
+    imucal.ferraris_regions_from_section_list: Generate valid sections based on raw data and start-end labels for the
+        individual sections.
 
     """
 
@@ -98,8 +140,20 @@ class FerrarisCalibration:
     expected_angle: float
     calibration_info_class: Type[FerrarisCalibrationInfo]
 
-    OUT_ACC_UNIT = "m/s^2"
-    OUT_GYR_UNIT = "deg/s"
+    OUT_ACC_UNIT: ClassVar[str] = "m/s^2"
+    OUT_GYR_UNIT: ClassVar[str] = "deg/s"
+
+    FERRARIS_SECTIONS: ClassVar[Tuple[str, ...]] = (
+        "x_p",
+        "x_a",
+        "y_p",
+        "y_a",
+        "z_p",
+        "z_a",
+        "x_rot",
+        "y_rot",
+        "z_rot",
+    )
 
     def __init__(
         self,
@@ -107,22 +161,6 @@ class FerrarisCalibration:
         expected_angle: float = -360,
         calibration_info_class: Type[FerrarisCalibrationInfo] = FerrarisCalibrationInfo,
     ):
-        """Create a Calibration object.
-
-
-        Parameter
-        ---------
-        sampling_rate :
-            Sampling rate of the data
-        expected_angle :
-            expected rotation angle for the gyroscope rotation.
-        grav :
-            The expected value of the gravitational acceleration.
-        calibration_info_class :
-            The calibration Info class to use to store the final calibration information.
-            This should be a FerrarisCalibrationInfo or a custom subclass.
-
-        """
         self.grav = grav
         self.expected_angle = expected_angle
         self.calibration_info_class = calibration_info_class
@@ -278,11 +316,16 @@ class TurntableCalibration(FerrarisCalibration):
     """Calculate a Ferraris calibration matrices based on a turntable measurement.
 
     This calibration is basically identical to the FerrarisCalibration.
-    However, the calibrate method will return a `TurntableCalibrationInfo` to indicate the expected higher precision
-    of this calibration method.
+    However, the calibrate method will return a :class:`~imucal.TurntableCalibrationInfo` to indicate the expected
+    higher precision of this calibration method.
 
     Further this Calibration expects rotations of 720 deg by default, as this is common for many turntables.
-    For further information on the sign of the expected rotation angle see the `FerrarisCalibration`.
+    For further information on the sign of the expected rotation angle see the :class:`~imucal.FerrarisCalibration`.
+
+    See Also
+    --------
+    imucal.FerrarisCalibration
+
     """
 
     def __init__(
@@ -291,20 +334,6 @@ class TurntableCalibration(FerrarisCalibration):
         expected_angle: float = -720,
         calibration_info_class: Type[TurntableCalibrationInfo] = TurntableCalibrationInfo,
     ):
-        """Create a Calibration object.
-
-
-        Parameter
-        ---------
-        expected_angle :
-            expected rotation angle for the gyroscope rotation.
-        grav :
-            The expected value of the gravitational acceleration.
-        calibration_info_class :
-            The calibration Info class to use to store the final calibration information.
-            This should be a FerrarisCalibrationInfo or a custom subclass.
-
-        """
         super().__init__(grav=grav, expected_angle=expected_angle, calibration_info_class=calibration_info_class)
 
 
@@ -316,11 +345,10 @@ def ferraris_regions_from_df(
     """Create a Calibration object based on a dataframe which has all required sections labeled.
 
     The expected Dataframe has the section label as index and has at least the 6 required data columns.
-    The index must contain all the following sections: {}.
+    The index must contain all the sections listed in :class:`~imucal.FerrarisCalibration``.FERRARIS_SECTIONS`.
 
     Examples
     --------
-    >>> from imucal import FerrarisCalibration
     >>> import pandas as pd
     >>> sampling_rate = 100 #Hz
     >>> df = ... # A valid DataFrame with all sections in the index
@@ -370,9 +398,6 @@ def ferraris_regions_from_df(
     return FerrarisSignalRegions(**acc_dict, **gyro_dict)
 
 
-ferraris_regions_from_df.__doc__ = ferraris_regions_from_df.__doc__.format(FERRARIS_SECTIONS)
-
-
 def ferraris_regions_from_section_list(
     data: pd.DataFrame,
     section_list: pd.DataFrame,
@@ -388,7 +413,7 @@ def ferraris_regions_from_section_list(
 
     Parameters
     ----------
-    df :
+    data :
         6 column dataframe (3 acc, 3 gyro)
     section_list :
         A pandas dataframe representing a section list
@@ -406,7 +431,6 @@ def ferraris_regions_from_section_list(
 
     Examples
     --------
-    >>> from imucal import FerrarisCalibration
     >>> import pandas as pd
     >>> # Load a valid section list from disk. Note the `index_col=0` to preserve correct format!
     >>> section_list = pd.read_csv('./calibration_sections.csv', index_col=0)
@@ -440,7 +464,6 @@ def ferraris_regions_from_interactive_plot(
 
     Examples
     --------
-    >>> from imucal import FerrarisCalibration
     >>> sampling_rate = 100 #Hz
     >>> data = ... # my data as 6 col pandas dataframe
     >>> # This will open an interactive plot, where you can select the start and the stop sample of each region
@@ -451,7 +474,7 @@ def ferraris_regions_from_interactive_plot(
 
     Parameters
     ----------
-    df :
+    data :
         6 column dataframe (3 acc, 3 gyro)
     acc_cols :
         The name of the 3 acceleration columns in order x,y,z.
@@ -497,7 +520,7 @@ def _find_ferraris_regions_interactive(acc: np.ndarray, gyro: np.ndarray, title:
         Optional title for the Calibration GUI
 
     """
-    plot = CalibrationGui(acc, gyro, FerrarisSignalRegions.FERRARIS_SECTIONS, title=title)
+    plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS, title=title)
 
     section_list = plot.section_list
 
