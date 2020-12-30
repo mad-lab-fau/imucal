@@ -22,7 +22,7 @@ class NumpyEncoder(json.JSONEncoder):
 class CalibrationInfo:
     """Abstract BaseClass for all Calibration Info objects."""
 
-    CAL_TYPE: ClassVar[str]  # noqa: invalid-name
+    CAL_TYPE: ClassVar[str] = None # noqa: invalid-name
     acc_unit: Optional[str] = None
     gyr_unit: Optional[str] = None
     from_acc_unit: Optional[str] = None
@@ -145,7 +145,7 @@ class CalibrationInfo:
             out_cls = next(x for x in cls._get_subclasses() if x.CAL_TYPE == cal_type)
         except StopIteration:
             raise ValueError("No suitable calibration info class could be found for caltype `{}`. "
-                             "The following classes were checked: {}."
+                             "The following classes were checked: {}. "
                              "If your CalibrationInfo class is missing, make sure it is imported before loading a "
                              "file.".format(cal_type, (cls.__name__, *(x.__name__ for x in cls._get_subclasses()))))
         return out_cls

@@ -8,7 +8,6 @@ import numpy as np
 from imucal.calibration_info import CalibrationInfo
 
 
-# TODO: Add example to docstring
 @dataclass(eq=False)
 class FerrarisCalibrationInfo(CalibrationInfo):
     """Calibration object that represents all the required information to apply a Ferraris calibration to a dataset.
