@@ -3,7 +3,8 @@ from copy import deepcopy
 
 import pytest
 
-from imucal import CalibrationInfo, load_calibration_info
+from imucal import CalibrationInfo
+from imucal.management import load_calibration_info
 
 
 def test_equal(sample_cal):

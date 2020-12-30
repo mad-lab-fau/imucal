@@ -62,7 +62,7 @@ cal_mat.to_json_file('./calibration.json')
 Applying a calibration:
 
 ```python
-from imucal import load_calibration_info
+from imucal.management import load_calibration_info
 
 cal_mat = load_calibration_info('./calibration.json')
 new_data = ...

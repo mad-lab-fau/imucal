@@ -2,17 +2,6 @@
 API Reference
 =============
 
-General Tools
-=============
-
-.. currentmodule:: imucal
-.. autosummary::
-   :toctree: generated
-   :template: function.rst
-
-    load_calibration_info
-
-
 Ferraris(based) Calibrations
 ============================
 
@@ -61,6 +50,25 @@ Helper Functions to generate valid input data for Ferraris like calibrations.
    :template: class.rst
 
     FerrarisSignalRegions
+
+
+Calibration File Management
+===========================
+
+.. automodule:: imucal.management
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: imucal.management
+.. autosummary::
+   :toctree: generated
+   :template: function.rst
+
+    load_calibration_info
+    save_calibration_info
+    find_calibration_info_for_sensor
+    find_closest_calibration_info_to_date
+
 
 Label GUI
 =========
