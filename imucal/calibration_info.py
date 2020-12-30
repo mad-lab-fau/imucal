@@ -47,30 +47,30 @@ class CalibrationInfo:
 
     __doc__ += _cal_type_explanation
 
-    def calibrate(self, acc: np.ndarray, gyro: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def calibrate(self, acc: np.ndarray, gyr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Abstract method to perform a calibration on both acc and gyro.
 
         This absolutely needs to implement by any daughter class
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         acc :
             3D acceleration
-        gyro :
+        gyr :
             3D gyroscope values
 
         """
         raise NotImplementedError("This method needs to be implemented by a subclass")
 
-    def calibrate_gyr(self, gyro: np.ndarray) -> np.ndarray:
+    def calibrate_gyr(self, gyr: np.ndarray) -> np.ndarray:
         """Abstract method to perform a calibration on both acc and gyro.
 
         This can implement by any daughter class, if separte calibration of acc makes sense for the calibration type.
         If not, an explicit error should be thrown
 
-        Parameter
-        ---------
-        gro :
+        Parameters
+        ----------
+        gyr :
             3D gyroscope values
 
         """
@@ -82,8 +82,8 @@ class CalibrationInfo:
         This can implement by any daughter class, if separte calibration of acc makes sense for the calibration type.
         If not, an explicit error should be thrown
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         acc :
             3D acceleration
 
@@ -161,8 +161,8 @@ class CalibrationInfo:
     def from_json(cls: Type[CalInfo], json_str: str) -> CalInfo:
         """Create a calibration object from a json string (created by `CalibrationInfo.to_json`).
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         json_str: valid json string object
 
         Returns
@@ -179,8 +179,8 @@ class CalibrationInfo:
     def to_json_file(self, path: Union[str, Path]):
         """Dump acc calibration matrices into a file in json format.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         path :
             path to the json file
 
@@ -192,8 +192,8 @@ class CalibrationInfo:
     def from_json_file(cls: Type[CalInfo], path: Union[str, Path]) -> CalInfo:
         """Create a calibration object from a valid json file (created by `CalibrationInfo.to_json_file`).
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         path :
             Path to the json file
 
@@ -212,8 +212,8 @@ class CalibrationInfo:
     def to_hdf5(self, path: Union[str, Path]):
         """Save calibration matrices to hdf5 file format.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         path :
             Path to the hdf5 file
 
@@ -234,8 +234,8 @@ class CalibrationInfo:
     def from_hdf5(cls: Type[CalInfo], path: Union[str, Path]):
         """Read calibration data stored in hdf5 fileformat (created by `CalibrationInfo.save_to_hdf5`).
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         path :
             Path to the hdf5 file
 

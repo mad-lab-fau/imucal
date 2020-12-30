@@ -152,7 +152,6 @@ class TestFindCalibration:
         assert all([load_calibration_info(c).CAL_TYPE.lower() == "ferraris" for c in cals])
 
 
-
 class TestFindClosestCalibration:
     @pytest.mark.parametrize("relative", ("before", "after", None))
     def test_find_closest(self, sample_cal_folder, relative):

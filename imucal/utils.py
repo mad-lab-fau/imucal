@@ -1,3 +1,5 @@
+"""Some general helper functions."""
+
 from pathlib import Path
 from typing import Union, Optional, Type
 
@@ -43,8 +45,9 @@ def load_calibration_info(
         elif suffix[1:] in ["hdf", "h5"]:
             file_type = "hdf"
         else:
-            raise ValueError("The loader format could not be determined from the file suffix."
-                             "Please specify `format` explicitly.")
+            raise ValueError(
+                "The loader format could not be determined from the file suffix." "Please specify `format` explicitly."
+            )
     if file_type not in format_options:
         raise ValueError("`format` must be one of {}".format(list(format_options.keys())))
 
