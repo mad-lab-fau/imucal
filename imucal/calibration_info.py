@@ -163,7 +163,8 @@ class CalibrationInfo:
 
         Parameters
         ----------
-        json_str: valid json string object
+        json_str :
+            valid json string object
 
         Returns
         -------

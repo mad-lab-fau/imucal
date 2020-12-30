@@ -10,7 +10,8 @@ from imucal import FerrarisCalibrationInfo, TurntableCalibrationInfo
 from imucal.management import (
     save_calibration_info,
     find_calibration_info_for_sensor,
-    find_closest_calibration_info_to_date, load_calibration_info,
+    find_closest_calibration_info_to_date,
+    load_calibration_info,
 )
 from tests.conftest import CustomFerraris
 
