@@ -1,4 +1,5 @@
-from imucal.calibration_info import CalibrationInfo, load_calibration_info  # noqa: F401
+from imucal.calibration_info import CalibrationInfo  # noqa: F401
+from imucal.utils import load_calibration_info
 from imucal.ferraris_calibration import (
     FerrarisCalibration,
     TurntableCalibration,
@@ -17,7 +18,6 @@ __all__ = [
     "FerrarisSignalRegions",
     "FerrarisCalibrationInfo",
     "TurntableCalibrationInfo",
-    "load_calibration_info",
     "ferraris_regions_from_df",
     "ferraris_regions_from_interactive_plot",
     "ferraris_regions_from_section_list"
