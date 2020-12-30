@@ -139,6 +139,19 @@ class TestFindCalibration:
         assert all(["test1" in str(x) for x in cals])
         assert all([load_calibration_info(c).CAL_TYPE.lower() == "ferraris" for c in cals])
 
+    def test_custom_validator(self, sample_cal_folder_recursive):
+        # We simulate the caltype filter with a custom validator
+        validator = lambda x: x.CAL_TYPE.lower() == "ferraris"
+
+        cals = find_calibration_info_for_sensor(
+            "test1", sample_cal_folder_recursive, recursive=True, filter_cal_type=None, custom_validator=validator
+        )
+
+        assert len(cals) == 10
+        assert all(["test1" in str(x) for x in cals])
+        assert all([load_calibration_info(c).CAL_TYPE.lower() == "ferraris" for c in cals])
+
+
 
 class TestFindClosestCalibration:
     @pytest.mark.parametrize("relative", ("before", "after", None))
