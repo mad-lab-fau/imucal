@@ -32,6 +32,14 @@ class TestLoadCalFiles:
             out = load_calibration_info(f.name, file_type=file_type)
         assert sample_cal == out
 
+    @pytest.mark.parametrize("file_type", ("json", "hdf"))
+    def test_auto_loader(self, file_type, sample_cal):
+        method = dict(json="to_json_file", hdf="to_hdf5")
+        with tempfile.NamedTemporaryFile(mode="w+", suffix="." + file_type) as f:
+            getattr(sample_cal, method[file_type])(f.name)
+            out = load_calibration_info(f.name)
+        assert sample_cal == out
+
     def test_invalid_loader(self):
         with pytest.raises(ValueError) as e:
             load_calibration_info("invalid_file.txt", file_type="invalid")

@@ -3,7 +3,7 @@ from typing import Union, Optional, Type
 
 from typing_extensions import Literal
 
-from imucal import CalibrationInfo
+from imucal.calibration_info import CalibrationInfo
 
 
 def load_calibration_info(
@@ -38,9 +38,9 @@ def load_calibration_info(
     if file_type is None:
         # Determine format from file ending:
         suffix = path.suffix
-        if suffix == "json":
+        if suffix[1:] == "json":
             file_type = "json"
-        elif suffix in ["hdf", "h5"]:
+        elif suffix[1:] in ["hdf", "h5"]:
             file_type = "hdf"
         else:
             raise ValueError("The loader format could not be determined from the file suffix."
