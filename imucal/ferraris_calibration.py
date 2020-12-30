@@ -286,9 +286,9 @@ class FerrarisCalibration:
         acc_x_rot_cor = cal_mat.calibrate_acc(signal_regions.acc_x_rot)
         acc_y_rot_cor = cal_mat.calibrate_acc(signal_regions.acc_y_rot)
         acc_z_rot_cor = cal_mat.calibrate_acc(signal_regions.acc_z_rot)
-        gyr_x_rot_cor = cal_mat._calibrate_gyro_offsets(signal_regions.gyr_x_rot, acc_x_rot_cor)
-        gyr_y_rot_cor = cal_mat._calibrate_gyro_offsets(signal_regions.gyr_y_rot, acc_y_rot_cor)
-        gyr_z_rot_cor = cal_mat._calibrate_gyro_offsets(signal_regions.gyr_z_rot, acc_z_rot_cor)
+        gyr_x_rot_cor = cal_mat._calibrate_gyr_offsets(signal_regions.gyr_x_rot, acc_x_rot_cor)
+        gyr_y_rot_cor = cal_mat._calibrate_gyr_offsets(signal_regions.gyr_y_rot, acc_y_rot_cor)
+        gyr_z_rot_cor = cal_mat._calibrate_gyr_offsets(signal_regions.gyr_z_rot, acc_z_rot_cor)
 
         # Integrate gyro readings
         # Eg. 13/14

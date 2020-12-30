@@ -38,7 +38,7 @@ def test_dummy_cal_acc(dummy_cal, dummy_data):
 
 def test_dummy_cal_gyro(dummy_cal, dummy_data):
     with pytest.warns(UserWarning) as rec:
-        gyro = dummy_cal.calibrate_gyro(dummy_data[1])
+        gyro = dummy_cal.calibrate_gyr(dummy_data[1])
 
     assert len(rec) == 1
     assert "CalibrationInfo.calibrate" in str(rec[0])
@@ -75,5 +75,5 @@ def test_gyro_no_kga(dummy_cal, dummy_data):
     dummy_cal.b_g += 2
     dummy_cal.R_g = np.array([[0, 0, 1], [0, 1, 0], [0.5, 0, 0]])
     dummy_cal.K_ga = np.identity(3)
-    gyro = dummy_cal.calibrate_gyro(dummy_data[1])
+    gyro = dummy_cal.calibrate_gyr(dummy_data[1])
     assert np.all(gyro == [-1, -0.5, -0.5])

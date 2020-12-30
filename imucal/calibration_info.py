@@ -63,7 +63,7 @@ class CalibrationInfo:
         """
         raise NotImplementedError("This method needs to be implemented by a subclass")
 
-    def calibrate_gyro(self, gyro: np.ndarray) -> np.ndarray:
+    def calibrate_gyr(self, gyro: np.ndarray) -> np.ndarray:
         """Abstract method to perform a calibration on both acc and gyro.
 
         This can implement by any daughter class, if separte calibration of acc makes sense for the calibration type.
