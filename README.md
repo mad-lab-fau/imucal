@@ -22,7 +22,11 @@ You can install it using:
 pip install imucal[calplot]
 ```
 
-## Calibrations
+## Quickstart
+
+To annotate a Ferraris calibration session that was recorded in a single go, you can use the following code snippet.
+Note: This will open an interactive Tkinter plot.
+Therefore, this will only work on your local PC and not on a server or remote hosted Jupyter instance.
 
 ### Ferraris
 
@@ -36,115 +40,37 @@ As example, `acc_y_a` would be the 3D-acceleration data measured during a static
 If the data of all of these sections is already available separately as numpy arrays of the shape `(n x 3)`, where `n` is the number of samples in each section, they can be directly used to initialize a Calibration object:
 
 ```python
-from imucal import FerrarisCalibration
+from imucal import ferraris_regions_from_interactive_plot
 
-sampling_rate = 100 #Hz 
-cal = FerrarisCalibration(sampling_rate=sampling_rate,
-                          acc_x_p=data_acc_x_p,
-                          ...,
-                          gyr_z_rot=data_gyr_x_rot)
-```
-or via class variables:
-```python
-from imucal import FerrarisCalibration
+# Your data as a 6 column dataframe
+data = ...
 
-sampling_rate = 100 #Hz 
-cal = FerrarisCalibration(sampling_rate=sampling_rate)
-cal.gyr_z_a = data_gyr_z_a
-...
-```
-
-If the data was recorded as a single continuous stream, we first need to identify the different regions in the data.
-The `from_interactive_plot` method can be used to extract them manually using a GUI.
-For this and for most other methods, we expect the data to be a `pd.DataFrame` with the columns `'acc_x', 'acc_y', 'acc_z, 'gyr_x', 'gyr_y', 'gyr_z'`, where each column represents the datastream of one sensor axis.
-
-Note: The expected column names can be overwritten
-
-```python
-from imucal import FerrarisCalibration
-
-sampling_rate = 100 #Hz 
-# This will open an interactive plot, where you can select the start and the stop sample of each region
-cal, section_list = FerrarisCalibration.from_interactive_plot(data, sampling_rate=sampling_rate)
-
+section_data, section_list = ferraris_regions_from_interactive_plot(
+    data, acc_cols=["acc_x", "acc_y", "acc_z"], gyr_cols=["gyr_x", "gyr_y", "gyr_z"]
+)
+# Save the section list as reference for the future
 section_list.to_csv('./calibration_sections.csv')  # This is optional, but recommended
 ```
 
-This method also returns the `section_list` in addition to the Calibration object.
-It is advised to save this list, as it can be used recreate the Calibration without performing the manual selection of the regions again:
-
+Now you can perform the calibration
 ```python
-# At some other day:
 from imucal import FerrarisCalibration
-import pandas as pd
-
-section_list = pd.read_csv('./calibration_sections.csv', index_col=0)
-sampling_rate = 100 #Hz 
-# This will recreate the calibration
-cal = FerrarisCalibration.from_section_list(data, section_list, sampling_rate=sampling_rate)
-```
-
-#### Performing the Calibration
-
-When the calibration object was successful initialized, you can obtain the calibration by simply calling `compute_calibration_matrix`:
-
-```python
-cal_mat = cal.compute_calibration_matrix()
-print(cal_mat)
-```
-
-This will return an `FerrarisCalibrationInfo` object, which holds all required calibration information.
-This object can be saved and loaded to and from `hdf5` and `json` using the respective methods:
-
-```python
-cal_mat.to_json_file('./calibration.json')
-# some other day:
-from imucal import FerrarisCalibrationInfo
-
-cal_mat = FerrarisCalibrationInfo.from_json_file('./calibration.json') 
-```
-
-```python
-cal_mat.to_hdf5('./calibration.h5')
-# some other day:
-from imucal import FerrarisCalibrationInfo
-
-cal_mat = FerrarisCalibrationInfo.from_hdf5('./calibration.h5') 
-```
-
-#### Applying the Calibration
-
-The `FerrarisCalibrationInfo` object can be used to apply the Calibration to new data from the same sensor:
-
-```python
-calibrated_acc, calibrated_gyro = cal_mat.calibrate(acc, gyro)
-```
-
-`acc` and `gyro` are expected to be numpy arrays in the shape (n x 3)
-
-
-### Turntable Calibration
-
-The turntable calibration uses some sort of instumeted turntable to perform the orientation changes and rotations for the Ferraris calibration.
-It is fundamentally identical to the simple Ferraris calibration, however to indicate the expected difference in precision, this calibration method is implemented as seperate classes.
-The interface is identical to the Ferraris calibration and all methods shown above can be used.
-
-**Note**: By default the Turntable calibration expects 720 deg rotations instead of 360 deg
-
-```python
-# obtain the calibration
-from imucal import TurntableCalibration
 
 sampling_rate = 100 #Hz 
-# This will open an interactive plot, where you can select the start and the stop sample of each region
-cal, section_list = TurntableCalibration.from_interactive_plot(data, sampling_rate=sampling_rate)
-cal_mat = cal.compute_calibration_matrix()
+cal = FerrarisCalibration()
+cal_mat = cal.compute(section_data, sampling_rate, from_acc_unit="m/s^2", from_gyr_unit="g")
+# `cal_mat` is you final calibration matrix object, you can use to calibrate data
 cal_mat.to_json_file('./calibration.json')
+```
 
-# Apply the calibration
-from imucal import TurntableCalibrationInfo
+Applying a calibration:
 
-cal_mat = TurntableCalibrationInfo.from_json_file('./calibration.json') 
+```python
+from imucal import load_calibration_info
 
-calibrated_acc, calibrated_gyro = cal_mat.calibrate(acc, gyro)
+cal_mat = load_calibration_info('./calibration.json')
+new_data = ...
+new_data_acc = new_data[["acc_x", "acc_y", "acc_z"]].to_numpy()
+new_data_gyr = new_data[["gyr_x", "gyr_y", "gyr_z"]].to_numpy()
+calibrated_acc, calibrated_gyr = cal_mat.calibrate(acc=new_data_acc, gyr=)
 ```
