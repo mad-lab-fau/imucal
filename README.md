@@ -23,21 +23,17 @@ pip install imucal[calplot]
 ```
 
 ## Quickstart
+This package implements the IMU-infield calibration based on Ferraris1995.
+This calibration methods requires the IMU data from 6 static positions (3 axis parallel and antiparallel to gravitation
+vector) and 3 rotations around the 3 main axis.
+In this implementation these parts are referred to as follows `{acc,gry}_{x,y,z}_{p,a}` for the static regions and
+`{acc,gry}_{x,y,z}_rot` for the rotations.
+As example, `acc_y_a` would be the 3D-acceleration data measured during a static phase, where the **y-axis** was 
+oriented **antiparallel** to the gravitation.
 
 To annotate a Ferraris calibration session that was recorded in a single go, you can use the following code snippet.
 Note: This will open an interactive Tkinter plot.
 Therefore, this will only work on your local PC and not on a server or remote hosted Jupyter instance.
-
-### Ferraris
-
-This package implements the IMU-infield calibration based on Ferraris1995.
-This calibration methods requires the IMU data from 6 static positions (3 axis parallel and antiparallel to gravitation vector) and 3 rotations around the 3 main axis.
-In this implementation these parts are referred to as follows `{acc,gry}_{x,y,z}_{p,a}` for the static regions and `{acc,gry}_{x,y,z}_rot` for the rotations.
-As example, `acc_y_a` would be the 3D-acceleration data measured during a static phase, where the **y-axis** was oriented **antiparallel** to the gravitation.
-
-#### Creating a new Calibration Object
-
-If the data of all of these sections is already available separately as numpy arrays of the shape `(n x 3)`, where `n` is the number of samples in each section, they can be directly used to initialize a Calibration object:
 
 ```python
 from imucal import ferraris_regions_from_interactive_plot
@@ -72,5 +68,27 @@ cal_mat = load_calibration_info('./calibration.json')
 new_data = ...
 new_data_acc = new_data[["acc_x", "acc_y", "acc_z"]].to_numpy()
 new_data_gyr = new_data[["gyr_x", "gyr_y", "gyr_z"]].to_numpy()
-calibrated_acc, calibrated_gyr = cal_mat.calibrate(acc=new_data_acc, gyr=)
+calibrated_acc, calibrated_gyr = cal_mat.calibrate(acc=new_data_acc, gyr=new_data_gyr)
 ```
+
+For further information on how to perform a calibration check the [User Guides](TODO) or the [examples](TODO)
+
+## Further Calibration Methods
+
+At the moment, this package only implements calibration methods based on Ferraris1994, because this is what we use to
+calibrate our IMUs.
+We are aware that various other methods exist and would love to add them to this package as well.
+Unfortunately, at the moment we can not justify the time requirement.
+
+Still, ee think that this package provides a suitable framework to implement other calibration emthods with relative
+easy.
+If you would like to contribute such a method, let us know on the github-issue page and we will try to help you as good
+as possible.
+
+## Contributing
+
+All project management and development happens through this Github project.
+If you have any issues, ideas, or any comments at all, just open a new issue.
+Please be polite and considerate of our time.
+We appreciate everyone who is using our software or even wants to improve it, but sometime other things come in the way,
+and it takes us a couple of days to get back to you.
