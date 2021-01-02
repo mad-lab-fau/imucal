@@ -115,9 +115,9 @@ html_theme_options = {"show_prev_next": False, "github_url": URL}
 
 # intersphinx configuration
 intersphinx_module_mapping = {
-    "numpy": ("https://numpy.org/doc/stable/objects.inv", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
 }
 
 intersphinx_mapping = {
