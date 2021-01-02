@@ -26,7 +26,7 @@ def test_example_calibration(example_calibration_data):
     data, sampling_rate, calib = example_calibration_data
 
     cal = FerrarisCalibration()
-    regions = ferraris_regions_from_df(data, acc_cols=("accX", "accY", "accZ"), gyr_cols=("gyroX", "gyroY", "gyroZ"))
+    regions = ferraris_regions_from_df(data)
     cal_mat = cal.compute(regions, sampling_rate, from_acc_unit="a.u.", from_gyr_unit="a.u.")
 
     # # Uncomment if you want to save the new cal matrix to update the regression test
