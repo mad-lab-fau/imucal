@@ -16,8 +16,8 @@ from imucal.ferraris_calibration import (
 
 @pytest.fixture()
 def example_calibration_data():
-    calib = FerrarisCalibrationInfo.from_json_file(Path(__file__).parent / "_test_data/example_cal.json")
-    data = pd.read_csv(Path(__file__).parent / "_test_data/example_data.csv", index_col=[0, 1])
+    calib = FerrarisCalibrationInfo.from_json_file(Path(__file__).parent / "snapshots/example_cal.json")
+    data = pd.read_csv(Path(__file__).parent.parent / "example_data/annotated_session.csv", index_col=[0, 1])
     sampling_rate = 204.8
     return data, sampling_rate, calib
 
@@ -30,7 +30,7 @@ def test_example_calibration(example_calibration_data):
     cal_mat = cal.compute(regions, sampling_rate, from_acc_unit="a.u.", from_gyr_unit="a.u.")
 
     # # Uncomment if you want to save the new cal matrix to update the regression test
-    # cal_mat.to_json_file(Path(__file__).parent / '_test_data/example_cal.json')
+    cal_mat.to_json_file(Path(__file__).parent / 'snapshots/example_cal.json')
 
     assert cal_mat == calib
 

@@ -3,6 +3,7 @@
     "gyr_unit": "deg/s",
     "from_acc_unit": "a.u.",
     "from_gyr_unit": "a.u.",
+    "comment": null,
     "K_a": [
         [
             208.54567263762615,
