@@ -20,7 +20,19 @@ class NumpyEncoder(json.JSONEncoder):
 
 @dataclass(eq=False)
 class CalibrationInfo:
-    """Abstract BaseClass for all Calibration Info objects."""
+    """Abstract BaseClass for all Calibration Info objects.
+
+    .. note ::
+        All `CalibrationInfo` subclasses implement a `CAL_TYPE` attribute.
+        If the calibration is exported into any format, this information is stored as well.
+        If imported, all constructor methods intelligently infer the correct CalibrationInfo subclass based on
+        this parameter.
+
+        >>> json_string = "{cal_type: 'Ferraris', ...}"
+        >>> CalibrationInfo.from_json(json_string)
+        <FerrarisCalibrationInfo ...>
+
+    """
 
     CAL_TYPE: ClassVar[str] = None  # noqa: invalid-name
     acc_unit: Optional[str] = None
@@ -31,21 +43,6 @@ class CalibrationInfo:
 
     _cal_paras: ClassVar[Tuple[str, ...]]
 
-    _cal_type_explanation = """
-    Note:
-        All `CalibrationInfo` subclasses implement a `CAL_TYPE` attribute.
-        If the calibration is exported into any format, this information is stored as well.
-        If imported, all constructor methods intelligently infer the correct CalibrationInfo subclass based on
-        this parameter.
-
-        Example:
-            >>> json_string = "{cal_type: 'Ferraris', ...}"
-            >>> CalibrationInfo.from_json(json_string)
-            <FerrarisCalibrationInfo ...>
-
-    """
-
-    __doc__ += _cal_type_explanation
 
     def calibrate(self, acc: np.ndarray, gyr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Abstract method to perform a calibration on both acc and gyro.

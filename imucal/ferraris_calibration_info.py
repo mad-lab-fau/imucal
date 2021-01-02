@@ -45,8 +45,6 @@ class FerrarisCalibrationInfo(CalibrationInfo):
     K_ga: Optional[np.ndarray] = None  # noqa: invalid-name
     b_g: Optional[np.ndarray] = None
 
-    __doc__ += CalibrationInfo._cal_type_explanation
-
     _cal_paras: ClassVar[Tuple[str, ...]] = ("K_a", "R_a", "b_a", "K_g", "R_g", "K_ga", "b_g")
 
     def calibrate_acc(self, acc: np.ndarray) -> np.ndarray:
