@@ -11,8 +11,7 @@ license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/mad-lab-fau/imucal"
 repository = "https://github.com/mad-lab-fau/imucal"
-# TODO: Set up sphinx docs
-#documentation = "https://imcucal.nilspodlib.readthedocs.io/en/latest/"
+documentation = "https://imcucal.readthedocs.io/en/latest/"
 keywords = ["sensors", "scientific", "IMU", "accelerometer"]
 classifiers = [
     "Intended Audience :: Science/Research",
