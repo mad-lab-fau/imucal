@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 from numpy.testing import assert_array_almost_equal
 
+from example_data import EXAMPLE_PATH
 from imucal import FerrarisCalibrationInfo
 from imucal.ferraris_calibration import (
     FerrarisCalibration,
@@ -17,7 +18,7 @@ from imucal.ferraris_calibration import (
 @pytest.fixture()
 def example_calibration_data():
     calib = FerrarisCalibrationInfo.from_json_file(Path(__file__).parent / "snapshots/example_cal.json")
-    data = pd.read_csv(Path(__file__).parent.parent / "example_data/annotated_session.csv", index_col=[0, 1])
+    data = pd.read_csv(EXAMPLE_PATH / "annotated_session.csv", index_col=[0, 1])
     sampling_rate = 204.8
     return data, sampling_rate, calib
 
