@@ -81,7 +81,9 @@ new_data = pd.DataFrame(...)
 calibrated_data = cal_mat.calibrate_df(new_data, acc_unit="m/s^2", gyr_unit="deg/s")
 ```
 
-For further information on how to perform a calibration check the [User Guides](TODO) or the [examples](TODO)
+For further information on how to perform a calibration check the 
+[User Guides](https://imucal.readthedocs.io/en/latest/guides/index.html) or the
+[examples](https://imucal.readthedocs.io/en/latest/auto_examples/index.html)
 
 ## Further Calibration Methods
 
