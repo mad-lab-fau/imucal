@@ -10,6 +10,7 @@ from imucal.management import (
     find_calibration_info_for_sensor,
     find_closest_calibration_info_to_date,
     load_calibration_info,
+    CalibrationWarning,
 )
 from tests.conftest import CustomFerraris
 
@@ -190,7 +191,7 @@ class TestFindClosestCalibration:
 
         assert cal.name == expected
 
-    @pytest.mark.parametrize("warn_type, day", ((UserWarning, 15), (None, 14)))
+    @pytest.mark.parametrize("warn_type, day", ((CalibrationWarning, 15), (None, 14)))
     def test_find_closest_warning(self, sample_cal_folder, warn_type, day):
         with pytest.warns(warn_type) as rec:
             find_closest_calibration_info_to_date(

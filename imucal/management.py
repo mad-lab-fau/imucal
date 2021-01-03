@@ -13,6 +13,10 @@ from imucal import CalibrationInfo
 path_t = TypeVar("path_t", str, Path)  # noqa: invalid-name
 
 
+class CalibrationWarning(Warning):
+    """Indicate potential issues with a calibration."""
+
+
 def save_calibration_info(
     cal_info: CalibrationInfo,
     sensor_id: str,
@@ -228,6 +232,7 @@ def find_closest_calibration_info_to_date(
             "The closest calibration is {} away.".format(
                 sensor_id, warn_thres, cal_time, datetime.timedelta(seconds=min_dist)
             ),
+            CalibrationWarning,
         )
 
     return potential_list[int(np.nanargmin(np.abs(diffs)))]
