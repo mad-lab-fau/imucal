@@ -95,7 +95,7 @@ calibrate our IMUs.
 We are aware that various other methods exist and would love to add them to this package as well.
 Unfortunately, at the moment we can not justify the time requirement.
 
-Still, ee think that this package provides a suitable framework to implement other calibration emthods with relative
+Still, we think that this package provides a suitable framework to implement other calibration emthods with relative
 easy.
 If you would like to contribute such a method, let us know on the github-issue page and we will try to help you as good
 as possible.
