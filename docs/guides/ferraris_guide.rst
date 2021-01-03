@@ -38,7 +38,7 @@ Note, that the calibrated coordinate system must be right-handed.
    Make sure that it does not wobble and use the same orientation, when calibrating multiple sensor units.
 3. Place the sensor on the flat surface in a way that the calibrated x-axis points upwards.
    In this configuration, mark the top left corner using a marker or a sticker.
-   We will use it as guide for all further calibration positions (see image)
+   We will use it as guide for all further calibration positions (see image).
 4. Prepare the sensor unit to record the calibration.
    You can either record each calibration position/motion as a separate recording or you can make a single large
    recording and use :func:`~imucal.ferraris_regions_from_interactive_plot` to mark the different sections after the
@@ -58,6 +58,8 @@ Note, that the calibrated coordinate system must be right-handed.
 6. End your recording and load the data onto a PC.
    Then follow :ref:`the code part of this tutorial <basic_ferraris>`.
 
+.. image:: ./ferraris_calibration_instructions.png
+
 General Tips and Gotchas
 ========================
 
@@ -70,7 +72,7 @@ General Tips and Gotchas
   Because the calibration uses an integration, such additional signals would introduce additional errors.
 - If you have multiple sensors to calibrate, make sure you think of a way to store and retrieve the calibration
   information.
-  For further information on this, read <# TODO: Add link>
+  For further information on this, read :ref:`our dedicated guide on this topic <cal_store_guide>`
 - Be aware of the signal units before and after calibration.
   Some sensor units provide data in a raw format (voltage or bits) with no real unit (a.u.), while others will provide
   the data in physical units.
