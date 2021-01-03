@@ -69,6 +69,11 @@ Calibration File Management
     find_calibration_info_for_sensor
     find_closest_calibration_info_to_date
 
+.. autosummary::
+   :toctree: generated
+   :template: class.rst
+
+    CalibrationWarning
 
 Label GUI
 =========
