@@ -9,6 +9,18 @@ So far supported are:
 - Ferraris Calibration (Ferraris1995)
 - Ferraris Calibration using a Turntable
 
+## WARNING: VERSION UPDATE
+
+Version 2.0 was recently released and contains multiple API breaking changes!
+To learn more about that, check `Changelog.md`.
+
+If you want to ensure that your old code still works, specify a correct version during install and in your
+`requirement.txt` files
+
+```
+pip install "imucal<2.0"
+```
+
 ## Installation
 
 ```
