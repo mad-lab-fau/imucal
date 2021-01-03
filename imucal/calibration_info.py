@@ -99,34 +99,6 @@ class CalibrationInfo:
 
         return cal_df
 
-    def calibrate_gyr(self, gyr: np.ndarray) -> np.ndarray:
-        """Abstract method to perform a calibration on both acc and gyro.
-
-        This can implement by any daughter class, if separte calibration of acc makes sense for the calibration type.
-        If not, an explicit error should be thrown
-
-        Parameters
-        ----------
-        gyr :
-            3D gyroscope values
-
-        """
-        raise NotImplementedError("This method needs to be implemented by a subclass")
-
-    def calibrate_acc(self, acc: np.ndarray) -> np.ndarray:
-        """Abstract method to perform a calibration on the gyro.
-
-        This can implement by any daughter class, if separte calibration of acc makes sense for the calibration type.
-        If not, an explicit error should be thrown
-
-        Parameters
-        ----------
-        acc :
-            3D acceleration
-
-        """
-        raise NotImplementedError("This method needs to be implemented by a subclass")
-
     def __eq__(self, other):
         """Check if two calibrations are identical.
 
@@ -294,7 +266,7 @@ class CalibrationInfo:
                 if k.name in subcls._cal_paras:
                     values[k.name] = np.array(tmp)
                 elif tmp:
-                    values[k.name] = tmp.value
+                    values[k.name] = tmp[()]
                 else:
                     values[k.name] = None
 

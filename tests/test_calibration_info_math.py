@@ -41,20 +41,6 @@ def test_dummy_cal_df(dummy_cal, dummy_data):
     assert np.array_equal(dummy_data[1], result_df.filter(like="gyr"))
 
 
-def test_dummy_cal_acc(dummy_cal, dummy_data):
-    acc = dummy_cal.calibrate_acc(dummy_data[0])
-    assert np.array_equal(acc, dummy_data[0])
-
-
-def test_dummy_cal_gyro(dummy_cal, dummy_data):
-    with pytest.warns(UserWarning) as rec:
-        gyro = dummy_cal.calibrate_gyr(dummy_data[1])
-
-    assert len(rec) == 1
-    assert "CalibrationInfo.calibrate" in str(rec[0])
-    assert np.array_equal(gyro, dummy_data[1])
-
-
 def test_ka_ba_ra(dummy_cal, dummy_data):
     dummy_cal.K_a *= 2
     dummy_cal.b_a += 2
@@ -78,12 +64,3 @@ def test_kga(dummy_cal, dummy_data):
     dummy_cal.K_ga = np.identity(3)
     _, gyro = dummy_cal.calibrate(*dummy_data)
     assert np.all(gyro == [-2, -0.5, -0.5])
-
-
-def test_gyro_no_kga(dummy_cal, dummy_data):
-    dummy_cal.K_g *= 2
-    dummy_cal.b_g += 2
-    dummy_cal.R_g = np.array([[0, 0, 1], [0, 1, 0], [0.5, 0, 0]])
-    dummy_cal.K_ga = np.identity(3)
-    gyro = dummy_cal.calibrate_gyr(dummy_data[1])
-    assert np.all(gyro == [-1, -0.5, -0.5])

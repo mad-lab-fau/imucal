@@ -39,6 +39,8 @@ Therefore, it is highly suggested upgrading to the new version, even if it takes
 
 - `FerrarisCalibration` does not have any `from_...` constructors anymore.
   The functionality of these constructors can now be accessed via the `ferraris_regions_from_...` helper functions.
+- It is not possible anymore to calibrate the acc and gyro separately.
+  No one was using this feature, and hence, was removed to simplify the API.
 
 ### Fixed
 

@@ -1,5 +1,4 @@
 """Wrapper object to hold calibration matrices for a Ferraris Calibration."""
-import warnings
 from dataclasses import dataclass
 from typing import Tuple, ClassVar, Optional
 
@@ -47,62 +46,6 @@ class FerrarisCalibrationInfo(CalibrationInfo):
 
     _cal_paras: ClassVar[Tuple[str, ...]] = ("K_a", "R_a", "b_a", "K_g", "R_g", "K_ga", "b_g")
 
-    def calibrate_acc(self, acc: np.ndarray) -> np.ndarray:
-        """Calibrate the accelerometer.
-
-        This corrects scaling, rotation, non-orthogonalities and bias.
-
-        Parameters
-        ----------
-        acc :
-            3D acceleration
-
-        Returns
-        -------
-        Calibrated acceleration
-
-        """
-        # Check if all required paras are initialized to throw appropriate error messages:
-        paras = ("K_a", "R_a", "b_a")
-        for v in paras:
-            if getattr(self, v, None) is None:
-                raise ValueError(
-                    "{} need to initialised before an acc calibration can be performed. {} is missing".format(paras, v)
-                )
-
-        # Combine Scaling and rotation matrix to one matrix
-        acc_mat = np.linalg.inv(self.R_a) @ np.linalg.inv(self.K_a)
-        acc_out = acc_mat @ (acc - self.b_a).T
-
-        return acc_out.T
-
-    def calibrate_gyr(self, gyr: np.ndarray) -> np.ndarray:
-        """Calibrate the gyroscope.
-
-        .. warning ::
-            This is not supported for the FerrarisCalibration, as it is not possible to fully calibrate the gyroscope
-            without the acc values.
-            Any acc interference on the gyroscope (`K_ga`) will not be taken into account.
-            Use `FerrarisCalibrationInfo.calibrate` instead.
-
-        Parameters
-        ----------
-        gyr :
-            3D gyroscope values
-
-        Warns
-        -----
-        UserWarning
-            Always, informing about the missing `K_ga` calibration
-
-        """
-        warnings.warn(
-            "Performing a calibration on the Gyro data alone, will not correct potential acc-gyro"
-            " interferences. Use `{}CalibrationInfo.calibrate` to calibrate acc and gyro"
-            " together.".format(self.CAL_TYPE)
-        )
-        return self._calibrate_gyr(gyr, calibrated_acc=None)
-
     def calibrate(self, acc: np.ndarray, gyr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Calibrate the accelerometer and the gyroscope.
 
@@ -131,10 +74,39 @@ class FerrarisCalibrationInfo(CalibrationInfo):
                     )
                 )
 
-        acc_out = self.calibrate_acc(acc)
+        acc_out = self._calibrate_acc(acc)
         gyro_out = self._calibrate_gyr(gyr, acc_out)
 
         return acc_out, gyro_out
+
+    def _calibrate_acc(self, acc: np.ndarray) -> np.ndarray:
+        """Calibrate the accelerometer.
+
+        This corrects scaling, rotation, non-orthogonalities and bias.
+
+        Parameters
+        ----------
+        acc :
+            3D acceleration
+
+        Returns
+        -------
+        Calibrated acceleration
+
+        """
+        # Check if all required paras are initialized to throw appropriate error messages:
+        paras = ("K_a", "R_a", "b_a")
+        for v in paras:
+            if getattr(self, v, None) is None:
+                raise ValueError(
+                    "{} need to initialised before an acc calibration can be performed. {} is missing".format(paras, v)
+                )
+
+        # Combine Scaling and rotation matrix to one matrix
+        acc_mat = np.linalg.inv(self.R_a) @ np.linalg.inv(self.K_a)
+        acc_out = acc_mat @ (acc - self.b_a).T
+
+        return acc_out.T
 
     def _calibrate_gyr(self, gyr, calibrated_acc=None):
         # Check if all required paras are initialized to throw appropriate error messages:
