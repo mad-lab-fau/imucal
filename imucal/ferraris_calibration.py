@@ -385,9 +385,6 @@ def ferraris_regions_from_df(
     ferraris_regions_from_section_list
 
     """
-    acc_cols = list(acc_cols)
-    gyr_cols = list(gyr_cols)
-
     acc_df = df[list(acc_cols)]
     gyro_df = df[list(gyr_cols)]
     acc_dict = acc_df.groupby(level=0).apply(lambda x: x.values).to_dict()
@@ -497,8 +494,8 @@ def ferraris_regions_from_interactive_plot(
     ferraris_regions_from_df
 
     """
-    acc = data[acc_cols].to_numpy()
-    gyr = data[gyr_cols].to_numpy()
+    acc = data[list(acc_cols)].to_numpy()
+    gyr = data[list(gyr_cols)].to_numpy()
 
     section_list = _find_ferraris_regions_interactive(acc, gyr, title=title)
     return (
