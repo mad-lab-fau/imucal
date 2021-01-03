@@ -39,3 +39,23 @@ def test_hdf5_file_roundtrip(sample_cal):
         sample_cal.to_hdf5(f.name)
         out = load_calibration_info(f.name, file_type="hdf")
     assert sample_cal == out
+
+
+@pytest.mark.parametrize("unit", ("acc", "gyr"))
+@pytest.mark.parametrize("is_none", ("some_value", None))
+def test_error_on_wrong_calibration(unit, is_none, dummy_cal, dummy_data):
+    # Test without error first:
+    setattr(dummy_cal, "from_{}_unit".format(unit), is_none)
+    units = {"acc_unit": dummy_cal.from_acc_unit, "gyr_unit": dummy_cal.from_gyr_unit}
+    units["{}_unit".format(unit)] = is_none
+    dummy_cal.calibrate(*dummy_data, **units)
+
+    # Now with error
+    units["{}_unit".format(unit)] = "wrong_value"
+    with pytest.raises(ValueError) as e:
+        dummy_cal.calibrate(*dummy_data, **units)
+
+    if is_none is None:
+        assert "explicitly to `None` to ignore this error" in str(e.value)
+    else:
+        assert is_none in str(e.value)

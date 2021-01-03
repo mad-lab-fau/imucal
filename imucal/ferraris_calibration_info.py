@@ -34,8 +34,6 @@ class FerrarisCalibrationInfo(CalibrationInfo):
 
     acc_unit: str = "m/s^2"
     gyr_unit: str = "deg/s"
-    from_acc_unit: str = "a.u."
-    from_gyr_unit: str = "a.u."
     K_a: Optional[np.ndarray] = None  # noqa: invalid-name
     R_a: Optional[np.ndarray] = None  # noqa: invalid-name
     b_a: Optional[np.ndarray] = None
@@ -46,7 +44,9 @@ class FerrarisCalibrationInfo(CalibrationInfo):
 
     _cal_paras: ClassVar[Tuple[str, ...]] = ("K_a", "R_a", "b_a", "K_g", "R_g", "K_ga", "b_g")
 
-    def calibrate(self, acc: np.ndarray, gyr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def calibrate(
+        self, acc: np.ndarray, gyr: np.ndarray, acc_unit: Optional[str], gyr_unit: Optional[str]
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Calibrate the accelerometer and the gyroscope.
 
         This corrects:
@@ -59,6 +59,10 @@ class FerrarisCalibrationInfo(CalibrationInfo):
             3D acceleration
         gyr :
             3D gyroscope values
+        acc_unit
+            The unit of the acceleration data
+        gyr_unit
+            The unit of the gyroscope data
 
         Returns
         -------
@@ -69,11 +73,11 @@ class FerrarisCalibrationInfo(CalibrationInfo):
         for v in self._cal_paras:
             if getattr(self, v, None) is None:
                 raise ValueError(
-                    "{} need to initialised before an acc calibration can be performed. {} is missing".format(
+                    "{} need to initialised before an acc calibration can be performed. {} is missing.".format(
                         self._cal_paras, v
                     )
                 )
-
+        self._validate_units(acc_unit, gyr_unit)
         acc_out = self._calibrate_acc(acc)
         gyro_out = self._calibrate_gyr(gyr, acc_out)
 

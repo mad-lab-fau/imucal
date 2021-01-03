@@ -55,3 +55,24 @@ def sample_cal(sample_cal_dict, request):
     if info_class == CustomFerraris:
         sample_cal_dict["custom_field"] = "custom_value"
     return info_class(**sample_cal_dict)
+
+
+@pytest.fixture(params=[FerrarisCalibrationInfo, TurntableCalibrationInfo])
+def dummy_cal(request):
+    sample_data = {
+        "K_a": np.identity(3),
+        "R_a": np.identity(3),
+        "b_a": np.zeros(3),
+        "K_g": np.identity(3),
+        "R_g": np.identity(3),
+        "K_ga": np.zeros((3, 3)),
+        "b_g": np.zeros(3),
+    }
+    return request.param(**sample_data)
+
+
+@pytest.fixture()
+def dummy_data():
+    sample_acc = np.repeat(np.array([[0, 0, 1.0]]), 100, axis=0)
+    sample_gyro = np.repeat(np.array([[1, 1, 1.0]]), 100, axis=0)
+    return sample_acc, sample_gyro

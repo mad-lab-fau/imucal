@@ -75,7 +75,7 @@ data.head()
 # In general it is advisable to save the annotated sections, so that you can rerun the calibration in the future.
 from imucal import ferraris_regions_from_section_list
 
-section_list = pd.read_json("../example_data/example_ferraris_session_list.json").T
+section_list = pd.read_json(EXAMPLE_PATH / "example_ferraris_session_list.json").T
 
 section_list
 
@@ -150,7 +150,7 @@ print(loaded_cal_info.to_json())
 # After loading the calibration file, we will apply it to a "new" recording (we will just use the calibration session
 # as example here).
 
-calibrated_data = loaded_cal_info.calibrate_df(data)
+calibrated_data = loaded_cal_info.calibrate_df(data, "m/s^2", "deg/s")
 
 # %%
 # We can see the effect of the calibration, when we plot the acc norm in the beginning of the recording.

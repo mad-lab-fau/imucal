@@ -44,10 +44,14 @@ class CalibrationInfo:
 
     _cal_paras: ClassVar[Tuple[str, ...]]
 
-    def calibrate(self, acc: np.ndarray, gyr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def calibrate(
+        self, acc: np.ndarray, gyr: np.ndarray, acc_unit: Optional[str], gyr_unit: Optional[str]
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Abstract method to perform a calibration on both acc and gyro.
 
-        This absolutely needs to implement by any daughter class
+        This absolutely needs to implement by any daughter class.
+        It is further recommended to call `self._validate_units` in the overwritten calibrate method, to check if the
+        input units are as expected.
 
         Parameters
         ----------
@@ -55,6 +59,10 @@ class CalibrationInfo:
             3D acceleration
         gyr :
             3D gyroscope values
+        acc_unit
+            The unit of the acceleration data
+        gyr_unit
+            The unit of the gyroscope data
 
         """
         raise NotImplementedError("This method needs to be implemented by a subclass")
@@ -62,6 +70,8 @@ class CalibrationInfo:
     def calibrate_df(
         self,
         df: pd.DataFrame,
+        acc_unit: Optional[str],
+        gyr_unit: Optional[str],
         acc_cols: Iterable[str] = ("acc_x", "acc_y", "acc_z"),
         gyr_cols: Iterable[str] = ("gyr_x", "gyr_y", "gyr_z"),
     ) -> pd.DataFrame:
@@ -80,6 +90,10 @@ class CalibrationInfo:
             The name of the 3 acceleration columns in order x,y,z.
         gyr_cols :
             The name of the 3 acceleration columns in order x,y,z.
+        acc_unit
+            The unit of the acceleration data
+        gyr_unit
+            The unit of the gyroscope data
 
         Returns
         -------
@@ -91,13 +105,30 @@ class CalibrationInfo:
         gyr_cols = list(gyr_cols)
         acc = df[acc_cols].to_numpy()
         gyr = df[gyr_cols].to_numpy()
-        cal_acc, cal_gyr = self.calibrate(acc=acc, gyr=gyr)
+        cal_acc, cal_gyr = self.calibrate(acc=acc, gyr=gyr, acc_unit=acc_unit, gyr_unit=gyr_unit)
 
         cal_df = df.copy()
         cal_df[acc_cols] = cal_acc
         cal_df[gyr_cols] = cal_gyr
 
         return cal_df
+
+    def _validate_units(self, other_acc, other_gyr):
+        check_pairs = {"acc": (other_acc, self.from_acc_unit), "gyr": (other_gyr, self.from_gyr_unit)}
+        for name, (other, this) in check_pairs.items():
+            if other != this:
+                if this is None:
+                    raise ValueError(
+                        "This calibration does not provide any information about the expected input "
+                        "units for {0}. "
+                        "Set `{0}_unit` explicitly to `None` to ignore this error. "
+                        "However, we recommend to recreate your calibration with proper information "
+                        "about the input unit.".format(name)
+                    )
+                raise ValueError(
+                    "The provided {} data has a unit of {}. "
+                    "However, the calibration is created to calibrate data with a unit of {}.".format(name, other, this)
+                )
 
     def __eq__(self, other):
         """Check if two calibrations are identical.

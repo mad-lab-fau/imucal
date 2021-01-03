@@ -66,7 +66,7 @@ from imucal.management import load_calibration_info
 
 cal_mat = load_calibration_info('./calibration.json')
 new_data = pd.DataFrame(...)
-calibrated_data = cal_mat.calibrate_df(new_data)
+calibrated_data = cal_mat.calibrate_df(new_data, acc_unit="m/s^2", gyr_unit="deg/s")
 ```
 
 For further information on how to perform a calibration check the [User Guides](TODO) or the [examples](TODO)

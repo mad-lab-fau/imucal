@@ -19,5 +19,3 @@ def test_basic_ferraris_calibration():
     expected = pd.read_csv(Path(__file__).parent / "ferraris_example.csv", header=0, index_col=0)
 
     pd.testing.assert_frame_equal(expected, calibrated_data.head(50))
-
-

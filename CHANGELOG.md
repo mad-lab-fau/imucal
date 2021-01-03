@@ -19,6 +19,7 @@ Therefore, it is highly suggested upgrading to the new version, even if it takes
 - The ability to add a custom comment to a `CalibrationInfo`
 - The user is now forced to provide the units of the input data to avoid applying calibrations that were meant for unit
   conversion.
+- Applying a calibration now checks if the units of your data match with the input unit of the calibration.  
 
 ### Changed
 
@@ -68,6 +69,12 @@ Therefore, it is highly suggested upgrading to the new version, even if it takes
   Note, that you are also forced to provide the units of the input data.
   We always recommend to first turn your data into the same units you would expect after the calibration and then using
   the calibrations as refinement.
+- `CalibrationInfot.calibrate` now requires you to specify the units of your data and validates that they match the 
+  units expected by the calibration.
+  You need to add the parameters `acc_unit` and `gyr_unit` to all calls to calibrate.
+  Note, that older calibrations will not have `from` units and hence, can not perform this check.
+  In this case you can set the units to `None` to avoid an error.
+  However, it is recommended to recreate the calibrations with proper `from` units.
 - If you were using `from_json_file` before, double check, if this still works for you, as the way the correct baseclass
   is selected have been chosen.
   In any case, you should consider to use `imucal.management.load_calibration_info` instead, as it is more flexible.
