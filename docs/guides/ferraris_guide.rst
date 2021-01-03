@@ -1,3 +1,5 @@
+.. _ferraris_guide:
+
 ========================================
 Ferraris Calibration - A practical guide
 ========================================
@@ -39,7 +41,7 @@ Note, that the calibrated coordinate system must be right-handed.
    We will use it as guide for all further calibration positions (see image)
 4. Prepare the sensor unit to record the calibration.
    You can either record each calibration position/motion as a separate recording or you can make a single large
-   recording and use py:`imucal.ferraris_regions_from_interactive_plot` to mark the different sections after the
+   recording and use :func:`~imucal.ferraris_regions_from_interactive_plot` to mark the different sections after the
    recording.
    While the first option sounds like less manual work, it is more error prone and still requires some manual cleaning
    for the best possible results.
@@ -54,7 +56,7 @@ Note, that the calibrated coordinate system must be right-handed.
    This is the most sensitive part of the calibration.
    Therefore, go slow and consistent to avoid additional movements that should not be part of the rotation.
 6. End your recording and load the data onto a PC.
-   Then follow #TODO: Add link this code tutorial that guides you through calculating the the calibration matrizes.
+   Then follow :ref:`the code part of this tutorial <basic_ferraris>`.
 
 General Tips and Gotchas
 ========================

@@ -1,3 +1,5 @@
+.. _cal_store_guide:
+
 =====================================================
 Storing and Managing calibrations of multiple sensors
 =====================================================

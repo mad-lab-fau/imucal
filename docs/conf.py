@@ -53,7 +53,6 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
-    # "sphinx.ext.imgconverter",
     "sphinx_gallery.gen_gallery",
     "recommonmark",
 ]
@@ -108,7 +107,7 @@ html_theme_options = {"show_prev_next": False, "github_url": URL}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ["_static"]
+html_static_path = ["_static"]
 
 # -- Options for extensions --------------------------------------------------
 # Intersphinx
@@ -168,8 +167,8 @@ def linkcode_resolve(domain, info):
         pass
     if filename:
         if code_line:
-            return "{}/{}#L{}".format(URL, filename, code_line)
-        return "{}/{}".format(URL, filename)
+            return "{}/tree/master/{}#L{}".format(URL, filename, code_line)
+        return "{}/tree/master/{}".format(URL, filename)
 
 
 def skip_properties(app, what, name, obj, skip, options):
