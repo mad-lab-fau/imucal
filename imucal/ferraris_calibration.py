@@ -100,10 +100,11 @@ class FerrarisCalibration:
     calibration, you might need to change the `grav` and `expected_angle` parameter.
 
     Typical situations are:
-        - If you define the positive axis direction as the direction, where the acc measures -g, change `grav` to
-            -9.81 m/s^2
-        - If you perform a counter-clockwise rotation during the calibration, set `expected_angle` to +360
-        - For combinations of both, both parameter might need to be adapted
+
+    - If you define the positive axis direction as the direction, where the acc measures -g, change `grav` to
+      -9.81 m/s^2
+    - If you perform a counter-clockwise rotation during the calibration, set `expected_angle` to +360
+    - For combinations of both, both parameter might need to be adapted
 
 
     Examples
