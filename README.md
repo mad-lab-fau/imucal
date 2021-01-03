@@ -1,4 +1,7 @@
 # IMU Calibration
+![Test and Lint](https://github.com/mad-lab-fau/imucal/workflows/Test%20and%20Lint/badge.svg)
+[![Documentation Status](https://readthedocs.org/projects/imucal/badge/?version=latest)](https://imucal.readthedocs.io/en/latest/?badge=latest)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PyPI](https://img.shields.io/pypi/v/imucal)](https://pypi.org/project/imucal/)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/imucal)
 
