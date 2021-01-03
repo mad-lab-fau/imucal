@@ -25,6 +25,7 @@ If you just want to extend an existing object, subclass from the respective clas
 from dataclasses import dataclass
 from typing import Optional
 
+from example_data import EXAMPLE_PATH
 from imucal import FerrarisCalibrationInfo, ferraris_regions_from_df
 
 
@@ -48,7 +49,7 @@ cal = FerrarisCalibration(calibration_info_class=ExtendedFerrarisCalibrationInfo
 # To provide a value for our `new_meta_info` field, we can pass it directly to the `calculate` method.
 import pandas as pd
 
-cal_data = ferraris_regions_from_df(pd.read_csv("../example_data/annotated_session.csv", header=0, index_col=[0, 1]))
+cal_data = ferraris_regions_from_df(pd.read_csv(EXAMPLE_PATH / "annotated_session.csv", header=0, index_col=[0, 1]))
 
 cal_info = cal.compute(
     cal_data, sampling_rate_hz=204.8, from_acc_unit="a.u.", from_gyr_unit="a.u.", new_meta_info="my value"

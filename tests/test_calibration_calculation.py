@@ -30,7 +30,7 @@ def test_example_calibration(example_calibration_data):
     cal_mat = cal.compute(regions, sampling_rate, from_acc_unit="a.u.", from_gyr_unit="a.u.")
 
     # # Uncomment if you want to save the new cal matrix to update the regression test
-    cal_mat.to_json_file(Path(__file__).parent / 'snapshots/example_cal.json')
+    # cal_mat.to_json_file(Path(__file__).parent / "snapshots/example_cal.json")
 
     assert cal_mat == calib
 
