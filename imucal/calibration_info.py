@@ -2,9 +2,10 @@
 import json
 from dataclasses import dataclass, fields, asdict
 from pathlib import Path
-from typing import Tuple, Union, TypeVar, ClassVar, Optional
+from typing import Tuple, Union, TypeVar, ClassVar, Optional, Type, Iterable
 
 import numpy as np
+import pandas as pd
 
 CalInfo = TypeVar("CalInfo", bound="CalibrationInfo")
 
@@ -20,72 +21,114 @@ class NumpyEncoder(json.JSONEncoder):
 
 @dataclass(eq=False)
 class CalibrationInfo:
-    """Abstract BaseClass for all Calibration Info objects."""
+    """Abstract BaseClass for all Calibration Info objects.
 
-    CAL_TYPE: ClassVar[str]  # noqa: invalid-name
-    acc_unit: Optional[str] = None
-    gyro_unit: Optional[str] = None
-
-    _cal_paras: ClassVar[Tuple[str, ...]]
-
-    _cal_type_explanation = """
-    Note:
+    .. note ::
         All `CalibrationInfo` subclasses implement a `CAL_TYPE` attribute.
         If the calibration is exported into any format, this information is stored as well.
         If imported, all constructor methods intelligently infer the correct CalibrationInfo subclass based on
         this parameter.
 
-        Example:
-            >>> json_string = "{cal_type: 'Ferraris', ...}"
-            >>> CalibrationInfo.from_json(json_string)
-            <FerrarisCalibrationInfo ...>
+        >>> json_string = "{cal_type: 'Ferraris', ...}"
+        >>> CalibrationInfo.from_json(json_string)
+        <FerrarisCalibrationInfo ...>
 
     """
 
-    __doc__ += _cal_type_explanation
+    CAL_TYPE: ClassVar[str] = None  # noqa: invalid-name
+    acc_unit: Optional[str] = None
+    gyr_unit: Optional[str] = None
+    from_acc_unit: Optional[str] = None
+    from_gyr_unit: Optional[str] = None
+    comment: Optional[str] = None
 
-    def calibrate(self, acc: np.ndarray, gyro: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    _cal_paras: ClassVar[Tuple[str, ...]]
+
+    def calibrate(
+        self, acc: np.ndarray, gyr: np.ndarray, acc_unit: Optional[str], gyr_unit: Optional[str]
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Abstract method to perform a calibration on both acc and gyro.
 
-        This absolutely needs to implement by any daughter class
+        This absolutely needs to implement by any daughter class.
+        It is further recommended to call `self._validate_units` in the overwritten calibrate method, to check if the
+        input units are as expected.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         acc :
             3D acceleration
-        gyro :
+        gyr :
             3D gyroscope values
+        acc_unit
+            The unit of the acceleration data
+        gyr_unit
+            The unit of the gyroscope data
 
         """
         raise NotImplementedError("This method needs to be implemented by a subclass")
 
-    def calibrate_gyro(self, gyro: np.ndarray) -> np.ndarray:
-        """Abstract method to perform a calibration on both acc and gyro.
+    def calibrate_df(
+        self,
+        df: pd.DataFrame,
+        acc_unit: Optional[str],
+        gyr_unit: Optional[str],
+        acc_cols: Iterable[str] = ("acc_x", "acc_y", "acc_z"),
+        gyr_cols: Iterable[str] = ("gyr_x", "gyr_y", "gyr_z"),
+    ) -> pd.DataFrame:
+        """Apply the calibration to data stored in a dataframe.
 
-        This can implement by any daughter class, if separte calibration of acc makes sense for the calibration type.
-        If not, an explicit error should be thrown
+        This calls `calibrate` for the respective columns and returns a copy of the df with the respective columns
+        replaced by their calibrated counter-part.
 
-        Parameter
-        ---------
-        gro :
-            3D gyroscope values
+        See the `calibrate` method for more information.
+
+        Parameters
+        ----------
+        df :
+            6 column dataframe (3 acc, 3 gyro)
+        acc_cols :
+            The name of the 3 acceleration columns in order x,y,z.
+        gyr_cols :
+            The name of the 3 acceleration columns in order x,y,z.
+        acc_unit
+            The unit of the acceleration data
+        gyr_unit
+            The unit of the gyroscope data
+
+        Returns
+        -------
+        cal_df
+            A copy of `df` with the calibrated data.
 
         """
-        raise NotImplementedError("This method needs to be implemented by a subclass")
+        acc_cols = list(acc_cols)
+        gyr_cols = list(gyr_cols)
+        acc = df[acc_cols].to_numpy()
+        gyr = df[gyr_cols].to_numpy()
+        cal_acc, cal_gyr = self.calibrate(acc=acc, gyr=gyr, acc_unit=acc_unit, gyr_unit=gyr_unit)
 
-    def calibrate_acc(self, acc: np.ndarray) -> np.ndarray:
-        """Abstract method to perform a calibration on the gyro.
+        cal_df = df.copy()
+        cal_df[acc_cols] = cal_acc
+        cal_df[gyr_cols] = cal_gyr
 
-        This can implement by any daughter class, if separte calibration of acc makes sense for the calibration type.
-        If not, an explicit error should be thrown
+        return cal_df
 
-        Parameter
-        ---------
-        acc :
-            3D acceleration
-
-        """
-        raise NotImplementedError("This method needs to be implemented by a subclass")
+    def _validate_units(self, other_acc, other_gyr):
+        check_pairs = {"acc": (other_acc, self.from_acc_unit), "gyr": (other_gyr, self.from_gyr_unit)}
+        for name, (other, this) in check_pairs.items():
+            if other != this:
+                if this is None:
+                    raise ValueError(
+                        "This calibration does not provide any information about the expected input "
+                        "units for {0}. "
+                        "Set `{0}_unit` explicitly to `None` to ignore this error. "
+                        "However, we recommend to recreate your calibration with proper information "
+                        "about the input unit.".format(name)
+                    )
+                raise ValueError(
+                    "The provided {} data has a unit of {}. "
+                    "However, the calibration is created to calibrate data with a unit of {}.".format(name, other, this)
+                )
 
     def __eq__(self, other):
         """Check if two calibrations are identical.
@@ -136,7 +179,18 @@ class CalibrationInfo:
     @classmethod
     def find_subclass_from_cal_type(cls, cal_type):
         """Get a SensorCalibration subclass that handles the specified calibration type."""
-        return next(x for x in CalibrationInfo._get_subclasses() if x.CAL_TYPE == cal_type)
+        if cls.CAL_TYPE == cal_type:
+            return cls
+        try:
+            out_cls = next(x for x in cls._get_subclasses() if x.CAL_TYPE == cal_type)
+        except StopIteration:
+            raise ValueError(
+                "No suitable calibration info class could be found for caltype `{}`. "
+                "The following classes were checked: {}. "
+                "If your CalibrationInfo class is missing, make sure it is imported before loading a "
+                "file.".format(cal_type, (cls.__name__, *(x.__name__ for x in cls._get_subclasses())))
+            )
+        return out_cls
 
     def to_json(self) -> str:
         """Convert all calibration matrices into a json string."""
@@ -144,12 +198,13 @@ class CalibrationInfo:
         return json.dumps(data_dict, indent=4, cls=NumpyEncoder)
 
     @classmethod
-    def from_json(cls, json_str: str) -> CalInfo:
+    def from_json(cls: Type[CalInfo], json_str: str) -> CalInfo:
         """Create a calibration object from a json string (created by `CalibrationInfo.to_json`).
 
-        Parameter
-        ---------
-        json_str: valid json string object
+        Parameters
+        ----------
+        json_str :
+            valid json string object
 
         Returns
         -------
@@ -165,21 +220,21 @@ class CalibrationInfo:
     def to_json_file(self, path: Union[str, Path]):
         """Dump acc calibration matrices into a file in json format.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         path :
             path to the json file
 
         """
         data_dict = self._to_list_dict()
-        return json.dump(data_dict, open(path, "w"), cls=NumpyEncoder)
+        return json.dump(data_dict, open(path, "w"), cls=NumpyEncoder, indent=4)
 
     @classmethod
-    def from_json_file(cls, path: Union[str, Path]) -> CalInfo:
+    def from_json_file(cls: Type[CalInfo], path: Union[str, Path]) -> CalInfo:
         """Create a calibration object from a valid json file (created by `CalibrationInfo.to_json_file`).
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         path :
             Path to the json file
 
@@ -190,15 +245,16 @@ class CalibrationInfo:
             The exact child class is determined by the `cal_type` key in the json string.
 
         """
-        raw_json = json.load(open(path, "r"))
+        with open(path, "r") as f:
+            raw_json = json.load(f)
         subclass = cls.find_subclass_from_cal_type(raw_json.pop("cal_type"))
         return subclass._from_list_dict(raw_json)
 
     def to_hdf5(self, path: Union[str, Path]):
         """Save calibration matrices to hdf5 file format.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         path :
             Path to the hdf5 file
 
@@ -206,19 +262,21 @@ class CalibrationInfo:
         import h5py  # noqa: import-outside-toplevel
 
         with h5py.File(path, "w") as hdf:
-            d = {key: getattr(self, key).tolist() for key in self._cal_paras}
-            for k, v in d.items():
-                hdf.create_dataset(k, data=v)
+            for k in fields(self):
+                value = getattr(self, k.name)
+                if k.name in self._cal_paras:
+                    hdf.create_dataset(k.name, data=value.tolist())
+                else:
+                    if value:
+                        hdf[k.name] = value
             hdf["cal_type"] = self.CAL_TYPE
-            hdf["acc_unit"] = self.acc_unit
-            hdf["gyro_unit"] = self.gyro_unit
 
     @classmethod
-    def from_hdf5(cls, path: Union[str, Path]):
+    def from_hdf5(cls: Type[CalInfo], path: Union[str, Path]):
         """Read calibration data stored in hdf5 fileformat (created by `CalibrationInfo.save_to_hdf5`).
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         path :
             Path to the hdf5 file
 
@@ -238,7 +296,9 @@ class CalibrationInfo:
                 tmp = hdf.get(k.name)
                 if k.name in subcls._cal_paras:
                     values[k.name] = np.array(tmp)
+                elif tmp:
+                    values[k.name] = tmp[()]
                 else:
-                    values[k.name] = tmp.value
+                    values[k.name] = None
 
         return subcls(**values)

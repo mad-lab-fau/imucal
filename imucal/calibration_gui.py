@@ -2,6 +2,7 @@
 import tkinter as tk
 from collections import OrderedDict
 from itertools import chain
+from tkinter.messagebox import showinfo
 from typing import Sequence, Optional
 
 import numpy as np
@@ -131,7 +132,7 @@ class CalibrationGui:
         self._update_list_box()
 
     def _show_help(self):
-        tk.messagebox.showinfo("Window", self.manual)
+        showinfo("Window", self.manual)
 
     def _select_next(self, current):
         next_val = (current + 1) % self.labels.size()
@@ -207,7 +208,7 @@ class CalibrationGui:
         return sum((all(v) for v in self.section_list.values()))
 
 
-def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame):
+def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame) -> pd.DataFrame:
     out = dict()
 
     for label, row in section_list.iterrows():

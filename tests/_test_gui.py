@@ -2,10 +2,12 @@ from pathlib import Path
 
 import pandas as pd
 
-from imucal import FerrarisCalibration
+from imucal import ferraris_regions_from_interactive_plot
 
-data = pd.read_csv(Path(__file__).parent / "_test_data/example_data.csv")
+data = pd.read_csv(Path(__file__).parent / "_test_data/example_data.csv").sort_values("samples")
 
-FerrarisCalibration.from_interactive_plot(
-    data, 100, acc_cols=["accX", "accY", "accZ"], gyro_cols=["gyroX", "gyroY", "gyroZ"]
+section_data, section_list = ferraris_regions_from_interactive_plot(
+    data, acc_cols=["accX", "accY", "accZ"], gyr_cols=["gyroX", "gyroY", "gyroZ"]
 )
+
+print(section_data, section_list)
