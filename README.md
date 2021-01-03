@@ -65,10 +65,8 @@ Applying a calibration:
 from imucal.management import load_calibration_info
 
 cal_mat = load_calibration_info('./calibration.json')
-new_data = ...
-new_data_acc = new_data[["acc_x", "acc_y", "acc_z"]].to_numpy()
-new_data_gyr = new_data[["gyr_x", "gyr_y", "gyr_z"]].to_numpy()
-calibrated_acc, calibrated_gyr = cal_mat.calibrate(acc=new_data_acc, gyr=new_data_gyr)
+new_data = pd.DataFrame(...)
+calibrated_data = cal_mat.calibrate_df(new_data)
 ```
 
 For further information on how to perform a calibration check the [User Guides](TODO) or the [examples](TODO)

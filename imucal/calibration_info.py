@@ -2,9 +2,10 @@
 import json
 from dataclasses import dataclass, fields, asdict
 from pathlib import Path
-from typing import Tuple, Union, TypeVar, ClassVar, Optional, Type
+from typing import Tuple, Union, TypeVar, ClassVar, Optional, Type, Iterable
 
 import numpy as np
+import pandas as pd
 
 CalInfo = TypeVar("CalInfo", bound="CalibrationInfo")
 
@@ -43,7 +44,6 @@ class CalibrationInfo:
 
     _cal_paras: ClassVar[Tuple[str, ...]]
 
-
     def calibrate(self, acc: np.ndarray, gyr: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Abstract method to perform a calibration on both acc and gyro.
 
@@ -58,6 +58,46 @@ class CalibrationInfo:
 
         """
         raise NotImplementedError("This method needs to be implemented by a subclass")
+
+    def calibrate_df(
+        self,
+        df: pd.DataFrame,
+        acc_cols: Iterable[str] = ("acc_x", "acc_y", "acc_z"),
+        gyr_cols: Iterable[str] = ("gyr_x", "gyr_y", "gyr_z"),
+    ) -> pd.DataFrame:
+        """Apply the calibration to data stored in a dataframe.
+
+        This calls `calibrate` for the respective columns and returns a copy of the df with the respective columns
+        replaced by their calibrated counter-part.
+
+        See the `calibrate` method for more information.
+
+        Parameters
+        ----------
+        df :
+            6 column dataframe (3 acc, 3 gyro)
+        acc_cols :
+            The name of the 3 acceleration columns in order x,y,z.
+        gyr_cols :
+            The name of the 3 acceleration columns in order x,y,z.
+
+        Returns
+        -------
+        cal_df
+            A copy of `df` with the calibrated data.
+
+        """
+        acc_cols = list(acc_cols)
+        gyr_cols = list(gyr_cols)
+        acc = df[acc_cols].to_numpy()
+        gyr = df[gyr_cols].to_numpy()
+        cal_acc, cal_gyr = self.calibrate(acc=acc, gyr=gyr)
+
+        cal_df = df.copy()
+        cal_df[acc_cols] = cal_acc
+        cal_df[gyr_cols] = cal_gyr
+
+        return cal_df
 
     def calibrate_gyr(self, gyr: np.ndarray) -> np.ndarray:
         """Abstract method to perform a calibration on both acc and gyro.
