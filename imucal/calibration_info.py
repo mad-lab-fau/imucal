@@ -1,6 +1,7 @@
 """Base Class for all CalibrationInfo objects."""
 import json
 from dataclasses import dataclass, fields, asdict
+from distutils.version import StrictVersion
 from pathlib import Path
 from typing import Tuple, Union, TypeVar, ClassVar, Optional, Type, Iterable
 
@@ -9,14 +10,7 @@ import pandas as pd
 
 CalInfo = TypeVar("CalInfo", bound="CalibrationInfo")
 
-
-class NumpyEncoder(json.JSONEncoder):
-    """Custom encoder for numpy array."""
-
-    def default(self, obj):  # noqa: arguments-differ
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
+_CAL_FORMAT_VERSION = StrictVersion("2.0.0")
 
 
 @dataclass(eq=False)
@@ -35,6 +29,7 @@ class CalibrationInfo:
 
     """
 
+    CAL_FORMAT_VERSION: ClassVar[StrictVersion] = _CAL_FORMAT_VERSION  # noqa: invalid-name
     CAL_TYPE: ClassVar[str] = None  # noqa: invalid-name
     acc_unit: Optional[str] = None
     gyr_unit: Optional[str] = None
@@ -162,6 +157,7 @@ class CalibrationInfo:
     def _to_list_dict(self):
         d = asdict(self)
         d["cal_type"] = self.CAL_TYPE
+        d["_format_version"] = str(self.CAL_FORMAT_VERSION)
         return d
 
     @classmethod
@@ -214,6 +210,7 @@ class CalibrationInfo:
 
         """
         raw_json = json.loads(json_str)
+        check_cal_format_version(StrictVersion(raw_json.pop("_format_version", None)), cls.CAL_FORMAT_VERSION)
         subclass = cls.find_subclass_from_cal_type(raw_json.pop("cal_type"))
         return subclass._from_list_dict(raw_json)
 
@@ -247,6 +244,7 @@ class CalibrationInfo:
         """
         with open(path, "r") as f:
             raw_json = json.load(f)
+        check_cal_format_version(raw_json.pop("_format_version", None), cls.CAL_FORMAT_VERSION)
         subclass = cls.find_subclass_from_cal_type(raw_json.pop("cal_type"))
         return subclass._from_list_dict(raw_json)
 
@@ -270,6 +268,7 @@ class CalibrationInfo:
                     if value:
                         hdf[k.name] = value
             hdf["cal_type"] = self.CAL_TYPE
+            hdf["_format_version"] = str(self.CAL_FORMAT_VERSION)
 
     @classmethod
     def from_hdf5(cls: Type[CalInfo], path: Union[str, Path]):
@@ -291,7 +290,11 @@ class CalibrationInfo:
 
         with h5py.File(path, "r") as hdf:
             values = dict()
-            subcls = cls.find_subclass_from_cal_type(hdf["cal_type"][...])
+            format_version = hdf.get("_format_version")
+            if format_version:
+                format_version = format_version[()]
+            check_cal_format_version(format_version, cls.CAL_FORMAT_VERSION)
+            subcls = cls.find_subclass_from_cal_type(hdf["cal_type"][()])
             for k in fields(subcls):
                 tmp = hdf.get(k.name)
                 if k.name in subcls._cal_paras:
@@ -302,3 +305,33 @@ class CalibrationInfo:
                     values[k.name] = None
 
         return subcls(**values)
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """Custom encoder for numpy array."""
+
+    def default(self, obj):  # noqa: arguments-differ
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+
+def check_cal_format_version(
+    version: Optional[StrictVersion] = None, current_version: StrictVersion = _CAL_FORMAT_VERSION
+):
+    """Check if a calibration can be loaded with the current loader."""
+    # No version means, the old 1.0 format is used that does not provide a version string
+    if not version:
+        version = StrictVersion("1.0.0")
+    if isinstance(version, str):
+        version = StrictVersion(version)
+
+    if version == current_version:
+        return
+    if version > current_version:
+        raise ValueError("The provided version, is larger than the currently supported version.")
+    if version < current_version:
+        raise ValueError(
+            "The provided calibration format is no longer supported. "
+            "Check `imucal.legacy` if conversion helper exist."
+        )
