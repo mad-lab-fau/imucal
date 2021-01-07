@@ -260,15 +260,11 @@ class CalibrationInfo:
         import h5py  # noqa: import-outside-toplevel
 
         with h5py.File(path, "w") as hdf:
-            for k in fields(self):
-                value = getattr(self, k.name)
-                if k.name in self._cal_paras:
-                    hdf.create_dataset(k.name, data=value.tolist())
-                else:
-                    if value:
-                        hdf[k.name] = value
-            hdf["cal_type"] = self.CAL_TYPE
-            hdf["_format_version"] = str(self.CAL_FORMAT_VERSION)
+            for k, v in self._to_list_dict().items():
+                if k in self._cal_paras:
+                    hdf.create_dataset(k, data=v.tolist())
+                elif v:
+                    hdf[k] = v
 
     @classmethod
     def from_hdf5(cls: Type[CalInfo], path: Union[str, Path]):
@@ -289,22 +285,14 @@ class CalibrationInfo:
         import h5py  # noqa: import-outside-toplevel
 
         with h5py.File(path, "r") as hdf:
-            values = dict()
             format_version = hdf.get("_format_version")
             if format_version:
                 format_version = format_version[()]
             check_cal_format_version(format_version, cls.CAL_FORMAT_VERSION)
             subcls = cls.find_subclass_from_cal_type(hdf["cal_type"][()])
-            for k in fields(subcls):
-                tmp = hdf.get(k.name)
-                if k.name in subcls._cal_paras:
-                    values[k.name] = np.array(tmp)
-                elif tmp:
-                    values[k.name] = tmp[()]
-                else:
-                    values[k.name] = None
+            data = {k.name: hdf.get(k.name)[()] for k in fields(subcls)}
 
-        return subcls(**values)
+        return subcls._from_list_dict(data)
 
 
 class NumpyEncoder(json.JSONEncoder):
