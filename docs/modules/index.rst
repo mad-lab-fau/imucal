@@ -75,6 +75,23 @@ Calibration File Management
 
     CalibrationWarning
 
+
+Legacy Support
+==============
+
+.. automodule:: imucal.legacy
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: imucal.legacy
+.. autosummary::
+   :toctree: generated
+   :template: function.rst
+
+    load_v1_json_files
+    load_v1_json
+
+
 Label GUI
 =========
 The gui label class.
