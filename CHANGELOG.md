@@ -20,6 +20,9 @@ Therefore, it is highly suggested upgrading to the new version, even if it takes
 - The user is now forced to provide the units of the input data to avoid applying calibrations that were meant for unit
   conversion.
 - Applying a calibration now checks if the units of your data match with the input unit of the calibration.
+- The export format of calibration-info objects is now versioned.
+  This helps to make changes to the format in the future while still supporting old exports.
+  See the migration guide for more information.
 - Helper functions to load "legacy" calibration info objects. (`imucal.legacy`)
 
 ### Changed
