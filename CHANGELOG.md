@@ -19,7 +19,8 @@ Therefore, it is highly suggested upgrading to the new version, even if it takes
 - The ability to add a custom comment to a `CalibrationInfo`
 - The user is now forced to provide the units of the input data to avoid applying calibrations that were meant for unit
   conversion.
-- Applying a calibration now checks if the units of your data match with the input unit of the calibration.  
+- Applying a calibration now checks if the units of your data match with the input unit of the calibration.
+- Helper functions to load "legacy" calibration info objects. (`imucal.legacy`)
 
 ### Changed
 
@@ -83,5 +84,8 @@ Therefore, it is highly suggested upgrading to the new version, even if it takes
   You will not be able to load them unless you replace `gyro_unit` with `gyr_unit` in all files.
 - The `CalibrationInfo` objects now have more fields by default.
   To avoid issues with missing values, we highly recommend recreating all calibration files you have using the original
-  session data and the most current version of `imucal`
+  session data and the most current version of `imucal`.
+  Alternatively you can use the functions provided in `imucal.legacy` to load the old
+  calibration.
+  Then you can modify the loaded calibration info object and save it again to replace the old calibration.
 
