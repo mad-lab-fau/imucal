@@ -1,6 +1,10 @@
 from pathlib import Path
 
+import matplotlib
 import pandas as pd
+
+# This is needed to avoid plots to open
+matplotlib.use("Agg")
 
 
 def test_custom_calibration_info():
