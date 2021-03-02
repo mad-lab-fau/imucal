@@ -6,7 +6,6 @@ import pandas as pd
 from numpy.linalg import inv
 from typing_extensions import ClassVar
 
-from imucal.calibration_gui import CalibrationGui, _convert_data_from_section_list_to_df
 from imucal.calibration_info import CalibrationInfo
 from imucal.ferraris_calibration_info import FerrarisCalibrationInfo, TurntableCalibrationInfo
 
@@ -444,6 +443,8 @@ def ferraris_regions_from_section_list(
     ferraris_regions_from_df
 
     """
+    from imucal.calibration_gui import _convert_data_from_section_list_to_df  # noqa: import-outside-toplevel
+
     df = _convert_data_from_section_list_to_df(data, section_list)
     return ferraris_regions_from_df(df, acc_cols=acc_cols, gyr_cols=gyr_cols)
 
@@ -518,6 +519,8 @@ def _find_ferraris_regions_interactive(acc: np.ndarray, gyro: np.ndarray, title:
         Optional title for the Calibration GUI
 
     """
+    from imucal.calibration_gui import CalibrationGui  # noqa: import-outside-toplevel
+
     plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS, title=title)
 
     section_list = plot.section_list
