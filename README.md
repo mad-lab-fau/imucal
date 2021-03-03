@@ -9,7 +9,7 @@ This package provides methods to calculate and apply calibrations for IMUs based
 
 So far supported are:
 
-- Ferraris Calibration (Ferraris1995)
+- Ferraris Calibration ([Ferraris1994](https://www.sciencedirect.com/science/article/pii/0924424794800316) / [Ferraris1995](https://www.researchgate.net/publication/245080041_Calibration_of_three-axial_rate_gyros_without_angular_velocity_standards))
 - Ferraris Calibration using a Turntable
 
 ## WARNING: VERSION UPDATE
@@ -90,7 +90,7 @@ For further information on how to perform a calibration check the
 
 ## Further Calibration Methods
 
-At the moment, this package only implements calibration methods based on Ferraris1994, because this is what we use to
+At the moment, this package only implements calibration methods based on Ferraris1994/95, because this is what we use to
 calibrate our IMUs.
 We are aware that various other methods exist and would love to add them to this package as well.
 Unfortunately, at the moment we can not justify the time requirement.
