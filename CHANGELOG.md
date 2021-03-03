@@ -4,7 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) (+ the Migration Guide section), and 
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# [2.0] - 09.01.2021 
+# [2.0.1] - 02.03.2021
+
+### Changed
+
+- Made sure that tkinter is only imported, if the GUI is really used.
+  This is important if the library is used in a context were no graphical output is possible (e.g. a Docker container).
+  Previous versions of imucal would result in an import error in these situations.
+
+# [2.0.0] - 09.01.2021 
 
 2.0 is a rewrite of a lot of the API and requires multiple changes to legacy code using this library.
 Please refer to the migration guide for more information.
