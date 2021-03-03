@@ -102,7 +102,7 @@ as possible.
 
 ## Contributing
 
-All project management and development happens through this Github project.
+All project management and development happens through [this Github project](https://github.com/mad-lab-fau/imucal).
 If you have any issues, ideas, or any comments at all, just open a new issue.
 Please be polite and considerate of our time.
 We appreciate everyone who is using our software or even wants to improve it, but sometime other things come in the way,
