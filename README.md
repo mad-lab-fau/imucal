@@ -30,7 +30,7 @@ pip install "imucal<2.0"
 pip install imucal
 ```
 
-To use the included calibration GUI you also need matplotlib (version >2.2).
+To use the included calibration GUI you also need [matplotlib](https://pypi.org/project/matplotlib/) (version >2.2).
 You can install it using:
 
 ```
