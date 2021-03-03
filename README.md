@@ -9,16 +9,16 @@ This package provides methods to calculate and apply calibrations for IMUs based
 
 So far supported are:
 
-- Ferraris Calibration (Ferraris1995)
+- Ferraris Calibration ([Ferraris1994](https://www.sciencedirect.com/science/article/pii/0924424794800316) / [Ferraris1995](https://www.researchgate.net/publication/245080041_Calibration_of_three-axial_rate_gyros_without_angular_velocity_standards))
 - Ferraris Calibration using a Turntable
 
 ## WARNING: VERSION UPDATE
 
 Version 2.0 was recently released and contains multiple API breaking changes!
-To learn more about that, check `Changelog.md`.
+To learn more about that, check [`Changelog.md`](https://github.com/mad-lab-fau/imucal/blob/master/CHANGELOG.md).
 
 If you want to ensure that your old code still works, specify a correct version during install and in your
-`requirement.txt` files
+`requirement.txt` files:
 
 ```
 pip install "imucal<2.0"
@@ -30,7 +30,7 @@ pip install "imucal<2.0"
 pip install imucal
 ```
 
-To use the included calibration GUI you also need matplotlib (version >2.2).
+To use the included calibration GUI you also need [matplotlib](https://pypi.org/project/matplotlib/) (version >2.2).
 You can install it using:
 
 ```
@@ -86,11 +86,11 @@ calibrated_data = cal_mat.calibrate_df(new_data, acc_unit="m/s^2", gyr_unit="deg
 
 For further information on how to perform a calibration check the 
 [User Guides](https://imucal.readthedocs.io/en/latest/guides/index.html) or the
-[examples](https://imucal.readthedocs.io/en/latest/auto_examples/index.html)
+[examples](https://imucal.readthedocs.io/en/latest/auto_examples/index.html).
 
 ## Further Calibration Methods
 
-At the moment, this package only implements calibration methods based on Ferraris1994, because this is what we use to
+At the moment, this package only implements calibration methods based on Ferraris1994/95, because this is what we use to
 calibrate our IMUs.
 We are aware that various other methods exist and would love to add them to this package as well.
 Unfortunately, at the moment we can not justify the time requirement.
@@ -102,7 +102,7 @@ as possible.
 
 ## Contributing
 
-All project management and development happens through this Github project.
+All project management and development happens through [this Github project](https://github.com/mad-lab-fau/imucal).
 If you have any issues, ideas, or any comments at all, just open a new issue.
 Please be polite and considerate of our time.
 We appreciate everyone who is using our software or even wants to improve it, but sometime other things come in the way,
