@@ -15,7 +15,7 @@ So far supported are:
 ## WARNING: VERSION UPDATE
 
 Version 2.0 was recently released and contains multiple API breaking changes!
-To learn more about that, check `Changelog.md`.
+To learn more about that, check [`Changelog.md`](https://github.com/mad-lab-fau/imucal/blob/master/CHANGELOG.md).
 
 If you want to ensure that your old code still works, specify a correct version during install and in your
 `requirement.txt` files:
