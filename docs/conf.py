@@ -39,7 +39,7 @@ info = toml.load("../pyproject.toml")["tool"]["poetry"]
 project = info["name"]
 author = ", ".join(info["authors"])
 release = info["version"]
-copyright = "2018 - {}, MaD-Lab FAU, Digital Health and Gait-Analysis Group".format(datetime.now().year)
+copyright = "2018 - {}, MaD-Lab FAU, Digital Health - Gait Analytics Group".format(datetime.now().year)
 
 # -- General configuration ---------------------------------------------------
 
