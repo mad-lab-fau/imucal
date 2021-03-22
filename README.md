@@ -93,10 +93,10 @@ For further information on how to perform a calibration check the
 At the moment, this package only implements calibration methods based on Ferraris1994/95, because this is what we use to
 calibrate our IMUs.
 We are aware that various other methods exist and would love to add them to this package as well.
-Unfortunately, at the moment we can not justify the time requirement.
+Unfortunately, at the moment we can not justify the time investment.
 
 Still, we think that this package provides a suitable framework to implement other calibration emthods with relative
-easy.
+ease.
 If you would like to contribute such a method, let us know on the github-issue page and we will try to help you as good
 as possible.
 
