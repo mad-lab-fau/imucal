@@ -69,7 +69,7 @@ from imucal import FerrarisCalibration
 
 sampling_rate = 100 #Hz 
 cal = FerrarisCalibration()
-cal_mat = cal.compute(section_data, sampling_rate, from_acc_unit="m/s^2", from_gyr_unit="g")
+cal_mat = cal.compute(section_data, sampling_rate, from_acc_unit="m/s^2", from_gyr_unit="deg/s")
 # `cal_mat` is you final calibration matrix object, you can use to calibrate data
 cal_mat.to_json_file('./calibration.json')
 ```
