@@ -5,6 +5,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PyPI](https://img.shields.io/pypi/v/imucal)](https://pypi.org/project/imucal/)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/imucal)
+[![DOI](https://zenodo.org/badge/307143332.svg)](https://zenodo.org/badge/latestdoi/307143332)
 
 This package provides methods to calculate and apply calibrations for IMUs based on multiple different methods.
 
@@ -12,18 +13,6 @@ So far supported are:
 
 - Ferraris Calibration ([Ferraris1994](https://www.sciencedirect.com/science/article/pii/0924424794800316) / [Ferraris1995](https://www.researchgate.net/publication/245080041_Calibration_of_three-axial_rate_gyros_without_angular_velocity_standards))
 - Ferraris Calibration using a Turntable
-
-## WARNING: VERSION UPDATE
-
-Version 2.0 was recently released and contains multiple API breaking changes!
-To learn more about that, check [`Changelog.md`](https://github.com/mad-lab-fau/imucal/blob/master/CHANGELOG.md).
-
-If you want to ensure that your old code still works, specify a correct version during install and in your
-`requirement.txt` files:
-
-```
-pip install "imucal<2.0"
-```
 
 ## Installation
 
@@ -100,6 +89,16 @@ Still, we think that this package provides a suitable framework to implement oth
 ease.
 If you would like to contribute such a method, let us know on the github-issue page and we will try to help you as good
 as possible.
+
+## Citation
+
+If you are using imucal in your scientific work, we would appreciate if you would cite or link the project:
+
+```
+Arne Küderle, Nils Roth, & Robert Richer. (2021). 
+mad-lab-fau/imucal: v2.0.2 - Zenodo Release (v2.0.2). Zenodo.
+https://doi.org/10.5281/`zenodo.5639238`
+```
 
 ## Contributing
 

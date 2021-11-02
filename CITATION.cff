@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Küderle"
+  given-names: "Arne"
+- family-names: "Roth"
+  given-names: "Nils"
+- family-names: "Richer"
+  given-names: "Robert"
+title: "imucal - A Python library to calibrate 6 DOF IMUs"
+version: 2.0.2
+doi: 10.5281/zenodo.5639238
+url: "https://github.com/mad-lab-fau/imucal"
