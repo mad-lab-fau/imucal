@@ -95,9 +95,9 @@ as possible.
 If you are using imucal in your scientific work, we would appreciate if you would cite or link the project:
 
 ```
-Arne Küderle, Nils Roth, & Robert Richer. (2021). 
-mad-lab-fau/imucal: v2.0.2 - Zenodo Release (v2.0.2). Zenodo.
-https://doi.org/10.5281/zenodo.5639238
+Küderle, A., Roth, N., & Richer, R. 
+imucal - A Python library to calibrate 6 DOF IMUs (Version 2.0.2) [Computer software].
+https://doi.org/10.5281/zenodo.56392388
 ```
 
 ## Contributing
