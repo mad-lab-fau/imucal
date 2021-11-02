@@ -9,6 +9,8 @@ from imucal.ferraris_calibration import (
 )
 from imucal.ferraris_calibration_info import FerrarisCalibrationInfo, TurntableCalibrationInfo  # noqa: F401
 
+__version__ = "patch"
+
 __all__ = [
     "CalibrationInfo",
     "FerrarisCalibration",
