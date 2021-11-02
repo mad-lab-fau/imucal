@@ -209,7 +209,7 @@ class CalibrationGui:
 
 
 def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame) -> pd.DataFrame:
-    out = dict()
+    out = {}
 
     for label, row in section_list.iterrows():
         out[label] = data.iloc[row.start : row.end]

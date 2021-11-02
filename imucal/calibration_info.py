@@ -179,13 +179,13 @@ class CalibrationInfo:
             return cls
         try:
             out_cls = next(x for x in cls._get_subclasses() if x.CAL_TYPE == cal_type)
-        except StopIteration:
+        except StopIteration as e:
             raise ValueError(
                 "No suitable calibration info class could be found for caltype `{}`. "
                 "The following classes were checked: {}. "
                 "If your CalibrationInfo class is missing, make sure it is imported before loading a "
                 "file.".format(cal_type, (cls.__name__, *(x.__name__ for x in cls._get_subclasses())))
-            )
+            ) from e
         return out_cls
 
     def to_json(self) -> str:
@@ -224,7 +224,7 @@ class CalibrationInfo:
 
         """
         data_dict = self._to_list_dict()
-        return json.dump(data_dict, open(path, "w"), cls=NumpyEncoder, indent=4)
+        return json.dump(data_dict, open(path, "w", encoding="utf8"), cls=NumpyEncoder, indent=4)
 
     @classmethod
     def from_json_file(cls: Type[CalInfo], path: Union[str, Path]) -> CalInfo:
@@ -242,7 +242,7 @@ class CalibrationInfo:
             The exact child class is determined by the `cal_type` key in the json string.
 
         """
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf8") as f:
             raw_json = json.load(f)
         check_cal_format_version(raw_json.pop("_format_version", None), cls.CAL_FORMAT_VERSION)
         subclass = cls.find_subclass_from_cal_type(raw_json.pop("cal_type"))

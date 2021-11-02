@@ -14,7 +14,7 @@ def load_v1_json_files(
     base_class: Type[CalibrationInfo] = CalibrationInfo,
 ):
     """Load a exported json file that was created using imucal <= 2.0."""
-    with open(path) as f:
+    with open(path, encoding="utf8") as f:
         json_str = f.read()
     return load_v1_json(json_str, base_class=base_class)
 
