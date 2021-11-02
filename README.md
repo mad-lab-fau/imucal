@@ -97,7 +97,7 @@ If you are using imucal in your scientific work, we would appreciate if you woul
 ```
 Arne Küderle, Nils Roth, & Robert Richer. (2021). 
 mad-lab-fau/imucal: v2.0.2 - Zenodo Release (v2.0.2). Zenodo.
-https://doi.org/10.5281/`zenodo.5639238`
+https://doi.org/10.5281/zenodo.5639238
 ```
 
 ## Contributing
