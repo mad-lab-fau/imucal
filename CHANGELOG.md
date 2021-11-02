@@ -10,6 +10,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - Minor typos
 - Zenodo Release
+- Coverage badge
 
 # [2.0.1] - 02.03.2021
 
