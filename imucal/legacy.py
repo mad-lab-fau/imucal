@@ -2,9 +2,10 @@
 
 import json
 import warnings
-from packaging.version import Version
 from pathlib import Path
 from typing import Union, Type
+
+from packaging.version import Version
 
 from imucal import CalibrationInfo
 

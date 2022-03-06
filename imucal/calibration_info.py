@@ -1,12 +1,12 @@
 """Base Class for all CalibrationInfo objects."""
 import json
 from dataclasses import dataclass, fields, asdict
-from packaging.version import Version
 from pathlib import Path
 from typing import Tuple, Union, TypeVar, ClassVar, Optional, Type, Iterable
 
 import numpy as np
 import pandas as pd
+from packaging.version import Version
 
 CalInfo = TypeVar("CalInfo", bound="CalibrationInfo")
 
@@ -304,9 +304,7 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def check_cal_format_version(
-    version: Optional[Version] = None, current_version: Version = _CAL_FORMAT_VERSION
-):
+def check_cal_format_version(version: Optional[Version] = None, current_version: Version = _CAL_FORMAT_VERSION):
     """Check if a calibration can be loaded with the current loader."""
     # No version means, the old 1.0 format is used that does not provide a version string
     if not version:
