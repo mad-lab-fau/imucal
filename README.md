@@ -1,4 +1,4 @@
-# IMU Calibration
+# IMUCal
 ![Test and Lint](https://github.com/mad-lab-fau/imucal/workflows/Test%20and%20Lint/badge.svg)
 [![codecov](https://codecov.io/gh/mad-lab-fau/imucal/branch/master/graph/badge.svg?token=0OPHTQDYIB)](https://codecov.io/gh/mad-lab-fau/imucal)
 [![Documentation Status](https://readthedocs.org/projects/imucal/badge/?version=latest)](https://imucal.readthedocs.io/en/latest/?badge=latest)
@@ -85,9 +85,9 @@ calibrate our IMUs.
 We are aware that various other methods exist and would love to add them to this package as well.
 Unfortunately, at the moment we can not justify the time investment.
 
-Still, we think that this package provides a suitable framework to implement other calibration emthods with relative
+Still, we think that this package provides a suitable framework to implement other calibration methods with relative
 ease.
-If you would like to contribute such a method, let us know on the github-issue page and we will try to help you as good
+If you would like to contribute such a method, let us know on the github-issue page, and we will try to help you as good
 as possible.
 
 ## Citation
@@ -95,7 +95,7 @@ as possible.
 If you are using imucal in your scientific work, we would appreciate if you would cite or link the project:
 
 ```
-Küderle, A., Roth, N., & Richer, R. 
+Küderle, A., Roth, N., Richer, R., & Eskofier, B., 
 imucal - A Python library to calibrate 6 DOF IMUs (Version 2.0.2) [Computer software].
 https://doi.org/10.5281/zenodo.56392388
 ```
@@ -104,6 +104,5 @@ https://doi.org/10.5281/zenodo.56392388
 
 All project management and development happens through [this Github project](https://github.com/mad-lab-fau/imucal).
 If you have any issues, ideas, or any comments at all, just open a new issue.
-Please be polite and considerate of our time.
-We appreciate everyone who is using our software or even wants to improve it, but sometime other things come in the way,
-and it takes us a couple of days to get back to you.
+We are always happy when people are interested to use our work and would like to support you in this process.
+In particular, we want to welcome contributions of new calibration algorithms, to make this package even more useful for a wider audience.
