@@ -19,7 +19,7 @@ authors:
 affiliations:
   - name: Machine Learning and Data Analytics Lab (MaD Lab), Department Artificial Intelligence in Biomedical Engineering (AIBE), Friedrich-Alexander-Universität Erlangen-Nürnberg (FAU)  
     index: 1
-date: 01 January 2022
+date: 06 March 2022
 bibliography: imucal.bib
 ---
 
@@ -28,7 +28,7 @@ bibliography: imucal.bib
 Inertial measurement units (IMUs) have wide application areas from human movement analysis to commercial drone navigation.
 However, to use modern micro-electromechanical systems (MEMS) based IMUs a calibration is required to transform the raw output of the sensor into physically meaningfully units.
 To obtain such calibrations one needs to perform sets of predefined motions with the sensor unit and then apply calibration algorithm to obtain the required transformation and correction factors for this unit.
-`imucal` implements the calibration algorithm described by Ferraris et al. (TODO: Add cite) and provides functionality to calculate calibration parameters and apply them to new measurements.
+`imucal` implements the calibration algorithm described by Ferraris et al. [@Ferraris1994; @Ferraris1995] and provides functionality to calculate calibration parameters and apply them to new measurements.
 As typically multiple calibrations are recorded per sensor over time, `imucal` further provides a set of opinionated tools to save, organise, and retrieve recorded calibrations.
 This helps to make sure that always the best possible calibration is applied for each recording even when dealing with multiple sensors and docents of measurements.
 
@@ -41,7 +41,7 @@ Various algorithms and protocols exist to perform such a calibration.
 Most of them require the sensor unit to be placed in multiple well-defined orientations relative to gravity to calibrate the accelerometer and rotated either with know angular rate or by a known degree to calibrate the gyroscope.
 From the data recorded in the different phases of the calibrations the correction and transformation parameters for a specific sensor can be calculated.
 
-While multiple of these procedures have been published in literature (TODO: Add cite), for most of them no high-quality code implementations are available.
+While multiple of these procedures have been published in literature, for example [@Skog2006; @Tedaldi2014a; @Ferraris1994; @Kozlov2014; @Qureshi2017; @Scapellato2005; @Zhang2009], for most of them no high-quality code implementations are available.
 Existing implementations that can be found in the internet are usually "one-off" scripts that would require adaption and tinkering to make them usable for custom use-cases.
 Further, many practical aspects of calibrating IMUs, like which information needs to be stored to make sure that a calibration can be correctly applied to a new recording, are usually not discussed in research papers or easily available online.
 
@@ -50,8 +50,16 @@ Hence, well maintained reference implementations of algorithms, clear guidelines
 # Provided Functionality
 
 With `imucal` and its documentation we address all the above needs and hope to even further expand on that in the future based on community feedback.
-`imucal` provides a sensor agnostic object-oriented implementation of the calibration algorithm by Ferraris et al. (TODO: Add citation) and functionality to apply it to new data.
-Further, we provide a simple GUI interface to annotate recorded calibration sessions for the use with the algorithm (TODO: Add image).
+`imucal` provides a sensor agnostic object-oriented implementation of the calibration algorithm by Ferraris et al. [@Ferraris1994,@Ferraris1995] and functionality to apply it to new data.
+Further, we provide a simple GUI interface to annotate recorded calibration sessions for the use with the algorithm (\autoref{fig:ferraris_gui}).
+
+\begin{figure}[!h]
+\includegraphics[width=0.9\textwidth]{img/imucal_ferraris_gui.png}
+\caption{Screenshot of the GUI to annotate recorded Ferraris sessions.
+Each region corresponds to one the required static positions or rotations.
+The annotation is performed using the mous with support for keyboard shortcuts to speed up some interactions.}
+\label{fig:ferraris_gui}
+\end{figure}
 
 When working with sensors and multiple calibrations, storing, and managing them can become complicated.
 Therefore, `imucal` also implements a set of opinionated helpers to store the calibrations and required metadata as json files and functions to retrieve them based on sensor id, datetime, type of calibration, or custom metadata.

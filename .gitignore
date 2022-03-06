@@ -313,3 +313,7 @@ _debug_test
 
 # Compiled doc examples
 docs/examples
+
+# Joss paper
+paper.jats
+paper.pdf
