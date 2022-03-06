@@ -2,7 +2,7 @@
 
 import json
 import warnings
-from distutils.version import StrictVersion
+from packaging.version import Version
 from pathlib import Path
 from typing import Union, Type
 
@@ -45,7 +45,7 @@ def load_v1_json(
 
     # Apply the required modifications:
     json_dict["gyr_unit"] = json_dict.pop("gyro_unit")
-    json_dict["_format_version"] = str(StrictVersion("2.0.0"))
+    json_dict["_format_version"] = str(Version("2.0.0"))
 
     json_str = json.dumps(json_dict)
 

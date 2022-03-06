@@ -1,7 +1,7 @@
 """Base Class for all CalibrationInfo objects."""
 import json
 from dataclasses import dataclass, fields, asdict
-from distutils.version import StrictVersion
+from packaging.version import Version
 from pathlib import Path
 from typing import Tuple, Union, TypeVar, ClassVar, Optional, Type, Iterable
 
@@ -10,7 +10,7 @@ import pandas as pd
 
 CalInfo = TypeVar("CalInfo", bound="CalibrationInfo")
 
-_CAL_FORMAT_VERSION = StrictVersion("2.0.0")
+_CAL_FORMAT_VERSION = Version("2.0.0")
 
 
 @dataclass(eq=False)
@@ -29,7 +29,7 @@ class CalibrationInfo:
 
     """
 
-    CAL_FORMAT_VERSION: ClassVar[StrictVersion] = _CAL_FORMAT_VERSION  # noqa: invalid-name
+    CAL_FORMAT_VERSION: ClassVar[Version] = _CAL_FORMAT_VERSION  # noqa: invalid-name
     CAL_TYPE: ClassVar[str] = None  # noqa: invalid-name
     acc_unit: Optional[str] = None
     gyr_unit: Optional[str] = None
@@ -210,7 +210,7 @@ class CalibrationInfo:
 
         """
         raw_json = json.loads(json_str)
-        check_cal_format_version(StrictVersion(raw_json.pop("_format_version", None)), cls.CAL_FORMAT_VERSION)
+        check_cal_format_version(Version(raw_json.pop("_format_version", None)), cls.CAL_FORMAT_VERSION)
         subclass = cls.find_subclass_from_cal_type(raw_json.pop("cal_type"))
         return subclass._from_list_dict(raw_json)
 
@@ -305,14 +305,14 @@ class NumpyEncoder(json.JSONEncoder):
 
 
 def check_cal_format_version(
-    version: Optional[StrictVersion] = None, current_version: StrictVersion = _CAL_FORMAT_VERSION
+    version: Optional[Version] = None, current_version: Version = _CAL_FORMAT_VERSION
 ):
     """Check if a calibration can be loaded with the current loader."""
     # No version means, the old 1.0 format is used that does not provide a version string
     if not version:
-        version = StrictVersion("1.0.0")
+        version = Version("1.0.0")
     if isinstance(version, str):
-        version = StrictVersion(version)
+        version = Version(version)
 
     if version == current_version:
         return
