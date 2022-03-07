@@ -9,6 +9,7 @@ authors:
     orcid: 0000-0002-5686-281X  
     affiliation: 1
   - name: Nils Roth
+    orcid: 0000-0002-9166-3920
     affiliation: 1
   - name: Robert Richer  
     orcid: 0000-0003-0272-5403  
