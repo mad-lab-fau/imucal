@@ -1,41 +1,41 @@
 .. _ferraris_guide:
 
 ========================================
-Ferraris Calibration - A practical guide
+Ferraris Calibration – A Practical Guide
 ========================================
 
 This guide will provide you a brief overview on how to perform a Ferraris Calibration and provide you with some
-experience based best practices.
+experience-based best practices.
 
 The Ferraris Calibration is a relatively simple calibration for 6 DOF IMUs as it only consists of placing the sensor
 units on each side and rotating them around each axis.
 These motions can either be performed entirely by hand or assisted by a turntable.
 The method was first described by Ferraris et al. in 1994 (full text of the paper is hard to find online, but the
 authors of this package might be able to help you with finding a copy).
-Compared to directly calibrating the Gyroscope using a defined rate of rotation, this method uses a rotation of an fixed
+Compared to directly calibrating the Gyroscope using a defined rate of rotation, this method uses a rotation of a fixed
 angle.
 This makes it feasible to perform the calibration without the use of expensive equipment.
 
-What I need
-===========
+What You Need
+=============
 
 1. A 6 DOF sensor unit that can record or stream the raw IMU data.
-2. (Optional) A calibration adapter for the IMU unit, if the sensor does not have flat perpendicular sides.
+2. (Optional) A calibration adapter for the IMU unit if the sensor does not have flat perpendicular sides.
 3. A flat and level surface
 4. A fixed flat object (like a box) that can be used as rotation guide
 
-Step by step
+Step by Step
 ============
 
 Before you start, you need to decide which directions the sensor axis (x, y, z) should have after the calibration.
-It is not important, in which direction the actual "hardware" axis of the MEMS IMU point.
-The calibration procedure will transform the "hardware" axis into the new calibrated coordinate system, independent of
+It is not important in which direction the actual "hardware" axes of the IMU point.
+The calibration procedure will transform the "hardware" axis into the newly calibrated coordinate system, independent of
 the orientation.
-Note, that the calibrated coordinate system must be right-handed.
+Note, that the calibrated coordinate system must be **right-handed**.
 
-1. Check that your surface is level and during the procedure avoid moving/bumping the surface
+1. Check that your surface is level. During the procedure, avoid moving/bumping the surface
 2. (Optional) Place the sensor unit in its calibration adapter.
-   Make sure that it does not wobble and use the same orientation, when calibrating multiple sensor units.
+   Make sure that it does not wobble and use the same orientation when calibrating multiple sensor units.
 3. Place the sensor on the flat surface in a way that the calibrated x-axis points upwards.
    In this configuration, mark the top left corner using a marker or a sticker.
    We will use it as guide for all further calibration positions (see image).
@@ -52,8 +52,8 @@ Note, that the calibrated coordinate system must be right-handed.
    Slowly move it forward a little, perform the rotation and press it against the box to mark the end position.
    This ensures that you really performed a rotation of 360 deg.
    Avoid, wobbling/tilting the sensor during the rotation.
-   If this is difficult, consider designing calibration adapter with larger flat surfaces.
-   This is the most sensitive part of the calibration.
+   If this is difficult, consider designing a calibration adapter with larger flat surfaces.
+   **Note:** This is the most sensitive part of the calibration!
    Therefore, go slow and consistent to avoid additional movements that should not be part of the rotation.
 6. End your recording and load the data onto a PC.
    Then follow :ref:`the code part of this tutorial <basic_ferraris>`.
@@ -69,11 +69,11 @@ General Tips and Gotchas
 - It is always advisable to perform sanity checks of the calculated results!
 - For the rotations, make sure the final signal used for the calibration contains only the rotation and little to no
   resting or other movements before and after.
-  Because the calibration uses an integration, such additional signals would introduce additional errors.
+  Because the calibration uses an integration, such additional movements would introduce calibration errors.
 - If you have multiple sensors to calibrate, make sure you think of a way to store and retrieve the calibration
   information.
   For further information on this, read :ref:`our dedicated guide on this topic <cal_store_guide>`
-- Be aware of the signal units before and after calibration.
+- Be aware of the signal units before and after calibration!
   Some sensor units provide data in a raw format (voltage or bits) with no real unit (a.u.), while others will provide
   the data in physical units.
   Independent of the input, the Ferraris Calibration will find a transformation to convert these values to m/s^2 and
