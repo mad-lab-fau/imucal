@@ -18,7 +18,7 @@ This management system should fulfill the following requirements:
 
 
 Storing Meta-information for Calibrations
-========================================
+=========================================
 
 To store the actual calibration information, you can simply use the :meth:`~imucal.CalibrationInfo.to_json_file` and
 :meth:`~imucal.CalibrationInfo.to_hdf5` methods of the :class:`~imucal.CalibrationInfo` objects.
@@ -44,7 +44,7 @@ implementation of option 1 (that we use internally as well) and provide further 
 be useful.
 
 Which Meta-information Should I Save?
-------------------------------------
+-------------------------------------
 
 Primarily, the meta-information is there to ensure that you apply the correct calibration to the correct recordings.
 This means you should at least store the following:

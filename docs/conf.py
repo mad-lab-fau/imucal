@@ -114,9 +114,9 @@ html_static_path = ["_static"]
 
 # intersphinx configuration
 intersphinx_module_mapping = {
-    "numpy": ("https://numpy.org/doc/stable", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy-1.8.0/html-scipyorg/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
 }
 
 intersphinx_mapping = {
