@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) (+ the Migration Guide section), and 
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [2.1.0] - 08.03.2022
+
+- switched from `distutils` to `packaging` for version handling.
+- Added a paper describing the basics of imucal for submission in JOSS
+- Fixed small issues in README and docs
+- manual gui test is working again
+- dependency updates
+
 # [2.0.2] - 02.11.2021
 
 ### Changed
