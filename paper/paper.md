@@ -80,5 +80,5 @@ Documentation can be found on [Read the Docs](https://imucal.readthedocs.io/).
 
 # Acknowledgments
 
-`imucal` was developed to solve the chaos of random calibration scripts, old calibrations in unknown formats on shared folders, and general uncertainty when it came to calibrating or finding calibrations for one of the hundreds if self-build or off-the-shelf IMU units at the MaD Lab.
+`imucal` was developed to solve the chaos of random calibration scripts, old calibrations in unknown formats on shared folders, and general uncertainty when it came to calibrating or finding calibrations for one of the hundreds of self-build or off-the-shelf IMU units at the MaD Lab.
 Therefore, we would like to thank all members of the team and our students for their feedback and suggestions when working with the library.
