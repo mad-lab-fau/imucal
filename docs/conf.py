@@ -124,7 +124,7 @@ intersphinx_mapping = {
     **intersphinx_module_mapping,
 }
 
-# Sphinx Gallary
+# Sphinx Gallery
 sphinx_gallery_conf = {
     "examples_dirs": ["../examples"],
     "gallery_dirs": ["./auto_examples"],
