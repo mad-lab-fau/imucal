@@ -34,7 +34,7 @@ disk and load them again.
 Data Preparation Helper
 -----------------------
 
-Helper Functions to generate valid input data for Ferraris like calibrations.
+Helper Functions to generate valid input data for Ferraris-like calibrations.
 
 .. currentmodule:: imucal
 .. autosummary::
@@ -95,7 +95,7 @@ Legacy Support
 Label GUI
 =========
 The gui label class.
-Normally you do not need to interact with these directly.
+Normally, you do not need to interact with these directly.
 
 .. currentmodule:: imucal.calibration_gui
 

@@ -7,6 +7,8 @@ authors:
   given-names: "Nils"
 - family-names: "Richer"
   given-names: "Robert"
+- family-names: "Eskofier"
+  given-names: "Bjoern M."
 title: "imucal - A Python library to calibrate 6 DOF IMUs"
 version: 2.0.2
 doi: 10.5281/zenodo.5639238
