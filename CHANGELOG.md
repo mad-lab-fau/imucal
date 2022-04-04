@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) (+ the Migration Guide section), and 
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [2.1.1] - 04.04.2022
+
+- Looser version requirements for typing-extensions
+
 # [2.1.0] - 08.03.2022
 
 - switched from `distutils` to `packaging` for version handling.
