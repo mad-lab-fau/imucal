@@ -226,7 +226,7 @@ class FerrarisCalibration:
 
         # Calculate Scaling matrix
         # Eq. 23
-        k_a_sq = 1 / (4 * self.grav ** 2) * np.diag(U_a_d @ U_a_d.T)
+        k_a_sq = 1 / (4 * self.grav**2) * np.diag(U_a_d @ U_a_d.T)
         K_a = np.diag(np.sqrt(k_a_sq))  # noqa: invalid_name
         cal_mat.K_a = K_a  # noqa: invalid_name
 
