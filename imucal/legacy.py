@@ -11,8 +11,7 @@ from imucal import CalibrationInfo
 
 
 def load_v1_json_files(
-    path: Union[Path, str],
-    base_class: Type[CalibrationInfo] = CalibrationInfo,
+    path: Union[Path, str], base_class: Type[CalibrationInfo] = CalibrationInfo,
 ):
     """Load a exported json file that was created using imucal <= 2.0."""
     with open(path, encoding="utf8") as f:
@@ -21,8 +20,7 @@ def load_v1_json_files(
 
 
 def load_v1_json(
-    json_str: str,
-    base_class: Type[CalibrationInfo] = CalibrationInfo,
+    json_str: str, base_class: Type[CalibrationInfo] = CalibrationInfo,
 ):
     """Load a json string that was created using imucal <= 2.0."""
     warnings.warn(
