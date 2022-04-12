@@ -105,3 +105,42 @@ All project management and development happens through [this GitHub project](htt
 If you have any issues, ideas, or any comments at all, just open a new issue.
 We are always happy when people are interested to use our work and would like to support you in this process.
 In particular, we want to welcome contributions of new calibration algorithms, to make this package even more useful for a wider audience.
+
+## Dev Setup
+
+We use [poetry](https://python-poetry.org) to manage our dependencies.
+Therefore, you need to first install Poetry locally on you machine.
+
+Then you can run the following command to install a local development version of this library in a dedicated venv.
+
+```
+poetry install -E calplot -E h5py
+```
+
+To run tests/the linter/... we use [doit](https://pydoit.org/tasks.html).
+You can see all available commands by running:
+
+```
+poetry run doit list
+```
+
+and execute any command by running
+
+```
+poetry run doit <command-name>
+```
+
+### Updating dependencies
+
+If you update or add dependencies using (`poetry add` or `poetry update`) you will see that the `pyproject.toml` and the `poetry.lock` files are both updated.
+This might take a while (>10 min) depending on the dependency you updated.
+Unfortunately, we can not do anything about that at the moment.
+Make sure you commit the changes to **both** files.
+Otherwise, wrong versions of dependencies will be used in the CI and by other developers.
+
+In case you update dependencies by directly editing the `pyproject.toml` file, you need to be very careful and make sure, you run `poetry lock [--no-update]` afterwards.
+Otherwise, the lock file will be out of date.
+
+In general, it is a good idea to just run `poetry update` from time to time.
+This will install the latest version of all dependencies that are still allowed by the version constrains in the `pyproject.toml`.
+This allows to check, if everything still works well with the newest versions of all libraries.
