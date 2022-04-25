@@ -6,6 +6,7 @@
 [![PyPI](https://img.shields.io/pypi/v/imucal)](https://pypi.org/project/imucal/)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/imucal)
 [![DOI](https://zenodo.org/badge/307143332.svg)](https://zenodo.org/badge/latestdoi/307143332)
+[![status](https://joss.theoj.org/papers/3dd1a7dd5ba06ce024326eee2e9be148/status.svg)](https://joss.theoj.org/papers/3dd1a7dd5ba06ce024326eee2e9be148)
 
 This package provides methods to calculate and apply calibrations for 6 DOF IMUs based on multiple different methods.
 
