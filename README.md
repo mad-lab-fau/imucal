@@ -15,6 +15,8 @@ So far supported are:
 - Ferraris Calibration ([Ferraris1994](https://www.sciencedirect.com/science/article/pii/0924424794800316) / [Ferraris1995](https://www.researchgate.net/publication/245080041_Calibration_of_three-axial_rate_gyros_without_angular_velocity_standards))
 - Ferraris Calibration using a Turntable
 
+For more information check the quickstart guide below and the [documentation](https://imucal.readthedocs.io/en/latest/).
+
 ## Installation
 
 ```
@@ -37,6 +39,13 @@ In this implementation, these parts are referred to as `{acc,gyr}_{x,y,z}_{p,a}`
 As example, `acc_y_a` would be the 3D-acceleration data measured during a static phase, where the **y-axis** was 
 oriented **antiparallel** to the gravitation vector.
 
+For the calibration, you need to separate your data into these individual sections.
+If you already recorded them separately or know where each section starts and ends in a continuous recording, you can 
+use [`ferraris_regions_from_df`](https://imucal.readthedocs.io/en/latest/modules/generated/imucal.ferraris_regions_from_df.html)] 
+and [`ferraris_regions_from_section_list`](https://imucal.readthedocs.io/en/latest/modules/generated/imucal.ferraris_regions_from_section_list.html),
+respectively to convert the data into the correct format for the calibration (`section_data` in the snippet below).
+
+If you don't have that information yet, we recommend to use the included GUI to annotate the data.
 To annotate a Ferraris calibration session that was recorded in a single go, you can use the following code snippet.  
 **Note**: This will open an interactive Tkinter plot. Therefore, this will only work on your local PC and not on a server or remote hosted Jupyter instance.
 
@@ -53,7 +62,9 @@ section_data, section_list = ferraris_regions_from_interactive_plot(
 section_list.to_csv('./calibration_sections.csv')  # This is optional, but recommended
 ```
 
-Now you can perform the calibration:
+Independent of how you obtained the `section_data` in the correct format, you can now calculate the calibration
+parameters:
+
 ```python
 from imucal import FerrarisCalibration
 
