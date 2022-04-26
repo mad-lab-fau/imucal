@@ -30,6 +30,14 @@ You can install it using:
 pip install imucal[calplot]
 ```
 
+### Supported Python versions and Platforms
+
+`imucal` is officially tested on Python 3.7, 3.8, and 3.9..
+It should work on Python 3.10. as well, except for the hdf5 export feature of the calibration data.
+This feature depends on `hd5py` which currently seems to cause some issues on Python 3.10..
+Similarly, you might run into some issues on ARM based MacBooks, as `hd5py` does not seem to be properly supported yet.
+However, as `hd5py` is only an optional dependency, you can still use `imucal` without it.
+
 ## Quickstart
 This package implements the IMU-infield calibration based on [Ferraris1995](https://www.researchgate.net/publication/245080041_Calibration_of_three-axial_rate_gyros_without_angular_velocity_standards).
 This calibration method requires the IMU data from 6 static positions (3 axes parallel and antiparallel to the gravitation
