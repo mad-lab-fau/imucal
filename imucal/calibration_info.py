@@ -287,11 +287,17 @@ class CalibrationInfo:
         with h5py.File(path, "r") as hdf:
             format_version = hdf.get("_format_version")
             if format_version:
-                format_version = format_version[()]
+                format_version = format_version.asstr()[()] # type: ignore
             check_cal_format_version(format_version, cls.CAL_FORMAT_VERSION)
-            subcls = cls.find_subclass_from_cal_type(hdf["cal_type"][()])
-            data = {k.name: hdf.get(k.name)[()] for k in fields(subcls)}
-
+            subcls = cls.find_subclass_from_cal_type(hdf["cal_type"][()].decode("utf-8"))
+            data = {}
+            for k in fields(subcls):
+                try:
+                    # String data
+                    data[k.name] = hdf.get(k.name).asstr()[()]
+                except TypeError:
+                    # No string data
+                    data[k.name] = hdf.get(k.name)[()]
         return subcls._from_list_dict(data)
 
 
