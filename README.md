@@ -38,10 +38,11 @@ In this implementation, these parts are referred to as `{acc,gyr}_{x,y,z}_{p,a}`
 `{acc,gyr}_{x,y,z}_rot` for the rotations.
 As example, `acc_y_a` would be the 3D-acceleration data measured during a static phase, where the **y-axis** was 
 oriented **antiparallel** to the gravitation vector.
+For more information on how to perform the calibration check [our guide](https://imucal.readthedocs.io/en/latest/guides/ferraris_guide.html).
 
 For the calibration, you need to separate your data into these individual sections.
 If you already recorded them separately or know where each section starts and ends in a continuous recording, you can 
-use [`ferraris_regions_from_df`](https://imucal.readthedocs.io/en/latest/modules/generated/imucal.ferraris_regions_from_df.html)] 
+use [`ferraris_regions_from_df`](https://imucal.readthedocs.io/en/latest/modules/generated/imucal.ferraris_regions_from_df.html)
 and [`ferraris_regions_from_section_list`](https://imucal.readthedocs.io/en/latest/modules/generated/imucal.ferraris_regions_from_section_list.html),
 respectively to convert the data into the correct format for the calibration (`section_data` in the snippet below).
 
