@@ -6,7 +6,6 @@ from typing import Tuple, Union, TypeVar, ClassVar, Optional, Type, Iterable
 
 import numpy as np
 import pandas as pd
-from h5py import check_string_dtype
 from packaging.version import Version
 
 CalInfo = TypeVar("CalInfo", bound="CalibrationInfo")
@@ -294,7 +293,7 @@ class CalibrationInfo:
             data = {}
             for k in fields(subcls):
                 dp = hdf.get(k.name)
-                if check_string_dtype(dp.dtype):
+                if h5py.check_string_dtype(dp.dtype):
                     # String data
                     data[k.name] = dp.asstr()[()]
                 else:
