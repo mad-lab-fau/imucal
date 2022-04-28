@@ -20,4 +20,4 @@ build:
       - asdf global poetry latest
       - poetry config virtualenvs.create false
     post_install:
-      - poetry install
+      - poetry install -E calplot
