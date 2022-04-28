@@ -15,7 +15,9 @@ build:
     python: "3.8"
   jobs:
     pre_create_environment:
-      - pip install poetry
+      - asdf plugin add poetry
+      - asdf install poetry latest
+      - asdf global poetry latest
       - poetry config virtualenvs.create false
     post_install:
       - poetry install
