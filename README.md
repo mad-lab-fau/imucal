@@ -5,7 +5,6 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PyPI](https://img.shields.io/pypi/v/imucal)](https://pypi.org/project/imucal/)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/imucal)
-[![DOI](https://zenodo.org/badge/307143332.svg)](https://zenodo.org/badge/latestdoi/307143332)
 [![status](https://joss.theoj.org/papers/3dd1a7dd5ba06ce024326eee2e9be148/status.svg)](https://joss.theoj.org/papers/3dd1a7dd5ba06ce024326eee2e9be148)
 
 This package provides methods to calculate and apply calibrations for 6 DOF IMUs based on multiple different methods.
@@ -112,13 +111,7 @@ as possible.
 
 ## Citation
 
-If you are using `imucal` in your scientific work, we would appreciate if you would cite or link the project:
-
-```
-Küderle, A., Roth, N., Richer, R., & Eskofier, B. M., 
-imucal - A Python library to calibrate 6 DOF IMUs (Version 2.0.2) [Computer software].
-https://doi.org/10.5281/zenodo.56392388
-```
+If you are using `imucal` in your scientific work, we would appreciate if you would cite our [JOSS paper](https://joss.theoj.org/papers/3dd1a7dd5ba06ce024326eee2e9be148) or link the project.
 
 ## Contributing
 
