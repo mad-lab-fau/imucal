@@ -53,13 +53,9 @@ With `imucal` and its documentation, we address all the above needs and hope to 
 The library provides a sensor-agnostic object-oriented implementation of the calibration algorithm by Ferraris et al. [@Ferraris1994,@Ferraris1995] and functionality to apply it to new data.
 Further, we provide a simple GUI interface to annotate recorded calibration sessions (\autoref{fig:ferraris_gui}).
 
-\begin{figure}[!h]
-\includegraphics[width=0.9\textwidth]{img/imucal_ferraris_gui.png}
-\caption{Screenshot of the GUI to annotate recorded Ferraris sessions.
+![Screenshot of the GUI to annotate recorded Ferraris sessions.
 Each region corresponds to one of the required static positions or rotations.
-The annotation is performed using the mouse with support for keyboard shortcuts to speed up some interactions.}
-\label{fig:ferraris_gui}
-\end{figure}
+The annotation is performed using the mouse with support for keyboard shortcuts to speed up some interactions.\label{fig:ferraris_gui}](img/imucal_ferraris_gui.png)
 
 When working with sensors and multiple calibrations, storing and managing them can become complicated.
 Therefore, `imucal` also implements a set of opinionated helpers to store the calibrations and required metadata as _.json_ files and functions to retrieve them based on sensor ID, date, type of calibration, or custom metadata.
