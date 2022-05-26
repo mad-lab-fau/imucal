@@ -3,13 +3,40 @@ message: "If you use this software, please cite it as below."
 authors:
 - family-names: "Küderle"
   given-names: "Arne"
+  orcid: "https://orcid.org/0000-0002-5686-281X"
 - family-names: "Roth"
   given-names: "Nils"
+  orcid: "https://orcid.org/0000-0002-9166-3920"
 - family-names: "Richer"
   given-names: "Robert"
+  orcid: "https://orcid.org/0000-0003-0272-5403"
 - family-names: "Eskofier"
   given-names: "Bjoern M."
+  orcid: "https://orcid.org/0000-0002-0417-0336"
 title: "imucal - A Python library to calibrate 6 DOF IMUs"
 version: 2.0.2
-doi: 10.5281/zenodo.5639238
+doi: 10.17605/OSF.IO/37TD9
 url: "https://github.com/mad-lab-fau/imucal"
+
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Küderle"
+    given-names: "Arne"
+    orcid: "https://orcid.org/0000-0002-5686-281X"
+  - family-names: "Roth"
+    given-names: "Nils"
+    orcid: "https://orcid.org/0000-0002-9166-3920"
+  - family-names: "Richer"
+    given-names: "Robert"
+    orcid: "https://orcid.org/0000-0003-0272-5403"
+  - family-names: "Eskofier"
+    given-names: "Bjoern M."
+    orcid: "https://orcid.org/0000-0002-0417-0336"
+  doi: 10.21105/joss.04338
+  journal: "Journal of Open Source Software"
+  start: 4338
+  title: "imucal - A Python library to calibrate 6 DOF IMUs"
+  issue: 73
+  volume: 7
+  year: 2022
