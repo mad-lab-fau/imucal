@@ -114,7 +114,9 @@ as possible.
 If you are using `imucal` in your scientific work, we would appreciate if you would cite our [JOSS paper](https://joss.theoj.org/papers/3dd1a7dd5ba06ce024326eee2e9be148) or link the project.
 
 ```
-Küderle, Arne, Nils Roth, Robert Richer, and Bjoern M. Eskofier. “Imucal - A Python Library to Calibrate 6 DOF IMUs.” Journal of Open Source Software 7, no. 73 (May 26, 2022): 4338. https://doi.org/10.21105/joss.04338.
+Küderle, Arne, Nils Roth, Robert Richer, and Bjoern M. Eskofier. 
+“Imucal - A Python Library to Calibrate 6 DOF IMUs.”
+Journal of Open Source Software 7, no. 73 (May 26, 2022): 4338. https://doi.org/10.21105/joss.04338.
 ```
 
 ## Contributing
