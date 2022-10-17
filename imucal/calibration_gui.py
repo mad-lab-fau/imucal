@@ -6,7 +6,6 @@ from tkinter.messagebox import showinfo
 from typing import Sequence, Optional
 
 import numpy as np
-import pandas as pd
 
 
 class CalibrationGui:
@@ -206,15 +205,6 @@ class CalibrationGui:
 
     def _n_labels(self):
         return sum((all(v) for v in self.section_list.values()))
-
-
-def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame) -> pd.DataFrame:
-    out = {}
-
-    for label, row in section_list.iterrows():
-        out[label] = data.iloc[row.start : row.end]
-
-    return pd.concat(out)
 
 
 def _create_figure(acc, gyro):

@@ -12,6 +12,15 @@ from imucal.ferraris_calibration_info import FerrarisCalibrationInfo, TurntableC
 T = TypeVar("T", bound="FerrarisCalibration")
 
 
+def _convert_data_from_section_list_to_df(data: pd.DataFrame, section_list: pd.DataFrame) -> pd.DataFrame:
+    out = {}
+
+    for label, row in section_list.iterrows():
+        out[label] = data.iloc[row.start : row.end]
+
+    return pd.concat(out)
+
+
 class FerrarisSignalRegions(NamedTuple):
     """NamedTuple containing all signal regions required for a Ferraris Calibration."""
 
@@ -443,8 +452,6 @@ def ferraris_regions_from_section_list(
     ferraris_regions_from_df
 
     """
-    from imucal.calibration_gui import _convert_data_from_section_list_to_df  # noqa: import-outside-toplevel
-
     df = _convert_data_from_section_list_to_df(data, section_list)
     return ferraris_regions_from_df(df, acc_cols=acc_cols, gyr_cols=gyr_cols)
 
