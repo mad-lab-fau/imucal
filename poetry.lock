@@ -1106,7 +1106,7 @@ h5py = ["h5py"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<4.0"
-content-hash = "cd3bf82648ba8c880553cd83701ef8fe7713e822e674212ab6960a8d159c0877"
+content-hash = "3b8a9adaa7682ff845b47307eb1d08311c5e1c18ed7788bef3473659a839896f"
 
 [metadata.files]
 alabaster = [

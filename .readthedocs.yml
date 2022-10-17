@@ -14,10 +14,7 @@ build:
   tools:
     python: "3.8"
   jobs:
-    pre_create_environment:
-      - asdf plugin add poetry
-      - asdf install poetry latest
-      - asdf global poetry latest
-      - poetry config virtualenvs.create false
     post_install:
-      - poetry install -E calplot
+      - pip install poetry
+      - poetry config virtualenvs.create false
+      - poetry install -E calplot -E h5py
