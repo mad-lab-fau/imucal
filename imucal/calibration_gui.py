@@ -2,8 +2,8 @@
 import tkinter as tk  # noqa: import-error
 from collections import OrderedDict
 from itertools import chain
-from tkinter.messagebox import showinfo
-from typing import Sequence, Optional  # noqa: import-error
+from tkinter.messagebox import showinfo  # noqa: import-error
+from typing import Sequence, Optional
 
 import numpy as np
 
