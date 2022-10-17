@@ -67,7 +67,7 @@ def save_calibration_info(
     """
     if not sensor_id.isalnum():
         raise ValueError(
-            "Sensor ids must be alphanumerical characters to not interfere with pattern matching in the " "file name."
+            "Sensor ids must be alphanumerical characters to not interfere with pattern matching in the file name."
         )
     folder = Path(folder) / folder_structure.format(sensor_id=sensor_id, cal_info=cal_info, **kwargs)
     folder.mkdir(parents=True, exist_ok=True)
@@ -276,7 +276,7 @@ def load_calibration_info(
             file_type = "hdf"
         else:
             raise ValueError(
-                "The loader format could not be determined from the file suffix." "Please specify `format` explicitly."
+                "The loader format could not be determined from the file suffix. Please specify `format` explicitly."
             )
     if file_type not in format_options:
         raise ValueError("`format` must be one of {}".format(list(format_options.keys())))
