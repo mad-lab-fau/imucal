@@ -1,9 +1,9 @@
 """Helper providing a small GUI to label timeseries data."""
-import tkinter as tk
+import tkinter as tk  # noqa: import-error
 from collections import OrderedDict
 from itertools import chain
 from tkinter.messagebox import showinfo
-from typing import Sequence, Optional
+from typing import Sequence, Optional  # noqa: import-error
 
 import numpy as np
 
