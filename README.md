@@ -33,9 +33,6 @@ pip install imucal[calplot]
 
 `imucal` is officially tested on Python 3.7, 3.8, 3.9 and 3.10.
 It should further work with all major operating systems.
-However, you might run into some issues on ARM based MacBooks, as `hd5py` does not seem to be properly supported yet.
-However, as `hd5py` is only an optional dependency, you can still use `imucal` without it, if you do not need support
-for HDF5 import or export of calibration files.
 
 ## Quickstart
 This package implements the IMU-infield calibration based on [Ferraris1995](https://www.researchgate.net/publication/245080041_Calibration_of_three-axial_rate_gyros_without_angular_velocity_standards).
