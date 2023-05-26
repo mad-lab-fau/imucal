@@ -1,0 +1,107 @@
+line-length = 120
+target-version = "py38"
+
+select = [
+    # pyflakes
+    "F",
+    # pycodestyle
+    "E",
+    "W",
+    # mccabe
+    "C90",
+    # isort
+    "I",
+    # pydocstyle
+    "D",
+    # pyupgrade
+    "UP",
+    # pep8-naming
+    "N",
+    # flake8-blind-except
+    "BLE",
+    # flake8-2020
+    "YTT",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger
+    "T10",
+    # flake8-errmsg
+    "EM",
+    # flake8-implicit-str-concat
+    "ISC",
+    # flake8-pytest-style
+    "PT",
+    # flake8-return
+    "RET",
+    # flake8-simplify
+    "SIM",
+    # flake8-unused-arguments
+    "ARG",
+    # pandas-vet
+    "PD",
+    # pygrep-hooks
+    "PGH",
+    # flake8-bugbear
+    "B",
+    # flake8-quotes
+    "Q",
+    # pylint
+    "PL",
+    # flake8-pie
+    "PIE",
+    # flake8-type-checking
+    "TCH",
+    # tryceratops
+    "TRY",
+    # flake8-use-pathlib
+    "PTH",
+    "RUF"
+]
+
+ignore = [
+    # controversial
+    "B006",
+    # controversial
+    "B008",
+    "B010",
+    # Magic constants
+    "PLR2004",
+    # Strings in error messages
+    "EM101",
+    "EM102",
+    "EM103",
+    # Multiline docstring summary
+    "D213",
+    # Varaibles before return
+    "RET504",
+    # Abstract raise into inner function
+    "TRY301",
+    # Use type-checking block
+    "TCH001",
+    "TCH002",
+    "TCH003",
+    # df as varaible name
+    "PD901",
+    # melt over stack
+    "PD013",
+    # I like more arguments
+    "PLR0913",
+    # I like long error messages
+    "TRY003"
+]
+
+
+exclude = [
+    "doc/sphinxext/*.py",
+    "doc/build/*.py",
+    "doc/temp/*.py",
+    ".eggs/*.py",
+    "example_data",
+    "examples"
+]
+
+
+[pydocstyle]
+convention = "numpy"

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) (+ the Migration Guide section), and 
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [2.4.0] - 26.05.2023
+
+- Tooling overhal to make the development process easier and fix doc building issues
+- Changed some ValueError to TypeError
 
 # [2.3.1] - 17.10.2022
 

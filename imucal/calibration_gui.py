@@ -2,7 +2,7 @@
 import tkinter as tk  # noqa: import-error
 from collections import OrderedDict
 from itertools import chain
-from tkinter.messagebox import showinfo  # noqa: import-error
+from tkinter.messagebox import showinfo  # : import-error
 from typing import Sequence, Optional
 
 import numpy as np
@@ -69,8 +69,8 @@ class CalibrationGui:
             Parent window if GUI should be embedded in larger application
 
         """
-        import matplotlib  # noqa: import-outside-toplevel
-        from matplotlib.backends.backend_tkagg import (  # noqa: import-outside-toplevel
+        import matplotlib  # : import-outside-toplevel
+        from matplotlib.backends.backend_tkagg import (  # : import-outside-toplevel
             FigureCanvasTkAgg,
             NavigationToolbar2Tk,
         )
@@ -79,16 +79,16 @@ class CalibrationGui:
         cmap = matplotlib.cm.get_cmap("Set3")
         self.colors = {k: matplotlib.colors.to_hex(cmap(i / 12)) for i, k in enumerate(expected_labels)}
 
-        self.text_label = "Labels set: {{}}/{}".format(len(expected_labels))
+        self.text_label = f"Labels set: {{}}/{len(expected_labels)}"
 
         if not master:
             master = tk.Tk()
 
         master.title(title or "Calibration Gui")
-        master.bind("<Return>", lambda x: self._select_next(self.labels.curselection()[0]))
+        master.bind("<Return>", lambda _: self._select_next(self.labels.curselection()[0]))
 
         # reset variables
-        self.section_list = OrderedDict(((k, [None, None]) for k in expected_labels))
+        self.section_list = OrderedDict((k, [None, None]) for k in expected_labels)
         self.acc_list_markers = {k: [] for k in expected_labels}
         self.gyro_list_markers = {k: [] for k in expected_labels}
 
@@ -177,7 +177,6 @@ class CalibrationGui:
         self._update_list_box()
 
     def _update_marker(self, key):
-
         for line in chain(self.acc_list_markers[key], self.gyro_list_markers[key]):
             line.remove()
             self.acc_list_markers[key] = []
@@ -204,11 +203,11 @@ class CalibrationGui:
         self.fig.canvas.flush_events()
 
     def _n_labels(self):
-        return sum((all(v) for v in self.section_list.values()))
+        return sum(all(v) for v in self.section_list.values())
 
 
 def _create_figure(acc, gyro):
-    from matplotlib.figure import Figure  # noqa: import-outside-toplevel
+    from matplotlib.figure import Figure  # : import-outside-toplevel
 
     fig = Figure(figsize=(20, 10))
     ax1 = fig.add_subplot(211)

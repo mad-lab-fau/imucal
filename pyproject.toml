@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "imucal"
-version = "2.3.1"
+version = "2.4.0"
 description = "A Python library to calibrate 6 DOF IMUs"
 authors = [
     "Arne Küderle <arne.kuederle@fau.de>",
@@ -32,24 +32,22 @@ h5py = {version = ">=3", optional = true}
 calplot = ["matplotlib"]
 h5py = ["h5py"]
 
-[tool.poetry.dev-dependencies]
-doit = "^0.33.1"
+[tool.poetry.group.dev.dependencies]
 pytest = "^6.1.1"
 pytest-cov = "^2.10.1"
 coverage = "^5.3"
-prospector = "^1.7.6"
-black = "^22.3.0"
-sphinx-gallery = "^0.10.1"
-Sphinx = "^4.4.0"
+prospector = "^1.10.2"
+sphinx-gallery = "^0.13.0"
+Sphinx = "^7.0.1"
 numpydoc = "^1.2.0"
-pydata-sphinx-theme = "^0.8.0"
 recommonmark = "^0.7.1"
 memory-profiler = "^0.58.0"
 Pillow = "^8.0.1"
 toml = "^0.10.2"
-
-[tool.poetry.group.dev.dependencies]
-toml = "^0.10.2"
+pydata-sphinx-theme = "^0.13.3"
+black = "^23.3.0"
+poethepoet = "^0.20.0"
+ruff = "^0.0.270"
 
 [tool.black]
 line-length = 120
@@ -71,6 +69,18 @@ exclude = '''
   )/
 )
 '''
+
+[tool.poe.tasks]
+_format_black = "black ."
+_format_ruff = "ruff . --fix-only --exit-zero"
+format = ["_format_black", "_format_ruff", "_format_black"]
+lint = { cmd = "ruff imucal --fix", help = "Lint all files with ruff." }
+_lint_ci = "ruff imucal --format=github"
+_check_black = "black . --check"
+ci_check = { sequence = ["_check_black", "_lint_ci"], help = "Check all potential format and linting issues." }
+test = { cmd = "pytest --cov imucal --cov-report=term-missing --cov-report=xml", help = "Run Pytest with coverage." }
+docs = { "script" = "_tasks:task_docs()",  help = "Build the html docs using Sphinx." }
+bump_version = { "script" = "_tasks:task_update_version()" }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

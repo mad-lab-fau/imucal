@@ -1,8 +1,8 @@
 """Base Class for all CalibrationInfo objects."""
 import json
-from dataclasses import dataclass, fields, asdict
+from dataclasses import asdict, dataclass, fields
 from pathlib import Path
-from typing import Tuple, Union, TypeVar, ClassVar, Optional, Type, Iterable
+from typing import ClassVar, Iterable, Optional, Tuple, Type, TypeVar, Union
 
 import numpy as np
 import pandas as pd
@@ -29,8 +29,8 @@ class CalibrationInfo:
 
     """
 
-    CAL_FORMAT_VERSION: ClassVar[Version] = _CAL_FORMAT_VERSION  # noqa: invalid-name
-    CAL_TYPE: ClassVar[str] = None  # noqa: invalid-name
+    CAL_FORMAT_VERSION: ClassVar[Version] = _CAL_FORMAT_VERSION  # : invalid-name
+    CAL_TYPE: ClassVar[str] = None  # : invalid-name
     acc_unit: Optional[str] = None
     gyr_unit: Optional[str] = None
     from_acc_unit: Optional[str] = None
@@ -132,7 +132,7 @@ class CalibrationInfo:
         """
         # Check type:
         if not isinstance(other, self.__class__):
-            raise ValueError("Comparison is only defined between two {} object!".format(self.__class__.__name__))
+            raise TypeError(f"Comparison is only defined between two {self.__class__.__name__} object!")
 
         # Test keys equal:
         if fields(self) != fields(other):
@@ -146,10 +146,7 @@ class CalibrationInfo:
         for f in fields(self):
             a1 = getattr(self, f.name)
             a2 = getattr(other, f.name)
-            if isinstance(a1, np.ndarray):
-                equal = np.array_equal(a1, a2)
-            else:
-                equal = a1 == a2
+            equal = np.array_equal(a1, a2) if isinstance(a1, np.ndarray) else a1 == a2
             if not equal:
                 return False
         return True
@@ -175,10 +172,10 @@ class CalibrationInfo:
     @classmethod
     def find_subclass_from_cal_type(cls, cal_type):
         """Get a SensorCalibration subclass that handles the specified calibration type."""
-        if cls.CAL_TYPE == cal_type:
+        if cal_type == cls.CAL_TYPE:
             return cls
         try:
-            out_cls = next(x for x in cls._get_subclasses() if x.CAL_TYPE == cal_type)
+            out_cls = next(x for x in cls._get_subclasses() if cal_type == x.CAL_TYPE)
         except StopIteration as e:
             raise ValueError(
                 "No suitable calibration info class could be found for caltype `{}`. "
@@ -224,7 +221,7 @@ class CalibrationInfo:
 
         """
         data_dict = self._to_list_dict()
-        return json.dump(data_dict, open(path, "w", encoding="utf8"), cls=NumpyEncoder, indent=4)
+        return json.dump(data_dict, Path(path).open("w", encoding="utf8"), cls=NumpyEncoder, indent=4)
 
     @classmethod
     def from_json_file(cls: Type[CalInfo], path: Union[str, Path]) -> CalInfo:
@@ -242,7 +239,7 @@ class CalibrationInfo:
             The exact child class is determined by the `cal_type` key in the json string.
 
         """
-        with open(path, "r", encoding="utf8") as f:
+        with Path(path).open(encoding="utf8") as f:
             raw_json = json.load(f)
         check_cal_format_version(raw_json.pop("_format_version", None), cls.CAL_FORMAT_VERSION)
         subclass = cls.find_subclass_from_cal_type(raw_json.pop("cal_type"))
@@ -257,7 +254,7 @@ class CalibrationInfo:
             Path to the hdf5 file
 
         """
-        import h5py  # noqa: import-outside-toplevel
+        import h5py  # : import-outside-toplevel
 
         with h5py.File(path, "w") as hdf:
             for k, v in self._to_list_dict().items():
@@ -282,12 +279,12 @@ class CalibrationInfo:
             The exact child class is determined by the `cal_type` key in the json string.
 
         """
-        import h5py  # noqa: import-outside-toplevel
+        import h5py
 
         with h5py.File(path, "r") as hdf:
             format_version = hdf.get("_format_version")
             if format_version:
-                format_version = format_version.asstr()[()]  # type: ignore
+                format_version = format_version.asstr()[()]
             check_cal_format_version(format_version, cls.CAL_FORMAT_VERSION)
             subcls = cls.find_subclass_from_cal_type(hdf["cal_type"][()].decode("utf-8"))
             data = {}

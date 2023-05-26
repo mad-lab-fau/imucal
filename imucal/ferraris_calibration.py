@@ -1,10 +1,9 @@
 """Calculate a Ferraris calibration from sensor data."""
-from typing import Optional, TypeVar, Type, NamedTuple, Iterable, Tuple
+from typing import ClassVar, Iterable, NamedTuple, Optional, Tuple, Type, TypeVar
 
 import numpy as np
 import pandas as pd
 from numpy.linalg import inv
-from typing_extensions import ClassVar
 
 from imucal.calibration_info import CalibrationInfo
 from imucal.ferraris_calibration_info import FerrarisCalibrationInfo, TurntableCalibrationInfo
@@ -237,12 +236,12 @@ class FerrarisCalibration:
         # Eq. 23
         k_a_sq = 1 / (4 * self.grav**2) * np.diag(U_a_d @ U_a_d.T)
         K_a = np.diag(np.sqrt(k_a_sq))  # noqa: invalid_name
-        cal_mat.K_a = K_a  # noqa: invalid_name
+        cal_mat.K_a = K_a  # : invalid_name
 
         # Calculate Rotation matrix
         # Eq. 22
         R_a = inv(K_a) @ U_a_d / (2 * self.grav)  # noqa: invalid_name
-        cal_mat.R_a = R_a  # noqa: invalid_name
+        cal_mat.R_a = R_a  # : invalid_name
 
         ###############################################################################################################
         # Calculate Gyroscope Matrix
@@ -287,7 +286,7 @@ class FerrarisCalibration:
 
         # Eq. 9
         K_ga = (U_g_p - U_g_a) / (2 * self.grav)  # noqa: invalid_name
-        cal_mat.K_ga = K_ga  # noqa: invalid_name
+        cal_mat.K_ga = K_ga  # : invalid_name
 
         # Gyroscope Scaling and Rotation
 
@@ -313,10 +312,10 @@ class FerrarisCalibration:
         # Eq. 12
         k_g_sq = np.diag(multiplied @ multiplied.T)
         K_g = np.diag(np.sqrt(k_g_sq))  # noqa: invalid_name
-        cal_mat.K_g = K_g  # noqa: invalid_name
+        cal_mat.K_g = K_g  # : invalid_name
 
         R_g = inv(K_g) @ multiplied  # noqa: invalid_name
-        cal_mat.R_g = R_g  # noqa: invalid_name
+        cal_mat.R_g = R_g  # : invalid_name
 
         return cal_mat
 
@@ -396,8 +395,8 @@ def ferraris_regions_from_df(
     """
     acc_df = df[list(acc_cols)]
     gyro_df = df[list(gyr_cols)]
-    acc_dict = acc_df.groupby(level=0).apply(lambda x: x.values).to_dict()
-    gyro_dict = gyro_df.groupby(level=0).apply(lambda x: x.values).to_dict()
+    acc_dict = acc_df.groupby(level=0).apply(lambda x: x.to_numpy()).to_dict()
+    gyro_dict = gyro_df.groupby(level=0).apply(lambda x: x.to_numpy()).to_dict()
     acc_dict = {"acc_" + k: v for k, v in acc_dict.items()}
     gyro_dict = {"gyr_" + k: v for k, v in gyro_dict.items()}
 
@@ -526,7 +525,7 @@ def _find_ferraris_regions_interactive(acc: np.ndarray, gyro: np.ndarray, title:
         Optional title for the Calibration GUI
 
     """
-    from imucal.calibration_gui import CalibrationGui  # noqa: import-outside-toplevel
+    from imucal.calibration_gui import CalibrationGui  # : import-outside-toplevel
 
     plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS, title=title)
 

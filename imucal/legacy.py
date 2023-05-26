@@ -3,7 +3,7 @@
 import json
 import warnings
 from pathlib import Path
-from typing import Union, Type
+from typing import Type, Union
 
 from packaging.version import Version
 
@@ -15,7 +15,7 @@ def load_v1_json_files(
     base_class: Type[CalibrationInfo] = CalibrationInfo,
 ):
     """Load a exported json file that was created using imucal <= 2.0."""
-    with open(path, encoding="utf8") as f:
+    with Path(path).open(encoding="utf8") as f:
         json_str = f.read()
     return load_v1_json(json_str, base_class=base_class)
 
@@ -32,7 +32,8 @@ def load_v1_json(
         "Double check the resulting calibration info object and adapt the parameters manually. "
         "\n"
         "If you made any changes, make sure to save the modified calibration and load it with the normal "
-        "loading function in the future."
+        "loading function in the future.",
+        stacklevel=2,
     )
     json_dict = json.loads(json_str)
 

@@ -9,9 +9,9 @@ from example_data import EXAMPLE_PATH
 from imucal import FerrarisCalibrationInfo
 from imucal.ferraris_calibration import (
     FerrarisCalibration,
+    FerrarisSignalRegions,
     TurntableCalibration,
     ferraris_regions_from_df,
-    FerrarisSignalRegions,
 )
 
 
@@ -38,7 +38,7 @@ def test_example_calibration(example_calibration_data):
 
 @pytest.fixture()
 def default_expected():
-    expected = dict()
+    expected = {}
     expected["K_a"] = np.identity(3)
     expected["R_a"] = np.identity(3)
     expected["b_a"] = np.zeros(3)
@@ -52,7 +52,7 @@ def default_expected():
 
 @pytest.fixture()
 def default_data():
-    data = dict()
+    data = {}
 
     data["acc_x_p"] = np.repeat(np.array([[9.81, 0, 0]]), 100, axis=0)
     data["acc_x_a"] = -data["acc_x_p"]
@@ -193,6 +193,6 @@ def test_turntable_calibration(default_data, default_expected):
     for para in keys:
         assert_array_almost_equal(getattr(cal_mat, para), default_expected[para], err_msg=para)
 
-    assert_array_almost_equal(getattr(cal_mat, "K_g"), default_expected["K_g"] / 2, err_msg="K_g")
+    assert_array_almost_equal(cal_mat.K_g, default_expected["K_g"] / 2, err_msg="K_g")
 
     assert cal.expected_angle == -720

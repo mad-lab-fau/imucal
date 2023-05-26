@@ -3,14 +3,13 @@ import datetime
 import re
 import warnings
 from pathlib import Path
-from typing import Optional, List, Callable, TypeVar, Union, Type
+from typing import Callable, List, Literal, Optional, Type, TypeVar, Union
 
 import numpy as np
-from typing_extensions import Literal
 
 from imucal import CalibrationInfo
 
-path_t = TypeVar("path_t", str, Path)  # noqa: invalid-name
+path_t = TypeVar("path_t", str, Path)  # : invalid-name
 
 
 class CalibrationWarning(Warning):
@@ -119,7 +118,7 @@ def find_calibration_info_for_sensor(
 
     r = sensor_id.lower() + r"_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}"
 
-    matches = [f for f in getattr(Path(folder), method)("{}_*.json".format(sensor_id)) if re.fullmatch(r, f.stem)]
+    matches = [f for f in getattr(Path(folder), method)(f"{sensor_id}_*.json") if re.fullmatch(r, f.stem)]
 
     final_matches = []
     for m in matches:
@@ -130,7 +129,7 @@ def find_calibration_info_for_sensor(
             final_matches.append(m)
 
     if not final_matches and ignore_file_not_found is not True:
-        raise ValueError("No Calibration for the sensor_type with the id {} could be found".format(sensor_id))
+        raise ValueError(f"No Calibration for the sensor_type with the id {sensor_id} could be found")
     return final_matches
 
 
@@ -142,7 +141,7 @@ def find_closest_calibration_info_to_date(
     filter_cal_type: Optional[str] = None,
     custom_validator: Optional[Callable[[CalibrationInfo], bool]] = None,
     before_after: Optional[str] = None,
-    warn_thres: datetime.timedelta = datetime.timedelta(days=30),  # noqa E252
+    warn_thres: datetime.timedelta = datetime.timedelta(days=30),  # E252
     ignore_file_not_found: Optional[bool] = False,
 ) -> Optional[Path]:
     """Find the calibration file for a sensor_type, that is closes to a given date.
@@ -205,7 +204,7 @@ def find_closest_calibration_info_to_date(
     if not potential_list:
         if ignore_file_not_found is True:
             return None
-        raise ValueError("No Calibration for the sensor with the id {} could be found".format(sensor_id))
+        raise ValueError(f"No Calibration for the sensor with the id {sensor_id} could be found")
 
     dates = [datetime.datetime.strptime("_".join(d.stem.split("_")[1:]), "%Y-%m-%d_%H-%M") for d in potential_list]
 
@@ -221,9 +220,7 @@ def find_closest_calibration_info_to_date(
         diffs[diffs > 0] = np.nan
 
     if np.all(diffs) == np.nan:
-        raise ValueError(
-            "No calibrations between {} and {} were found for sensor {}.".format(before_after, cal_time, sensor_id)
-        )
+        raise ValueError(f"No calibrations between {before_after} and {cal_time} were found for sensor {sensor_id}.")
 
     min_dist = float(np.nanmin(np.abs(diffs)))
     if warn_thres < datetime.timedelta(seconds=min_dist):
@@ -233,6 +230,7 @@ def find_closest_calibration_info_to_date(
                 sensor_id, warn_thres, cal_time, datetime.timedelta(seconds=min_dist)
             ),
             CalibrationWarning,
+            stacklevel=2,
         )
 
     return potential_list[int(np.nanargmin(np.abs(diffs)))]
@@ -279,6 +277,6 @@ def load_calibration_info(
                 "The loader format could not be determined from the file suffix. Please specify `format` explicitly."
             )
     if file_type not in format_options:
-        raise ValueError("`format` must be one of {}".format(list(format_options.keys())))
+        raise ValueError(f"`format` must be one of {list(format_options.keys())}")
 
     return getattr(base_class, format_options[file_type])(path)

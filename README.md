@@ -130,18 +130,32 @@ Therefore, you need to first install Poetry locally on you machine.
 
 Then you can run the following command to install a local development version of this library in a dedicated venv.
 
-```
-poetry install -E calplot -E h5py
+```bash
+git clone https://github.com/mad-lab-fau/imucal
+cd imucal
+poetry install --all-extras
 ```
 
-To run tests/the linter/... we use [doit](https://pydoit.org/tasks.html).
+To run tests/the linter/... we use [poethepoet](https://github.com/nat-n/poethepoet).
 You can see all available commands by running:
 
 ```
-poetry run doit list
+poetry run poe list
 ```
 
-and execute any command by running
+This should show you all configured commands:
+
+```
+CONFIGURED TASKS
+  format         
+  lint           Lint all files with ruff.
+  ci_check       Check all potential format and linting issues.
+  test           Run Pytest with coverage.
+  docs           Build the html docs using Sphinx.
+  bump_version  
+```
+
+You execute any command by running
 
 ```
 poetry run doit <command-name>
@@ -150,8 +164,6 @@ poetry run doit <command-name>
 ### Updating dependencies
 
 If you update or add dependencies using (`poetry add` or `poetry update`) you will see that the `pyproject.toml` and the `poetry.lock` files are both updated.
-This might take a while (>10 min) depending on the dependency you updated.
-Unfortunately, we can not do anything about that at the moment.
 Make sure you commit the changes to **both** files.
 Otherwise, wrong versions of dependencies will be used in the CI and by other developers.
 

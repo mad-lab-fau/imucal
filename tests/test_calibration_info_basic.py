@@ -12,14 +12,14 @@ def test_equal(sample_cal):
 
 
 def test_equal_wrong_type(sample_cal):
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         assert sample_cal == 3
 
 
 def test_equal_data(sample_cal, sample_cal_dict):
     not_equal = sample_cal_dict
     not_equal["K_a"] = not_equal["K_a"] - 1
-    assert not (sample_cal == sample_cal.__class__(**not_equal))
+    assert sample_cal != sample_cal.__class__(**not_equal)
 
 
 def test_json_roundtrip(sample_cal):
@@ -45,13 +45,13 @@ def test_hdf5_file_roundtrip(sample_cal):
 @pytest.mark.parametrize("is_none", ("some_value", None))
 def test_error_on_wrong_calibration(unit, is_none, dummy_cal, dummy_data):
     # Test without error first:
-    setattr(dummy_cal, "from_{}_unit".format(unit), is_none)
+    setattr(dummy_cal, f"from_{unit}_unit", is_none)
     units = {"acc_unit": dummy_cal.from_acc_unit, "gyr_unit": dummy_cal.from_gyr_unit}
-    units["{}_unit".format(unit)] = is_none
+    units[f"{unit}_unit"] = is_none
     dummy_cal.calibrate(*dummy_data, **units)
 
     # Now with error
-    units["{}_unit".format(unit)] = "wrong_value"
+    units[f"{unit}_unit"] = "wrong_value"
     with pytest.raises(ValueError) as e:
         dummy_cal.calibrate(*dummy_data, **units)
 

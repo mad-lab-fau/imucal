@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from imucal import FerrarisCalibrationInfo
-from imucal.legacy import load_v1_json_files, load_v1_json
+from imucal.legacy import load_v1_json, load_v1_json_files
 from imucal.management import load_calibration_info
 
 

@@ -6,11 +6,11 @@ import pytest
 
 from imucal import FerrarisCalibrationInfo, TurntableCalibrationInfo
 from imucal.management import (
-    save_calibration_info,
+    CalibrationWarning,
     find_calibration_info_for_sensor,
     find_closest_calibration_info_to_date,
     load_calibration_info,
-    CalibrationWarning,
+    save_calibration_info,
 )
 from tests.conftest import CustomFerraris
 
@@ -60,7 +60,7 @@ class TestSaveCalibration:
             save_calibration_info(sample_cal, sensor_id, datetime.datetime(2000, 10, 3, 13, 22), self.temp_folder)
 
     @pytest.mark.parametrize(
-        "str_in, folder_path",
+        ("str_in", "folder_path"),
         (
             ("simple", ("simple",)),
             ("{sensor_id}/{cal_info.from_gyr_unit}_custom", ("test", "custom_from_gyr_unit_custom")),
@@ -101,7 +101,7 @@ class TestFindCalibration:
         cals = find_calibration_info_for_sensor("test1", sample_cal_folder)
 
         assert len(cals) == 10
-        assert all(["test1" in str(x) for x in cals])
+        assert all("test1" in str(x) for x in cals)
 
     def test_find_calibration_non_existent(self, sample_cal_folder):
         with pytest.raises(ValueError):
@@ -118,7 +118,7 @@ class TestFindCalibration:
         cals = find_calibration_info_for_sensor("test1", sample_cal_folder_recursive, recursive=True)
 
         assert len(cals) == 30
-        assert all(["test1" in str(x) for x in cals])
+        assert all("test1" in str(x) for x in cals)
 
     def test_find_calibration_type_filter(self, sample_cal_folder_recursive):
         cals = find_calibration_info_for_sensor(
@@ -126,8 +126,8 @@ class TestFindCalibration:
         )
 
         assert len(cals) == 10
-        assert all(["test1" in str(x) for x in cals])
-        assert all([load_calibration_info(c).CAL_TYPE.lower() == "ferraris" for c in cals])
+        assert all("test1" in str(x) for x in cals)
+        assert all(load_calibration_info(c).CAL_TYPE.lower() == "ferraris" for c in cals)
 
     @pytest.mark.parametrize("string", ("Ferraris", "ferraris", "FERRARIS"))
     def test_find_calibration_type_filter_case_sensitive(self, sample_cal_folder_recursive, string):
@@ -136,20 +136,21 @@ class TestFindCalibration:
         )
 
         assert len(cals) == 10
-        assert all(["test1" in str(x) for x in cals])
-        assert all([load_calibration_info(c).CAL_TYPE.lower() == "ferraris" for c in cals])
+        assert all("test1" in str(x) for x in cals)
+        assert all(load_calibration_info(c).CAL_TYPE.lower() == "ferraris" for c in cals)
 
     def test_custom_validator(self, sample_cal_folder_recursive):
         # We simulate the caltype filter with a custom validator
-        validator = lambda x: x.CAL_TYPE.lower() == "ferraris"
+        def validator(x):
+            return x.CAL_TYPE.lower() == "ferraris"
 
         cals = find_calibration_info_for_sensor(
             "test1", sample_cal_folder_recursive, recursive=True, filter_cal_type=None, custom_validator=validator
         )
 
         assert len(cals) == 10
-        assert all(["test1" in str(x) for x in cals])
-        assert all([load_calibration_info(c).CAL_TYPE.lower() == "ferraris" for c in cals])
+        assert all("test1" in str(x) for x in cals)
+        assert all(load_calibration_info(c).CAL_TYPE.lower() == "ferraris" for c in cals)
 
 
 class TestFindClosestCalibration:
@@ -176,7 +177,7 @@ class TestFindClosestCalibration:
         assert cal is None
 
     @pytest.mark.parametrize(
-        "relative, expected",
+        ("relative", "expected"),
         (
             ("before", "test1_2000-10-03_13-14.json"),
             ("after", "test1_2000-10-03_13-16.json"),
@@ -191,7 +192,7 @@ class TestFindClosestCalibration:
 
         assert cal.name == expected
 
-    @pytest.mark.parametrize("warn_type, day", ((CalibrationWarning, 15), (None, 14)))
+    @pytest.mark.parametrize(("warn_type", "day"), ((CalibrationWarning, 15), (None, 14)))
     def test_find_closest_warning(self, sample_cal_folder, warn_type, day):
         with pytest.warns(warn_type) as rec:
             find_closest_calibration_info_to_date(
@@ -226,7 +227,7 @@ class TestLoadCalFiles:
 
     @pytest.mark.parametrize("file_type", ("json", "hdf"))
     def test_fixed_loader(self, file_type, sample_cal):
-        method = dict(json="to_json_file", hdf="to_hdf5")
+        method = {"json": "to_json_file", "hdf": "to_hdf5"}
         with tempfile.NamedTemporaryFile(mode="w+") as f:
             getattr(sample_cal, method[file_type])(f.name)
             out = load_calibration_info(f.name, file_type=file_type)
@@ -234,7 +235,7 @@ class TestLoadCalFiles:
 
     @pytest.mark.parametrize("file_type", ("json", "hdf"))
     def test_auto_loader(self, file_type, sample_cal):
-        method = dict(json="to_json_file", hdf="to_hdf5")
+        method = {"json": "to_json_file", "hdf": "to_hdf5"}
         with tempfile.NamedTemporaryFile(mode="w+", suffix="." + file_type) as f:
             getattr(sample_cal, method[file_type])(f.name)
             out = load_calibration_info(f.name)
