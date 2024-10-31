@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "imucal"
-version = "2.6.0"
+version = "2.5.0"
 description = "A Python library to calibrate 6 DOF IMUs"
 authors = [
     "Arne Küderle <arne.kuederle@fau.de>",
