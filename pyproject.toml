@@ -20,12 +20,11 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
-pandas = ">=1.1.3"
-numpy = ">=1.19.2"
-typing-extensions = ">=3.7.4"
+python = ">=3.9,<3.14"
+pandas = ">=2.0.0"
+numpy = ">=1.25.2"
 packaging = ">=21.3"
-matplotlib = {version = ">=3.3.2", optional = true}
+matplotlib = {version=">=3.9.2", optional=true}
 h5py = {version = ">=3", optional = true}
 
 [tool.poetry.extras]
@@ -33,53 +32,33 @@ calplot = ["matplotlib"]
 h5py = ["h5py"]
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^6.1.1"
-pytest-cov = "^2.10.1"
-coverage = "^5.3"
-prospector = "^1.10.2"
-sphinx-gallery = "^0.13.0"
-Sphinx = "^7.0.1"
-numpydoc = "^1.2.0"
-recommonmark = "^0.7.1"
-memory-profiler = "^0.58.0"
-Pillow = "^8.0.1"
+poethepoet = "^0.22.0"
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+ruff = "^0.5.0"
+sphinx = "^7.2.6"
+sphinx-gallery = "^0.14.0"
+memory-profiler = "^0.61.0"
+matplotlib = "^3.7.2"
 toml = "^0.10.2"
-pydata-sphinx-theme = "^0.13.3"
-black = "^23.3.0"
-poethepoet = "^0.20.0"
-ruff = "^0.0.270"
-
-[tool.black]
-line-length = 120
-target-version = ['py37']
-exclude = '''
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | docs
-    | build
-    | dist
-    | \.virtual_documents
-  )/
-)
-'''
+myst-parser = "^2.0.0"
+numpydoc = "^1.6.0"
+recommonmark = "^0.7.1"
+pydata-sphinx-theme = "^0.16.0"
 
 [tool.poe.tasks]
-_format_black = "black ."
-_format_ruff = "ruff . --fix-only --exit-zero"
-format = ["_format_black", "_format_ruff", "_format_black"]
-lint = { cmd = "ruff imucal --fix", help = "Lint all files with ruff." }
-_lint_ci = "ruff imucal --format=github"
-_check_black = "black . --check"
-ci_check = { sequence = ["_check_black", "_lint_ci"], help = "Check all potential format and linting issues." }
-test = { cmd = "pytest --cov imucal --cov-report=term-missing --cov-report=xml", help = "Run Pytest with coverage." }
+_format = "ruff format ."
+_auto_fix = "ruff check . --fix-only --show-fixes --exit-zero"
+_auto_fix_unsafe = "ruff check . --fix-only --show-fixes --exit-zero --unsafe-fixes"
+format = ["_auto_fix", "_format"]
+format_unsafe = ["_auto_fix_unsafe", "_format"]
+lint = { cmd = "ruff check imucal --fix", help = "Lint all files with ruff." }
+_lint_ci = "ruff check imucal --output-format=github"
+_check_format = "ruff format . --check"
+ci_check = { sequence = ["_check_format", "_lint_ci"], help = "Check all potential format and linting issues." }
+test = { cmd = "pytest tests --cov=imucal --cov-report=term-missing --cov-report=xml", help = "Run Pytest with coverage." }
 docs = { "script" = "_tasks:task_docs()",  help = "Build the html docs using Sphinx." }
+docs_preview = { cmd = "python -m http.server --directory docs/_build/html", help = "Preview the built html docs." }
 bump_version = { "script" = "_tasks:task_update_version()" }
 
 [build-system]

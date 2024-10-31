@@ -122,8 +122,9 @@ cal_info.to_json_file(Path(d.name) / "my_sensor_cal.json")
 # %%
 # ... or use the provided management tools to save the file in a predefined folder structure.
 # Read more about this in the our :ref:`guide on that topic <cal_store_guide>`.
-from imucal.management import save_calibration_info
 from datetime import datetime
+
+from imucal.management import save_calibration_info
 
 file_path = save_calibration_info(
     cal_info, sensor_id="imu1", cal_time=datetime(2020, 8, 12, 13, 21), folder=Path(d.name)

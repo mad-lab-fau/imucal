@@ -1,15 +1,16 @@
 """A set of highly opinionated helper functions to store and load calibration files for a medium number of sensors."""
+
 import datetime
 import re
 import warnings
 from pathlib import Path
-from typing import Callable, List, Literal, Optional, Type, TypeVar, Union
+from typing import Callable, Literal, Optional, TypeVar, Union
 
 import numpy as np
 
 from imucal import CalibrationInfo
 
-path_t = TypeVar("path_t", str, Path)  # : invalid-name
+path_t = TypeVar("path_t", str, Path)
 
 
 class CalibrationWarning(Warning):
@@ -82,7 +83,7 @@ def find_calibration_info_for_sensor(
     filter_cal_type: Optional[str] = None,
     custom_validator: Optional[Callable[[CalibrationInfo], bool]] = None,
     ignore_file_not_found: Optional[bool] = False,
-) -> List[Path]:
+) -> list[Path]:
     """Find possible calibration files based on the filename.
 
     As this only checks the filenames, this might return false positives depending on your folder structure and naming.
@@ -225,10 +226,8 @@ def find_closest_calibration_info_to_date(
     min_dist = float(np.nanmin(np.abs(diffs)))
     if warn_thres < datetime.timedelta(seconds=min_dist):
         warnings.warn(
-            "For the sensor {} no calibration could be located that was in {} of the {}."
-            "The closest calibration is {} away.".format(
-                sensor_id, warn_thres, cal_time, datetime.timedelta(seconds=min_dist)
-            ),
+            f"For the sensor {sensor_id} no calibration could be located that was in {warn_thres} of the {cal_time}."
+            f"The closest calibration is {datetime.timedelta(seconds=min_dist)} away.",
             CalibrationWarning,
             stacklevel=2,
         )
@@ -239,7 +238,7 @@ def find_closest_calibration_info_to_date(
 def load_calibration_info(
     path: Union[Path, str],
     file_type: Optional[Literal["hdf", "json"]] = None,
-    base_class: Type[CalibrationInfo] = CalibrationInfo,
+    base_class: type[CalibrationInfo] = CalibrationInfo,
 ) -> CalibrationInfo:
     """Load any calibration info object from file.
 

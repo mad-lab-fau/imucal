@@ -24,6 +24,7 @@ import toml
 sys.path.insert(0, os.path.abspath(".."))
 
 import contextlib
+from typing import Optional
 
 import imucal
 
@@ -150,7 +151,7 @@ def get_nested_attr(obj, attr):
         return get_nested_attr(new_obj, attrs[1])
 
 
-def linkcode_resolve(domain, info):
+def linkcode_resolve(domain, info) -> Optional[str]:
     if domain != "py":
         return None
     if not info["module"]:
@@ -172,12 +173,12 @@ def linkcode_resolve(domain, info):
     return None
 
 
-def skip_properties(app, what, name, obj, skip, options):
+def skip_properties(app, what, name, obj, skip, options) -> Optional[bool]:
     """This removes all properties from the documentation as they are expected to be documented in the docstring."""
     if isinstance(obj, property):
         return True
     return None
 
 
-def setup(app):
+def setup(app) -> None:
     app.connect("autodoc-skip-member", skip_properties)

@@ -1,11 +1,12 @@
 """Helper providing a small GUI to label timeseries data."""
-import tkinter as tk  # noqa: import-error
-from collections import OrderedDict
-from itertools import chain
-from tkinter.messagebox import showinfo  # : import-error
-from typing import Sequence, Optional
 
-from matplotlib.backend_bases import MouseButton
+import tkinter as tk
+from collections import OrderedDict
+from collections.abc import Sequence
+from itertools import chain
+from tkinter.messagebox import showinfo
+from typing import Optional
+
 import numpy as np
 
 
@@ -17,12 +18,12 @@ class CalibrationGui:
     Examples
     --------
     >>> # This will launch the GUI and block execution until closed
-    >>> gui = CalibrationGui(acc, gyro, ['label1', 'label2'])
+    >>> gui = CalibrationGui(acc, gyro, ["label1", "label2"])
     >>> # While the GUI is open the sections are labeled. Once closed the next line is executed
     >>> labels = gui.section_list
-    >>> labels['label1']  # First value is start, second value is end of region
+    >>> labels["label1"]  # First value is start, second value is end of region
     (12, 355)
-    >>> labels['label2']  # First value is start, second value is end of region
+    >>> labels["label2"]  # First value is start, second value is end of region
     (500, 758)
 
     """
@@ -64,7 +65,7 @@ class CalibrationGui:
         expected_labels: Sequence[str],
         title: Optional[str] = None,
         master: Optional[tk.Frame] = None,
-    ):
+    ) -> None:
         """Launch new GUI instance.
 
         Parameters
@@ -81,21 +82,19 @@ class CalibrationGui:
             Parent window if GUI should be embedded in larger application
 
         """
-        import matplotlib  # : import-outside-toplevel
-        from matplotlib.backends.backend_tkagg import (  # : import-outside-toplevel
+        import matplotlib
+        from matplotlib.backends.backend_tkagg import (
             FigureCanvasTkAgg,
             NavigationToolbar2Tk,
         )
 
-
         class CustomToolbar(NavigationToolbar2Tk):
-            def __init__(self, canvas, window):
+            def __init__(self, canvas, window) -> None:
                 # List of buttons to remove
-                buttons_to_remove = ['Subplots', 'Save']
+                buttons_to_remove = ["Subplots", "Save"]
                 print(self.toolitems)
                 self.toolitems = [item for item in self.toolitems if item[0] not in buttons_to_remove]
                 super().__init__(canvas, window)
-
 
         self.expected_labels = expected_labels
         cmap = matplotlib.cm.get_cmap("Set3")
@@ -135,11 +134,11 @@ class CalibrationGui:
 
         # To make the shortcut works, we need to manually forward the key event to the toolbar
         # Bind keypress events to the canvas widget
-        self.canvas.get_tk_widget().bind("<p>", lambda event: toolbar.pan())
-        self.canvas.get_tk_widget().bind("<o>", lambda event: toolbar.zoom())
-        self.canvas.get_tk_widget().bind("<h>", lambda event: toolbar.home())
-        self.canvas.get_tk_widget().bind("<b>", lambda event: toolbar.back())
-        self.canvas.get_tk_widget().bind("<f>", lambda event: toolbar.forward())
+        self.canvas.get_tk_widget().bind("<p>", lambda _: toolbar.pan())
+        self.canvas.get_tk_widget().bind("<o>", lambda _: toolbar.zoom())
+        self.canvas.get_tk_widget().bind("<h>", lambda _: toolbar.home())
+        self.canvas.get_tk_widget().bind("<b>", lambda _: toolbar.back())
+        self.canvas.get_tk_widget().bind("<f>", lambda _: toolbar.forward())
 
         # Bind mouse wheel event to scroll along the x-axis
         self.canvas.get_tk_widget().bind("<MouseWheel>", self._scroll_x)
@@ -155,18 +154,17 @@ class CalibrationGui:
 
         toolbar.pack(side=tk.TOP, fill=tk.X, expand=0)
 
-
         # This way, we can start labeling right away
         self.labels.selection_set(0)
 
         master.mainloop()
 
-    def _scroll_x(self, event):
+    def _scroll_x(self, event) -> None:
         ax = self.canvas.figure.gca()
         x_min, x_max = ax.get_xlim()
         data_min, data_max = ax.dataLim.intervalx
-        delta = (x_max - x_min)
-        scroll_in_units =  delta * 0.1  # Adjust the scroll speed as needed
+        delta = x_max - x_min
+        scroll_in_units = delta * 0.1  # Adjust the scroll speed as needed
 
         if data_min >= x_min and data_max <= x_max:
             # No scrolling, when we see all the data
@@ -186,7 +184,7 @@ class CalibrationGui:
         ax.set_xlim(new_x_min, new_x_max)
         self.canvas.draw_idle()
 
-    def _create_sidebar(self):
+    def _create_sidebar(self) -> None:
         self.labels = tk.Listbox(master=self.side_bar, width=30)
         self.labels.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         help_button = tk.Button(master=self.side_bar, height=2, text="Help", command=self._show_help)
@@ -197,10 +195,10 @@ class CalibrationGui:
 
         self._update_list_box()
 
-    def _show_help(self):
+    def _show_help(self) -> None:
         showinfo("Window", self.manual)
 
-    def _select_next(self, current):
+    def _select_next(self, current) -> None:
         next_val = (current + 1) % self.labels.size()
 
         if all(list(self.section_list.values())[next_val]):
@@ -213,21 +211,19 @@ class CalibrationGui:
         self.labels.selection_anchor(next_val)
         self.labels.selection_set(next_val)
 
-    def _update_list_box(self):
+    def _update_list_box(self) -> None:
         for i, (key, val) in enumerate(self.section_list.items()):
             self.labels.itemconfig(i, {"bg": self.colors[key]})
             if all(val):
                 self.labels.itemconfig(i, {"fg": "#a5a9af"})
 
-
-    def _update_text_label(self, new_text):
+    def _update_text_label(self, new_text) -> None:
         self.label_text.config(state=tk.NORMAL)
         self.label_text.delete("1.0", tk.END)
         self.label_text.insert(tk.END, new_text)
         self.label_text.config(state=tk.DISABLED)
 
-
-    def _onclick(self, event):
+    def _onclick(self, event) -> None:
         # Only listen to left and right mouse clicks and only if we are not in zoom or drag mode.
         if event.button not in [1, 3] or str(self.canvas.toolbar.mode):
             return
@@ -255,7 +251,7 @@ class CalibrationGui:
 
         self._update_list_box()
 
-    def _update_marker(self, key):
+    def _update_marker(self, key) -> None:
         for line in chain(self.acc_list_markers[key], self.gyro_list_markers[key]):
             line.remove()
             self.acc_list_markers[key] = []
@@ -286,7 +282,7 @@ class CalibrationGui:
 
 
 def _create_figure(acc, gyro):
-    from matplotlib.figure import Figure  # : import-outside-toplevel
+    from matplotlib.figure import Figure
 
     fig = Figure(figsize=(20, 10))
     ax1 = fig.add_subplot(211)

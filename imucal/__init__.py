@@ -1,4 +1,5 @@
 """A library to calibrate 6 DOF IMUs."""
+
 from imucal.calibration_info import CalibrationInfo
 from imucal.ferraris_calibration import (
     FerrarisCalibration,

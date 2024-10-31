@@ -23,7 +23,7 @@ def example_calibration_data():
     return data, sampling_rate, calib
 
 
-def test_example_calibration(example_calibration_data):
+def test_example_calibration(example_calibration_data) -> None:
     data, sampling_rate, calib = example_calibration_data
 
     cal = FerrarisCalibration()
@@ -176,7 +176,7 @@ def scaling_data(default_data, default_expected):
 
 
 @pytest.mark.parametrize("test_data", ["k_ga_data", "bias_data", "scaling_data"])
-def test_simulations(test_data, request):
+def test_simulations(test_data, request) -> None:
     test_data = request.getfixturevalue(test_data)
     cal = FerrarisCalibration()
     cal_mat = cal.compute(**test_data[0])
@@ -185,7 +185,7 @@ def test_simulations(test_data, request):
         assert_array_almost_equal(getattr(cal_mat, para), val, err_msg=para)
 
 
-def test_turntable_calibration(default_data, default_expected):
+def test_turntable_calibration(default_data, default_expected) -> None:
     cal = TurntableCalibration()
     cal_mat = cal.compute(**default_data)
 

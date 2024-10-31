@@ -1,6 +1,7 @@
 line-length = 120
-target-version = "py38"
+target-version = "py39"
 
+[lint]
 select = [
     # pyflakes
     "F",
@@ -57,7 +58,15 @@ select = [
     "TRY",
     # flake8-use-pathlib
     "PTH",
-    "RUF"
+    "RUF",
+    # Numpy rules
+    "NPY",
+    # Implicit namespace packages
+    "INP",
+    # No relative imports
+    "TID252",
+    # f-strings over string concatenation
+    "FLY",
 ]
 
 ignore = [
@@ -72,24 +81,28 @@ ignore = [
     "EM101",
     "EM102",
     "EM103",
-    # Multiline docstring summary
-    "D213",
+    # Exception strings
+    "TRY003",
     # Varaibles before return
     "RET504",
     # Abstract raise into inner function
     "TRY301",
-    # Use type-checking block
-    "TCH001",
-    "TCH002",
-    "TCH003",
     # df as varaible name
     "PD901",
     # melt over stack
     "PD013",
-    # I like more arguments
+    # No Any annotations
+    "ANN401",
+    # Self annotation
+    "ANN101",
+    # To many arguments
     "PLR0913",
-    # I like long error messages
-    "TRY003"
+    # Class attribute shadows builtin
+    "A003",
+    # No typing for `cls`
+    "ANN102",
+    # Ignore because of formatting
+    "ISC001",
 ]
 
 
@@ -99,9 +112,11 @@ exclude = [
     "doc/temp/*.py",
     ".eggs/*.py",
     "example_data",
-    "examples"
 ]
 
-
-[pydocstyle]
+[lint.pydocstyle]
 convention = "numpy"
+
+[format]
+docstring-code-format = true
+docstring-code-line-length = 80

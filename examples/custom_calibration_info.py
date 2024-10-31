@@ -62,6 +62,7 @@ cal_info.new_meta_info
 # here to not clutter the example folder).
 import tempfile
 from pathlib import Path
+
 from imucal.management import load_calibration_info
 
 with tempfile.TemporaryDirectory() as d:
