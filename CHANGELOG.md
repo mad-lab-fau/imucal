@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) (+ the Migration Guide section), and 
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [2.6.0] - 31.10.2024
+
+- Added the option to control the initial figure size of the interactive plot. This should help resolve [#24](https://github.com/mad-lab-fau/imucal/issues/24)
+
 # [2.5.0] - 31.10.2024
 
 - Tooling overhaul to make the development process easier and fix doc building issues
