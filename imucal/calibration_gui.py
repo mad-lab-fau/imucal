@@ -5,6 +5,7 @@ from itertools import chain
 from tkinter.messagebox import showinfo  # : import-error
 from typing import Sequence, Optional
 
+from matplotlib.backend_bases import MouseButton
 import numpy as np
 
 
@@ -34,7 +35,7 @@ class CalibrationGui:
     manual = """
     Mark the start and end point of each section listed in the sidebar in the plots.
     The section that is currently labeled is marked in blue in the sidebar.
-    You can use either <return> (<Enter>) to advance to the next section, which has missing labels
+    You can use either <return> (<Enter>) or <space> to advance to the next section, which has missing labels
     or click a section label manual.
 
     To create a mark click either with the left or the right mouse button on the plot.
@@ -43,6 +44,17 @@ class CalibrationGui:
     If both labels are placed, the region in between them is colored.
     Now you can either press Enter (or click on any other label in the sidebar) to continue with labeling the next
     section or you can adjust the labels by repeated left and right clicks until you're satisfied.
+
+    Tip: You can use the matplotlib toolbar to zoom in and out or to pan the plots.
+    For faster operations, you can toggle the matplotlib tools using there respective shortcuts:
+
+    Zoom: 'o'
+    Pan: 'p'
+    Home: 'h'
+    Back: 'b'
+    Forward: 'f'
+
+    After zooming in, you can use the mouse wheel to scroll along the x-axis.
     """
 
     def __init__(
@@ -75,6 +87,16 @@ class CalibrationGui:
             NavigationToolbar2Tk,
         )
 
+
+        class CustomToolbar(NavigationToolbar2Tk):
+            def __init__(self, canvas, window):
+                # List of buttons to remove
+                buttons_to_remove = ['Subplots', 'Save']
+                print(self.toolitems)
+                self.toolitems = [item for item in self.toolitems if item[0] not in buttons_to_remove]
+                super().__init__(canvas, window)
+
+
         self.expected_labels = expected_labels
         cmap = matplotlib.cm.get_cmap("Set3")
         self.colors = {k: matplotlib.colors.to_hex(cmap(i / 12)) for i, k in enumerate(expected_labels)}
@@ -86,6 +108,7 @@ class CalibrationGui:
 
         master.title(title or "Calibration Gui")
         master.bind("<Return>", lambda _: self._select_next(self.labels.curselection()[0]))
+        master.bind("<space>", lambda _: self._select_next(self.labels.curselection()[0]))
 
         # reset variables
         self.section_list = OrderedDict((k, [None, None]) for k in expected_labels)
@@ -107,17 +130,61 @@ class CalibrationGui:
 
         self.canvas.mpl_connect("button_press_event", self._onclick)
 
-        self.label_text = tk.Text(self.main_area, height=1, width=80)
-        self.label_text.pack(side=tk.TOP, fill=tk.X, expand=0)
-        self.label_text.insert(tk.END, self.text_label.format(str(0)))
-        toolbar = NavigationToolbar2Tk(self.canvas, self.main_area)
+        toolbar = CustomToolbar(self.canvas, self.main_area)
         toolbar.update()
-        toolbar.pack(side=tk.TOP, fill=tk.X, expand=0)
+
+        # To make the shortcut works, we need to manually forward the key event to the toolbar
+        # Bind keypress events to the canvas widget
+        self.canvas.get_tk_widget().bind("<p>", lambda event: toolbar.pan())
+        self.canvas.get_tk_widget().bind("<o>", lambda event: toolbar.zoom())
+        self.canvas.get_tk_widget().bind("<h>", lambda event: toolbar.home())
+        self.canvas.get_tk_widget().bind("<b>", lambda event: toolbar.back())
+        self.canvas.get_tk_widget().bind("<f>", lambda event: toolbar.forward())
+
+        # Bind mouse wheel event to scroll along the x-axis
+        self.canvas.get_tk_widget().bind("<MouseWheel>", self._scroll_x)
+        self.canvas.get_tk_widget().bind("<Button-4>", self._scroll_x)  # For Linux
+        self.canvas.get_tk_widget().bind("<Button-5>", self._scroll_x)  # For Linux
+
+        self.label_text = tk.Text(self.main_area, height=1, width=80, state=tk.DISABLED)
+        self.label_text.pack(side=tk.TOP, fill=tk.X, expand=0)
+        self._update_text_label(self.text_label.format(str(0)))
 
         self.labels.selection_anchor(0)
         self.labels.selection_set(0)
 
+        toolbar.pack(side=tk.TOP, fill=tk.X, expand=0)
+
+
+        # This way, we can start labeling right away
+        self.labels.selection_set(0)
+
         master.mainloop()
+
+    def _scroll_x(self, event):
+        ax = self.canvas.figure.gca()
+        x_min, x_max = ax.get_xlim()
+        data_min, data_max = ax.dataLim.intervalx
+        delta = (x_max - x_min)
+        scroll_in_units =  delta * 0.1  # Adjust the scroll speed as needed
+
+        if data_min >= x_min and data_max <= x_max:
+            # No scrolling, when we see all the data
+            return
+
+        # But we allow scrolling past the ends a little
+        data_min -= delta * 0.1
+        data_max += delta * 0.1
+
+        if event.num == 5 or event.delta < 0:  # Scroll down -> right
+            new_x_max = min(x_max + scroll_in_units, data_max)
+            new_x_min = new_x_max - delta
+        elif event.num == 4 or event.delta > 0:  # Scroll up -> left
+            new_x_min = max(x_min - scroll_in_units, data_min)
+            new_x_max = new_x_min + delta
+
+        ax.set_xlim(new_x_min, new_x_max)
+        self.canvas.draw_idle()
 
     def _create_sidebar(self):
         self.labels = tk.Listbox(master=self.side_bar, width=30)
@@ -152,12 +219,25 @@ class CalibrationGui:
             if all(val):
                 self.labels.itemconfig(i, {"fg": "#a5a9af"})
 
+
+    def _update_text_label(self, new_text):
+        self.label_text.config(state=tk.NORMAL)
+        self.label_text.delete("1.0", tk.END)
+        self.label_text.insert(tk.END, new_text)
+        self.label_text.config(state=tk.DISABLED)
+
+
     def _onclick(self, event):
         # Only listen to left and right mouse clicks and only if we are not in zoom or drag mode.
         if event.button not in [1, 3] or str(self.canvas.toolbar.mode):
             return
 
-        selected_key = self.labels.get(self.labels.curselection())
+        selected_index = self.labels.curselection()
+
+        if not selected_index:
+            return
+
+        selected_key = self.labels.get(selected_index)
 
         if event.button == 1:
             x = int(event.xdata)
@@ -171,8 +251,7 @@ class CalibrationGui:
 
         self._update_marker(selected_key)
 
-        self.label_text.delete("1.0", tk.END)
-        self.label_text.insert(tk.END, self.text_label.format(str(self._n_labels())))
+        self._update_text_label(self.text_label.format(str(self._n_labels())))
 
         self._update_list_box()
 
