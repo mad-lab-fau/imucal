@@ -466,6 +466,7 @@ def ferraris_regions_from_interactive_plot(
     acc_cols: Iterable[str] = ("acc_x", "acc_y", "acc_z"),
     gyr_cols: Iterable[str] = ("gyr_x", "gyr_y", "gyr_z"),
     title: Optional[str] = None,
+    figsize=(20, 10),
 ) -> tuple[FerrarisSignalRegions, pd.DataFrame]:
     """Create a Calibration object by selecting the individual signal sections manually in an interactive GUI.
 
@@ -497,6 +498,9 @@ def ferraris_regions_from_interactive_plot(
         The name of the 3 acceleration columns in order x,y,z.
     title :
         Optional title of the plot window
+    figsize :
+        The initial size of the plot window.
+        If you can not see the toolbar at the bottom, it might help to reduce the figure size.
 
     Returns
     -------
@@ -515,14 +519,16 @@ def ferraris_regions_from_interactive_plot(
     acc = data[list(acc_cols)].to_numpy()
     gyr = data[list(gyr_cols)].to_numpy()
 
-    section_list = _find_ferraris_regions_interactive(acc, gyr, title=title)
+    section_list = _find_ferraris_regions_interactive(acc, gyr, title=title, figsize=figsize)
     return (
         ferraris_regions_from_section_list(data, section_list, gyr_cols=gyr_cols, acc_cols=acc_cols),
         section_list,
     )
 
 
-def _find_ferraris_regions_interactive(acc: np.ndarray, gyro: np.ndarray, title: Optional[str] = None):
+def _find_ferraris_regions_interactive(
+    acc: np.ndarray, gyro: np.ndarray, title: Optional[str] = None, figsize=(20, 10)
+):
     """Prepare the calibration data for the later calculation of calibration matrices.
 
     Parameters
@@ -534,10 +540,11 @@ def _find_ferraris_regions_interactive(acc: np.ndarray, gyro: np.ndarray, title:
     title :
         Optional title for the Calibration GUI
 
+
     """
     from imucal.calibration_gui import CalibrationGui
 
-    plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS, title=title)
+    plot = CalibrationGui(acc, gyro, FerrarisCalibration.FERRARIS_SECTIONS, title=title, initial_figsize=figsize)
 
     section_list = plot.section_list
 

@@ -26,6 +26,11 @@ class CalibrationGui:
     >>> labels["label2"]  # First value is start, second value is end of region
     (500, 758)
 
+    Notes
+    -----
+    If the toolbar is not visible at the bottom of the GUI, try reducing the `initial_figsize` parameter, when
+    creating the GUI.
+
     """
 
     section_list = None
@@ -65,6 +70,7 @@ class CalibrationGui:
         expected_labels: Sequence[str],
         title: Optional[str] = None,
         master: Optional[tk.Frame] = None,
+        initial_figsize=(20, 10),
     ) -> None:
         """Launch new GUI instance.
 
@@ -122,7 +128,7 @@ class CalibrationGui:
         self._create_sidebar()
 
         # Create a container
-        self.fig, self.axs = _create_figure(acc, gyro)
+        self.fig, self.axs = _create_figure(acc, gyro, figsize=initial_figsize)
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.main_area)
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
@@ -281,10 +287,10 @@ class CalibrationGui:
         return sum(all(v) for v in self.section_list.values())
 
 
-def _create_figure(acc, gyro):
+def _create_figure(acc, gyro, figsize=(20, 10)):
     from matplotlib.figure import Figure
 
-    fig = Figure(figsize=(20, 10))
+    fig = Figure(figsize=figsize)
     ax1 = fig.add_subplot(211)
     lines = ax1.plot(acc)
     ax1.grid(True)
