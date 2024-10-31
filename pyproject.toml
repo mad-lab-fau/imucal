@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "imucal"
-version = "2.4.0"
+version = "2.6.0"
 description = "A Python library to calibrate 6 DOF IMUs"
 authors = [
     "Arne Küderle <arne.kuederle@fau.de>",
@@ -59,7 +59,7 @@ ci_check = { sequence = ["_check_format", "_lint_ci"], help = "Check all potenti
 test = { cmd = "pytest tests --cov=imucal --cov-report=term-missing --cov-report=xml", help = "Run Pytest with coverage." }
 docs = { "script" = "_tasks:task_docs()",  help = "Build the html docs using Sphinx." }
 docs_preview = { cmd = "python -m http.server --directory docs/_build/html", help = "Preview the built html docs." }
-bump_version = { "script" = "_tasks:task_update_version()" }
+version = { script = "_tasks:task_update_version()", help="Bump the version number in all relevant files."}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

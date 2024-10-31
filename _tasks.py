@@ -19,7 +19,7 @@ def task_docs() -> None:
         subprocess.run(["make", "-C", HERE / "docs", "html"], shell=False, check=True)
 
 
-def update_version_strings(file_path, new_version) -> None:
+def update_version_strings(file_path, new_version):
     # taken from:
     # https://stackoverflow.com/questions/57108712/replace-updated-version-strings-in-files-via-python
     version_regex = re.compile(r"(^_*?version_*?\s*=\s*\")(\d+\.\d+\.\d+-?\S*)\"", re.M)
@@ -36,7 +36,7 @@ def update_version_strings(file_path, new_version) -> None:
         f.truncate()
 
 
-def update_version(version) -> None:
+def update_version(version):
     subprocess.run(["poetry", "version", version], shell=False, check=True)
     new_version = (
         subprocess.run(["poetry", "version"], shell=False, check=True, capture_output=True)
@@ -47,5 +47,5 @@ def update_version(version) -> None:
     update_version_strings(HERE.joinpath("imucal/__init__.py"), new_version)
 
 
-def task_update_version() -> None:
+def task_update_version():
     update_version(sys.argv[1])
