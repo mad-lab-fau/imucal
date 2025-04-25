@@ -97,7 +97,7 @@ from imucal import FerrarisCalibration
 
 cal = FerrarisCalibration()
 cal_info = cal.compute(
-    regions, sampling_rate_hz=204.8, from_acc_unit="m/s^2", from_gyr_unit="deg/s", comment="My comment"
+    regions, sampling_rate_hz=102.4, from_acc_unit="m/s^2", from_gyr_unit="deg/s", comment="My comment"
 )
 
 
